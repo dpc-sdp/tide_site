@@ -1,0 +1,29 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.taxonomy_term.field_site_homepage
+    - node.type.landing_page
+    - node.type.page
+    - taxonomy.vocabulary.sites
+id: taxonomy_term.sites.field_site_homepage
+field_name: field_site_homepage
+entity_type: taxonomy_term
+bundle: sites
+label: Homepage
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:node'
+  handler_settings:
+    target_bundles:
+      landing_page: landing_page
+      page: page
+    sort:
+      field: _none
+    auto_create: false
+    auto_create_bundle: landing_page
+field_type: entity_reference

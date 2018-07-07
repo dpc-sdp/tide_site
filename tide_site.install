@@ -1,0 +1,78 @@
+<?php
+
+/**
+ * @file
+ * Install file for tide_site.
+ */
+
+/**
+ * Implements hook_install().
+ */
+function tide_site_install() {
+  // Retroactively create fields on existing entities.
+  $info = \Drupal::service('entity_type.bundle.info')->getAllBundleInfo();
+  foreach ($info as $type => $bundles) {
+    foreach (array_keys($bundles) as $bundle) {
+      tide_site_entity_bundle_create($type, $bundle);
+    }
+  }
+}
+
+/**
+ * Implements hook_update_dependencies().
+ */
+function tide_site_update_dependencies() {
+  $dependencies['tide_site'][8002] = ['tide_core' => 8003];
+  return $dependencies;
+}
+
+/**
+ * Add existing content types to field_site_homepage.
+ */
+function tide_site_update_8001() {
+  /** @var \Drupal\tide_site\TideSiteFields $helper */
+  $helper = \Drupal::service('tide_site.fields');
+
+  $info = \Drupal::service('entity_type.bundle.info')->getAllBundleInfo();
+  foreach ($info as $type => $bundles) {
+    if ($type == 'node') {
+      $helper->addContentTypesToSiteHomepageField(array_keys($bundles));
+    }
+  }
+}
+
+/**
+ * Generate path alias for existing content.
+ */
+function tide_site_update_8002(&$sandbox) {
+  $nids = [];
+  $nodes = \Drupal::entityQuery('node')->execute();
+  foreach ($nodes as $nid) {
+    $nids[] = $nid;
+  }
+
+  // Use the sandbox to store the information needed to track progression.
+  if (!isset($sandbox['current'])) {
+    $sandbox['current'] = 0;
+    $sandbox['max'] = count($nids);
+  }
+
+  /** @var \Drupal\pathauto\PathautoGenerator $generator */
+  $generator = \Drupal::service('pathauto.generator');
+  $entity_storage = \Drupal::entityTypeManager()->getStorage('node');
+
+  $limit = 20;
+  $nids = array_slice($nids, $sandbox['current'], $limit);
+  foreach ($nids as $nid) {
+    $node = $entity_storage->load($nid);
+    $generator->updateEntityAlias($node, 'create', ['force' => TRUE]);
+    // Update the progress.
+    $sandbox['current']++;
+  }
+
+  $sandbox['#finished'] = empty($sandbox['max']) ? 1 : ($sandbox['current'] / $sandbox['max']);
+
+  if ($sandbox['#finished'] >= 1) {
+    \Drupal::messenger()->addStatus(t('The batch URL Alias update is finished.'));
+  }
+}

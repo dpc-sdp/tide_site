@@ -1,0 +1,99 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.taxonomy_term.sites.field_site_domains
+    - field.field.taxonomy_term.sites.field_site_footer_menu
+    - field.field.taxonomy_term.sites.field_site_footer_text
+    - field.field.taxonomy_term.sites.field_site_homepage
+    - field.field.taxonomy_term.sites.field_site_logo
+    - field.field.taxonomy_term.sites.field_site_main_menu
+    - field.field.taxonomy_term.sites.field_site_slogan
+    - image.style.thumbnail
+    - taxonomy.vocabulary.sites
+  module:
+    - image
+    - maxlength
+    - text
+_core:
+  default_config_hash: xZvoDK_EdPuzorsfSLsZmydRAtPA5XN64lLlYnZEzww
+id: taxonomy_term.sites.default
+targetEntityType: taxonomy_term
+bundle: sites
+mode: default
+content:
+  field_site_domains:
+    weight: 4
+    settings:
+      rows: 3
+      placeholder: ''
+    third_party_settings:
+      maxlength:
+        maxlength_js: null
+        maxlength_js_label: 'Content limited to @limit characters, remaining: <strong>@remaining</strong>'
+        maxlength_js_enforce: false
+        maxlength_js_truncate_html: false
+    type: string_textarea
+    region: content
+  field_site_footer_menu:
+    weight: 6
+    settings:
+      match_operator: CONTAINS
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+    type: entity_reference_autocomplete
+    region: content
+  field_site_footer_text:
+    weight: 3
+    settings:
+      rows: 5
+      placeholder: ''
+    third_party_settings: {  }
+    type: text_textarea
+    region: content
+  field_site_homepage:
+    weight: 7
+    settings:
+      match_operator: CONTAINS
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+    type: entity_reference_autocomplete
+    region: content
+  field_site_logo:
+    weight: 2
+    settings:
+      progress_indicator: throbber
+      preview_image_style: thumbnail
+    third_party_settings: {  }
+    type: image_image
+    region: content
+  field_site_main_menu:
+    weight: 5
+    settings:
+      match_operator: CONTAINS
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+    type: entity_reference_autocomplete
+    region: content
+  field_site_slogan:
+    weight: 1
+    settings:
+      rows: 5
+      placeholder: ''
+    third_party_settings: {  }
+    type: text_textarea
+    region: content
+  name:
+    type: string_textfield
+    weight: 0
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+hidden:
+  description: true
+  path: true

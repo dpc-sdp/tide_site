@@ -1,0 +1,7 @@
+{
+    "name": "dpc-sdp/tide_site",
+    "description": "Post content to multiple sites and sections.",
+    "type": "drupal-module",
+    "license": "GPL-2.0+",
+    "version": "0.0.1"
+}

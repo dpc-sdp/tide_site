@@ -1,0 +1,26 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.taxonomy_term.field_site_slogan
+    - taxonomy.vocabulary.sites
+  module:
+    - allowed_formats
+    - text
+third_party_settings:
+  allowed_formats:
+    rich_text: '0'
+    admin_text: '0'
+    plain_text: '0'
+id: taxonomy_term.sites.field_site_slogan
+field_name: field_site_slogan
+entity_type: taxonomy_term
+bundle: sites
+label: Slogan
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: text_long
