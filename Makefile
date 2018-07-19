@@ -112,10 +112,12 @@ install-site:
 	$(call exec,docker-compose exec cli drush -r $(APP)/$(WEBROOT) si testing -y --db-url=mysql://drupal:drupal@$(MYSQL_HOST)/drupal --account-name=admin --account-pass=admin install_configure_form.enable_update_status_module=NULL install_configure_form.enable_update_status_emails=NULL)
 	$(call exec,docker-compose exec cli bash -c "COMPOSER=$(COMPOSER_BUILD) composer --working-dir=$(APP)/$(BUILD) drupal-post-install")
 
-## Install dev modules.
+## Install dev modules and enable seven theme.
 install-dev:
 	$(call title,Installing dev modules)
 	$(call exec,docker-compose exec cli drush en -y tide_test)
+	$(call exec,docker-compose exec cli drush cget system.theme default seven)
+	$(call exec,docker-compose exec cli drush cget system.theme admin seven)
 
 ## Lint code.
 lint:
