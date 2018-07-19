@@ -13,6 +13,7 @@ use Drupal\taxonomy\Entity\Term;
 use Drupal\tide_site\TideSiteFields;
 use Drupal\tide_site\TideSiteMenuAutocreate;
 use Drupal\views\ViewExecutable;
+use Drupal\field\Entity\FieldConfig;
 
 /**
  * Implements hook_entity_bundle_create().
@@ -24,6 +25,15 @@ function tide_site_entity_bundle_create($entity_type_id, $bundle) {
   // Add the new bundle to file_site_homepage entity reference of Sites.
   if ($entity_type_id == 'node') {
     $fields_helper->addContentTypesToSiteHomepageField([$bundle]);
+
+    // Support the content type in the homepage field.
+    $field_config = FieldConfig::loadbyName('taxonomy_term', 'sites', 'field_site_homepage');
+    if ($field_config) {
+      $handler_settings = $field_config->getSetting('handler_settings');
+      $handler_settings['target_bundles'][$bundle] = $bundle;
+      $field_config->setSetting('handler_settings', $handler_settings);
+      $field_config->save();
+    }
   }
 
   // Map of which fields should be created for which entity types.

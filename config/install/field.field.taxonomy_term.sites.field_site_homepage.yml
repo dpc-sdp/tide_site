@@ -3,8 +3,6 @@ status: true
 dependencies:
   config:
     - field.storage.taxonomy_term.field_site_homepage
-    - node.type.landing_page
-    - node.type.page
     - taxonomy.vocabulary.sites
 id: taxonomy_term.sites.field_site_homepage
 field_name: field_site_homepage
