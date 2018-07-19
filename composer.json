@@ -4,7 +4,8 @@
     "type": "drupal-module",
     "license": "GPL-2.0+",
     "require": {
-        "dpc-sdp/tide_core": "@dev"
+        "dpc-sdp/tide_core": "@dev",
+        "dpc-sdp/tide_api": "@dev"
     },
     "require-dev": {
         "dpc-sdp/tide_test": "@dev"
