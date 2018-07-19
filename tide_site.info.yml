@@ -5,6 +5,7 @@ package: Tide
 core: 8.x
 dependencies:
   - drupal:field
+  - drupal:field_ui
   - drupal:node
   - drupal:path
   - drupal:taxonomy
