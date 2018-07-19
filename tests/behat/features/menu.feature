@@ -18,7 +18,7 @@ Feature: Sites menu autocreate
       | site-footer-menu-test-1         |
       | site-footer-menu-test-1-test-11 |
 
-  @api
+  @api @nosuggest
   Scenario: Menu autocreate - new and existing sites
     Given I am logged in as a user with the "administer taxonomy" permission
     And I go to "admin/structure/taxonomy/manage/sites/add"
@@ -77,7 +77,7 @@ Feature: Sites menu autocreate
       | site-footer-menu-test-1         |
       | site-footer-menu-test-1-test-11 |
 
-  @api
+  @api @nosuggest
   Scenario: Menu autocreate - new and existing sections
     Given "sites" terms:
       | name   | field_site_slogan:value | field_site_footer_text:value | field_site_domains |

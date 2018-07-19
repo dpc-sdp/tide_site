@@ -6,7 +6,7 @@ Feature: Media view filter addition
   Background:
     Given vocabulary "sites" with name "Sites" exists
 
-  @api @javascript
+  @api @javascript @nosuggest
   Scenario: Media view has Site filter
     Given I am logged in as an administrator
     When I visit "admin/content/media"

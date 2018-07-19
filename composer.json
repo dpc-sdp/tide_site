@@ -3,5 +3,28 @@
     "description": "Post content to multiple sites and sections.",
     "type": "drupal-module",
     "license": "GPL-2.0+",
-    "version": "0.0.1"
+    "require": {
+        "dpc-sdp/tide_core": "@dev"
+    },
+    "require-dev": {
+        "dpc-sdp/tide_test": "@dev"
+    },
+    "suggest": {
+        "dpc-sdp/tide_media": "@dev"
+    },
+    "repositories": {
+        "drupal": {
+            "type": "composer",
+            "url": "https://packages.drupal.org/8"
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "config": {
+        "platform": {
+            "php": "7.1"
+        },
+        "process-timeout": 0,
+        "sort-packages": true
+    }
 }

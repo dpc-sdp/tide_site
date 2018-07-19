@@ -4,7 +4,7 @@ Feature: Site fields on media
   As a site administrator, I want to know that Site field automatically added
   to new media types upon creation.
 
-  @api @javascript
+  @api @javascript @suggest
   Scenario: Site field is added to media types upon creation.
     Given no "mymediatest" media type
     When I am logged in as a user with the "administer media, administer media types, create media, administer media fields, administer media form display, administer media display" permission

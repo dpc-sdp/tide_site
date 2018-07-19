@@ -1,7 +1,7 @@
 @tide
 Feature: Page
 
-  @api
+  @api @nosuggest
   Scenario: Request to "test" collection endpoint
     Given vocabulary "sites" with name "Sites" exists
     And sites terms:
@@ -19,7 +19,7 @@ Feature: Page
     And the JSON node "meta.count" should exist
     And the JSON node "data" should exist
 
-  @api
+  @api @nosuggest
   Scenario: Request to "test" individual/collection endpoint with results
     Given vocabulary "sites" with name "Sites" exists
     And sites terms:
