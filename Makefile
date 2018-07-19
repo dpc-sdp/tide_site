@@ -118,6 +118,7 @@ install-dev:
 	$(call exec,docker-compose exec cli drush en -y tide_test)
 	$(call exec,docker-compose exec cli drush -y cset system.theme default seven)
 	$(call exec,docker-compose exec cli drush -y cset system.theme admin seven)
+	$(call exec,docker-compose exec cli drush cr)
 
 ## Lint code.
 lint:
