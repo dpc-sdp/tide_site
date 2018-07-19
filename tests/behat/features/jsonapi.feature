@@ -9,7 +9,7 @@ Feature: JSONAPI exposure
       | name             | field_site_slogan:value | field_site_footer_text:value | field_site_domains |
       | [TEST] Site name | Test site slogan        | test site footer             | www.example.com    |
 
-  @api @nosuggest
+  @api @suggest
   Scenario: Request to Sites endpoint to get all information about sites
     Given I am an anonymous user
     When I send a GET request to "api/v1/taxonomy_term/sites?sort=-tid"

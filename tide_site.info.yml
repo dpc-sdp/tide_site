@@ -12,7 +12,6 @@ dependencies:
   - drupal:user
   - pathauto:pathauto
   - dpc-sdp:tide_core
-  - dpc-sdp:tide_api
 config_devel:
   install:
     - core.entity_view_display.taxonomy_term.sites.default

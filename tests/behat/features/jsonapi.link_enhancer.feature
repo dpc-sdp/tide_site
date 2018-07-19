@@ -1,7 +1,7 @@
 @tide @jsonapi
 Feature: Link Enhancer with Site
 
-  @api @nosuggest
+  @api @suggest
   Scenario: Request to "test" individual endpoint with results.
     Given vocabulary "sites" with name "Sites" exists
     And sites terms:

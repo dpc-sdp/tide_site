@@ -1,7 +1,7 @@
 @tide @jsonapi
 Feature: Route lookup
 
-  @api @nosuggest
+  @api @suggest
   Scenario: Request to route lookup API to find a route by existing alias
     And vocabulary "sites" with name "Sites" exists
     And sites terms:
@@ -59,7 +59,7 @@ Feature: Route lookup
     And the JSON node "data.section" should contain "10002"
     And the JSON node "errors" should not exist
 
-  @api @nosuggest
+  @api @suggest
   Scenario: Request to route lookup API to find the homepage of a site
     Given sites terms:
       | name        | parent | tid   | field_site_domains |

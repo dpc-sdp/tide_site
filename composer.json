@@ -11,7 +11,8 @@
         "dpc-sdp/tide_test": "@dev"
     },
     "suggest": {
-        "dpc-sdp/tide_media": "@dev"
+        "dpc-sdp/tide_media": "@dev",
+        "dpc-sdp/tide_api": "@dev"
     },
     "repositories": {
         "drupal": {

@@ -1,7 +1,7 @@
 @tide
 Feature: Node path alias with site prefix in JSONAPI.
 
-  @api @nosuggest
+  @api @suggest
   Scenario: Check for Site Alias in JSONAPI response
     Given sites terms:
       | name        | parent | tid    | field_site_domains |
