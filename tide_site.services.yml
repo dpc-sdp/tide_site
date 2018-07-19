@@ -27,10 +27,3 @@ services:
       - [setContainer, ['@service_container']]
     tags:
       - {name: event_subscriber}
-  tide_site.get_route_subscriber:
-    class: Drupal\tide_site\EventSubscriber\TideSiteGetRouteSubscriber
-    calls:
-      - [setContainer, ['@service_container']]
-      - [setStringTranslation, ['@string_translation']]
-    tags:
-      - {name: event_subscriber}

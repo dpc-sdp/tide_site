@@ -37,4 +37,22 @@ class TideSiteServiceProvider extends ServiceProviderBase {
     }
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function register(ContainerBuilder $container) {
+
+    // Dynamically define the service tide_site.get_route_subscriber
+    $modules = $container->getParameter('container.modules');
+
+    // Check for installed tide_api module..
+    if (isset($modules['tide_api']) ) {
+      $container
+        ->register('get_route_subscriber', 'Drupal\\tide_site\\EventSubscriber\\TideSiteGetRouteSubscriber')
+        ->addTag('event_subscriber')
+        ->addArgument(new Reference('service_container'))
+        ->addArgument(new Reference('string_translation'));
+    }
+  }
+
 }
