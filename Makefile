@@ -110,15 +110,14 @@ install-module:
 install-site:
 	$(call title,Installing a site)
 	$(call exec,docker-compose exec cli drush -r $(APP)/$(WEBROOT) si testing -y --db-url=mysql://drupal:drupal@$(MYSQL_HOST)/drupal --account-name=admin --account-pass=admin install_configure_form.enable_update_status_module=NULL install_configure_form.enable_update_status_emails=NULL)
-	$(call exec,docker-compose exec cli drush -y en seven)
-	$(call exec,docker-compose exec cli drush -y cset system.theme default seven)
-	$(call exec,docker-compose exec cli drush -y cset system.admin default seven)
 	$(call exec,docker-compose exec cli bash -c "COMPOSER=$(COMPOSER_BUILD) composer --working-dir=$(APP)/$(BUILD) drupal-post-install")
 
 ## Install dev modules and enable seven theme.
 install-dev:
 	$(call title,Installing dev modules)
 	$(call exec,docker-compose exec cli drush en -y tide_test)
+	$(call exec,docker-compose exec cli drush -y role-add-perm 'anonymous' 'access jsonapi resource list')
+	$(call exec,docker-compose exec cli drush -y en seven)
 	$(call exec,docker-compose exec cli drush -y cset system.theme default seven)
     $(call exec,docker-compose exec cli drush -y cset system.admin default seven)
     $(call exec,docker-compose exec cli drush cr)
@@ -141,7 +140,9 @@ rebuild-full: clean-full build
 
 ## Run Behat tests.
 test-behat:
-	$(call title,Running behat tests)
+	$(call title,Creating screenshots directory)
+    $(call exec,docker-compose exec cli mkdir -p /app/screenshots)
+    $(call title,Running behat tests)
 	$(call exec,docker-compose exec cli vendor/bin/behat --format=progress_fail --strict --colors $(BEHAT_PROFILE) $(filter-out $@,$(MAKECMDGOALS)))
 
 #-------------------------------------------------------------------------------
