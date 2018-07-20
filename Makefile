@@ -116,6 +116,7 @@ install-site:
 install-dev:
 	$(call title,Installing dev modules)
 	$(call exec,docker-compose exec cli drush en -y tide_test)
+	$(call exec,docker-compose exec cli drush pmu -y big_pipe)
 
 ## Lint code.
 lint:
