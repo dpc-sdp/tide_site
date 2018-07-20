@@ -116,7 +116,6 @@ install-site:
 install-dev:
 	$(call title,Installing dev modules)
 	$(call exec,docker-compose exec cli drush en -y tide_test)
-	$(call exec,docker-compose exec cli drush -y role-add-perm 'anonymous' 'access jsonapi resource list')
 	$(call exec,docker-compose exec cli drush -y en seven)
 	$(call exec,docker-compose exec cli drush -y cset system.theme default seven)
 	$(call exec,docker-compose exec cli drush -y cset system.admin default seven)
