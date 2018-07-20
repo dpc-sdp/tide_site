@@ -119,8 +119,8 @@ install-dev:
 	$(call exec,docker-compose exec cli drush -y role-add-perm 'anonymous' 'access jsonapi resource list')
 	$(call exec,docker-compose exec cli drush -y en seven)
 	$(call exec,docker-compose exec cli drush -y cset system.theme default seven)
-    $(call exec,docker-compose exec cli drush -y cset system.admin default seven)
-    $(call exec,docker-compose exec cli drush cr)
+	$(call exec,docker-compose exec cli drush -y cset system.admin default seven)
+	$(call exec,docker-compose exec cli drush cr)
 
 ## Lint code.
 lint:
