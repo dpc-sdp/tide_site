@@ -118,7 +118,9 @@ install-site:
 install-dev:
 	$(call title,Installing dev modules)
 	$(call exec,docker-compose exec cli drush en -y tide_test)
-	$(call exec,docker-compose exec cli drush pmu -y big_pipe)
+	$(call exec,docker-compose exec cli drush -y cset system.theme default seven)
+    $(call exec,docker-compose exec cli drush -y cset system.admin default seven)
+    $(call exec,docker-compose exec cli drush cr)
 
 ## Lint code.
 lint:
