@@ -47,10 +47,11 @@ class TideSiteServiceProvider extends ServiceProviderBase {
 
     // Check for installed tide_api module..
     if (isset($modules['tide_api']) ) {
+
       $container->register('tide_site.get_route_subscriber', 'Drupal\tide_site\EventSubscriber\TideSiteGetRouteSubscriber')
         ->addTag('event_subscriber')
-        ->addArgument(new Reference('service_container'))
-        ->addArgument(new Reference('string_translation'));
+        ->addMethodCall('setContainer', [new Reference('service_container')])
+        ->addMethodCall('setStringTranslation', [new Reference('string_translation')]);
     }
   }
 }
