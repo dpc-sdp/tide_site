@@ -13,7 +13,6 @@ use Drupal\taxonomy\Entity\Term;
 use Drupal\tide_site\TideSiteFields;
 use Drupal\tide_site\TideSiteMenuAutocreate;
 use Drupal\views\ViewExecutable;
-use Drupal\field\Entity\FieldConfig;
 
 /**
  * Implements hook_entity_bundle_create().
@@ -25,15 +24,6 @@ function tide_site_entity_bundle_create($entity_type_id, $bundle) {
   // Add the new bundle to file_site_homepage entity reference of Sites.
   if ($entity_type_id == 'node') {
     $fields_helper->addContentTypesToSiteHomepageField([$bundle]);
-
-    // Support the content type in the homepage field.
-    $field_config = FieldConfig::loadbyName('taxonomy_term', 'sites', 'field_site_homepage');
-    if ($field_config) {
-      $handler_settings = $field_config->getSetting('handler_settings');
-      $handler_settings['target_bundles'][$bundle] = $bundle;
-      $field_config->setSetting('handler_settings', $handler_settings);
-      $field_config->save();
-    }
   }
 
   // Map of which fields should be created for which entity types.
@@ -266,7 +256,7 @@ function tide_site_tide_link_enhancer_undo_transform_alter(&$data, &$context) {
     if (!empty($data['uri']) && !empty($data['frontpage'])) {
       $site = $helper->getSiteById($site_id);
       if ($site) {
-        $homepage = $helper->getSiteHomepage($site);
+        $homepage = $helper->getSiteHomepageEntity($site);
         if ($homepage) {
           $data['uri'] = 'entity:node/' . $homepage->bundle() . '/' . $homepage->uuid();
           $data['entity'] = [
@@ -294,7 +284,7 @@ function tide_site_tide_link_enhancer_undo_transform_alter(&$data, &$context) {
           $site_url = '';
         }
         else {
-          $site_url = $helper->getEntityPrimarySiteUrl($entity);
+          $site_url = $helper->getEntityPrimarySiteBaseUrl($entity);
           $data['url'] = $helper->getNodeUrlFromPrimarySite($entity);
         }
         // Remove site prefix from the  URL.
@@ -354,7 +344,7 @@ function tide_site_tide_path_enhancer_undo_transform_alter(&$data, &$context) {
         $site_url = '';
       }
       else {
-        $site_url = $helper->getEntityPrimarySiteUrl($node);
+        $site_url = $helper->getEntityPrimarySiteBaseUrl($node);
         $data['url'] = $helper->getNodeUrlFromPrimarySite($node);
       }
       // Remove site prefix from the  URL.
@@ -531,9 +521,7 @@ function tide_site_path_update($path) {
       if (!$alias_helper->isPathHasSitePrefix($path)) {
         /** @var \Drupal\tide_site\AliasStorage $alias_storage */
         $alias_storage = \Drupal::service('tide_site.alias_storage');
-        $alias_storage->delete([
-          'pid' => $path['pid'],
-        ], FALSE);
+        $alias_storage->delete(['pid' => $path['pid']], FALSE);
       }
     }
   }
@@ -579,6 +567,7 @@ function tide_site_node_presave($node) {
     $helper = \Drupal::service('tide_site.helper');
     $new_sites = $helper->getEntitySites($node, TRUE) ?: ['ids' => []];
     $old_sites = $helper->getEntitySites($old_node, TRUE) ?: ['ids' => []];
+
     $unassigned_sites = array_diff($old_sites['ids'], $new_sites['ids']);
     if ($unassigned_sites) {
       /** @var \Drupal\tide_site\AliasStorage $alias_storage */
@@ -591,6 +580,13 @@ function tide_site_node_presave($node) {
         ], FALSE, FALSE);
       }
     }
+
+    $new_assigned_sites = array_diff($new_sites['ids'], $old_sites['ids']);
+    if ($new_assigned_sites) {
+      /** @var \Drupal\tide_site\AliasStorageHelper $alias_helper */
+      $alias_helper = \Drupal::service('tide_site.alias_storage_helper');
+      $alias_helper->regenerateNodeSiteAliases($node, $new_assigned_sites);
+    }
   }
 }
 
@@ -599,9 +595,14 @@ function tide_site_node_presave($node) {
  */
 function tide_site_node_update($node) {
   // Regenerate site aliases of the updated node.
-  /** @var \Drupal\tide_site\AliasStorageHelper $alias_helper */
-  $alias_helper = \Drupal::service('tide_site.alias_storage_helper');
-  $alias_helper->regenerateNodeSiteAliases($node);
+  /** @var \Drupal\tide_site\AliasStorage $alias_storage */
+  $alias_storage = \Drupal::service('tide_site.alias_storage');
+  /** @var \Drupal\node\NodeInterface $node */
+  if (!$alias_storage->load(['source' => '/node/' . $node->id()])) {
+    /** @var \Drupal\tide_site\AliasStorageHelper $alias_helper */
+    $alias_helper = \Drupal::service('tide_site.alias_storage_helper');
+    $alias_helper->regenerateNodeSiteAliases($node);
+  }
 }
 
 /**

@@ -3,7 +3,6 @@
 namespace Drupal\tide_site;
 
 use Drupal\Core\Cache\Cache;
-use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityRepositoryInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\FieldableEntityInterface;
@@ -97,6 +96,30 @@ class TideSiteHelper {
   }
 
   /**
+   * Returns all sites.
+   *
+   * @return \Drupal\taxonomy\TermInterface[]
+   *   List of sites.
+   */
+  public function getAllSites() {
+    $sites = [];
+
+    try {
+      $tree = $this->entityTypeManager->getStorage('taxonomy_term')
+        ->loadTree('sites', 0, 1, TRUE);
+      /** @var \Drupal\taxonomy\TermInterface $site */
+      foreach ($tree as $site) {
+        $sites[$site->id()] = $site;
+      }
+    }
+    catch (\Exception $exception) {
+      watchdog_exception('tide_site', $exception);
+    }
+
+    return $sites;
+  }
+
+  /**
    * Loads a Site term by ID.
    *
    * @param int $tid
@@ -168,7 +191,7 @@ class TideSiteHelper {
    * @param \Drupal\taxonomy\TermInterface|null $site
    *   The site term.
    *
-   * @return array
+   * @return string[]
    *   The list of domains.
    */
   public function getSiteDomains(TermInterface $site = NULL) {
@@ -176,12 +199,34 @@ class TideSiteHelper {
     if ($site && $site->hasField('field_site_domains')) {
       $domains = $site->get('field_site_domains')->getString();
       $domains = preg_split('/\R/', $domains) ?: [];
+      foreach ($domains as &$domain) {
+        $domain = rtrim($domain, '/');
+      }
     }
     return $domains;
   }
 
   /**
-   * Get the homepage of a site.
+   * Returns the production domain of a Site.
+   *
+   * @param \Drupal\taxonomy\TermInterface|null $site
+   *   The site term.
+   *
+   * @return string
+   *   The domain.
+   */
+  public function getSiteProductionDomain(TermInterface $site = NULL) {
+    $domain = '';
+    $domains = $this->getSiteDomains($site);
+    if ($domains) {
+      $domain = reset($domains);
+    }
+
+    return $domain;
+  }
+
+  /**
+   * Get the homepage entity of a site.
    *
    * @param \Drupal\taxonomy\TermInterface|null $site
    *   The site term.
@@ -189,7 +234,7 @@ class TideSiteHelper {
    * @return \Drupal\Core\Entity\EntityInterface|null
    *   The homepage entity.
    */
-  public function getSiteHomepage(TermInterface $site = NULL) {
+  public function getSiteHomepageEntity(TermInterface $site = NULL) {
     $homepage = NULL;
     if ($site && $site->hasField('field_site_homepage') && !$site->get('field_site_homepage')->isEmpty()) {
       try {
@@ -223,6 +268,27 @@ class TideSiteHelper {
       $site_id = $site;
     }
     return '/site-' . $site_id;
+  }
+
+  /**
+   * Return the absolute URL of a site using its production domain.
+   *
+   * @param \Drupal\taxonomy\TermInterface $site
+   *   The site.
+   * @param string $scheme
+   *   The scheme, default to https.
+   *
+   * @return string
+   *   The base URL without trailing slashes.
+   */
+  public function getSiteBaseUrl(TermInterface $site, $scheme = 'https') {
+    $url = '';
+
+    $domain = $this->getSiteProductionDomain($site);
+    if ($domain) {
+      $url = rtrim($scheme . '://' . $domain, '/');
+    }
+    return $url;
   }
 
   /**
@@ -410,29 +476,21 @@ class TideSiteHelper {
   /**
    * Get the URL of the primary site of an entity.
    *
-   * @param \Drupal\Core\Entity\EntityInterface $node
+   * @param \Drupal\Core\Entity\FieldableEntityInterface $entity
    *   The node.
    *
    * @return \Drupal\Core\GeneratedUrl|string
    *   The URL.
    */
-  public function getEntityPrimarySiteUrl(EntityInterface $node) {
+  public function getEntityPrimarySiteBaseUrl(FieldableEntityInterface $entity) {
     $url = '';
 
-    /** @var \Symfony\Component\HttpFoundation\Request $request */
-    $request = $this->container->get('request_stack')->getCurrentRequest();
-
     // Fetch its primary site instead.
-    $site = $this->getEntityPrimarySite($node);
+    $site = $this->getEntityPrimarySite($entity);
     if ($site) {
-      $domains = $this->getSiteDomains($site);
-      // The first domain is always for production environment.
-      $domain = reset($domains);
-      if ($domain) {
-        $site_url = $request->getScheme() . '://' . $domain;
-        // Remove trailing slash.
-        $url = rtrim($site_url, '/');
-      }
+      /** @var \Symfony\Component\HttpFoundation\Request $request */
+      $request = $this->container->get('request_stack')->getCurrentRequest();
+      $url = $this->getSiteBaseUrl($site, $request->getScheme());
     }
     return $url;
   }
@@ -449,13 +507,122 @@ class TideSiteHelper {
   public function getNodeUrlFromPrimarySite(NodeInterface $node) {
     $url = '/node/' . $node->id();
 
-    $site_url = $this->getEntityPrimarySiteUrl($node);
-    if ($site_url) {
+    $primary_site_url = $this->getEntityPrimarySiteBaseUrl($node);
+    if ($primary_site_url) {
       // Return the absolute URL.
       $url = $node->toUrl('canonical', [
         'absolute' => TRUE,
-        'base_url' => $site_url,
+        'base_url' => $primary_site_url,
       ])->toString();
+    }
+
+    return $url;
+  }
+
+  /**
+   * Returns URLs of an entity for all sites.
+   *
+   * @param \Drupal\Core\Entity\FieldableEntityInterface $entity
+   *   The entity.
+   * @param string $scheme
+   *   Default to https.
+   *
+   * @return string[]
+   *   The list of URLs.
+   */
+  public function getEntitySiteUrls(FieldableEntityInterface $entity, $scheme = 'https') {
+    $site_urls = [];
+
+    $sites = $this->getEntitySites($entity, TRUE);
+    if (!empty($sites['ids'])) {
+      foreach ($sites['ids'] as $site_id) {
+        $site = $this->getSiteById($site_id);
+        if ($site) {
+          $site_base_url = $this->getSiteBaseUrl($site, $scheme);
+          if ($site_base_url) {
+            // Return the absolute URL.
+            $url = $entity->toUrl('canonical', [
+              'absolute' => TRUE,
+              'base_url' => $site_base_url,
+            ])->toString();
+
+            $site_urls[$site_id] = $url;
+          }
+        }
+      }
+    }
+
+    return $site_urls;
+  }
+
+  /**
+   * Returns all Site Base URLs of an entity.
+   *
+   * @param \Drupal\Core\Entity\FieldableEntityInterface $entity
+   *   The entity.
+   * @param string $scheme
+   *   Default to https.
+   *
+   * @return string[]
+   *   The list of base URLs.
+   */
+  public function getEntitySiteBaseUrls(FieldableEntityInterface $entity, $scheme = 'https') {
+    $site_base_urls = [];
+
+    $sites = $this->getEntitySites($entity, TRUE);
+    if (!empty($sites['ids'])) {
+      foreach ($sites['ids'] as $site_id) {
+        $site = $this->getSiteById($site_id);
+        if ($site) {
+          $site_base_url = $this->getSiteBaseUrl($site, $scheme);
+          if ($site_base_url) {
+            $site_base_urls[$site_id] = $site_base_url;
+          }
+        }
+      }
+    }
+
+    return $site_base_urls;
+  }
+
+  /**
+   * Override a URL with a Site Base URL.
+   *
+   * @param string $url
+   *   The URL, eg. http://content.vic.gov.au/about-us.
+   * @param string $site_base_url
+   *   The Site Base URL, eg. http://demo.vic.gov.au.
+   *
+   * @return string
+   *   The overridden URL, eg. http://demo.vic.gov.au/about-us.
+   */
+  public function overrideUrlStringWithSiteBaseUrl($url, $site_base_url) {
+    $url_components = parse_url($url);
+    if ($url_components) {
+      $original_base_url = $url_components['scheme'] . '://' . $url_components['host'];
+      return str_replace($original_base_url, $site_base_url, $url);
+    }
+
+    return $url;
+  }
+
+  /**
+   * Override a URL with base URL of a Site.
+   *
+   * @param string $url
+   *   The URL, eg. https://content.vic.gov.au/about-us.
+   * @param \Drupal\taxonomy\TermInterface $site
+   *   The Site with a base URL, eg. https://demo.vic.gov.au.
+   * @param string $scheme
+   *   Default to https when retrieving site base URL.
+   *
+   * @return string
+   *   The overridden URL, eg. https://demo.vic.gov.au/about-us.
+   */
+  public function overrideUrlStringWithSite($url, TermInterface $site, $scheme = 'https') {
+    $site_base_url = $this->getSiteBaseUrl($site, $scheme);
+    if ($site_base_url) {
+      $url = $this->overrideUrlStringWithSiteBaseUrl($url, $site_base_url);
     }
 
     return $url;

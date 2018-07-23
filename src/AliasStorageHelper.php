@@ -2,9 +2,11 @@
 
 namespace Drupal\tide_site;
 
+use Drupal\Component\Utility\Unicode;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Url;
 use Drupal\node\NodeInterface;
+use Drupal\pathauto\AliasUniquifierInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
 /**
@@ -14,6 +16,8 @@ use Symfony\Component\DependencyInjection\ContainerAwareTrait;
  */
 class AliasStorageHelper {
   use ContainerAwareTrait;
+
+  const ALIAS_SCHEMA_MAX_LENGTH = 255;
 
   /**
    * Tide Site Helper service.
@@ -37,6 +41,13 @@ class AliasStorageHelper {
   protected $entityTypeManager;
 
   /**
+   * The Alias uniquifier service.
+   *
+   * @var \Drupal\pathauto\AliasUniquifierInterface
+   */
+  protected $aliasUniquifier;
+
+  /**
    * AliasStorageHelper constructor.
    *
    * @param \Drupal\tide_site\TideSiteHelper $helper
@@ -50,6 +61,29 @@ class AliasStorageHelper {
     $this->helper = $helper;
     $this->aliasStorage = $alias_storage;
     $this->entityTypeManager = $entity_type_manager;
+  }
+
+  /**
+   * Set the Alias Uniquifier service.
+   *
+   * @param \Drupal\pathauto\AliasUniquifierInterface $alias_uniquifier
+   *   The service.
+   */
+  public function setAliasUniquifier(AliasUniquifierInterface $alias_uniquifier) {
+    $this->aliasUniquifier = $alias_uniquifier;
+  }
+
+  /**
+   * Get the Alias Uniquifier service.
+   *
+   * @return \Drupal\pathauto\AliasUniquifierInterface
+   *   The service.
+   */
+  public function getAliasUniquifier() {
+    if (empty($this->aliasUniquifier)) {
+      $this->setAliasUniquifier($this->container->get('pathauto.alias_uniquifier'));
+    }
+    return $this->aliasUniquifier;
   }
 
   /**
@@ -99,18 +133,18 @@ class AliasStorageHelper {
    *
    * @param array $path
    *   The path.
-   * @param string $site_url
-   *   The site URL with scheme and domain if the path alias is an absolute URL.
+   * @param string $site_base_url
+   *   The site base URL if the path alias is an absolute URL.
    *
    * @return string
    *   The raw internal alias without site prefix.
    */
-  public function getPathAliasWithoutSitePrefix(array $path, $site_url = '') {
+  public function getPathAliasWithoutSitePrefix(array $path, $site_base_url = '') {
     $pattern = '/^\/site\-(\d+)\//';
-    if ($site_url) {
-      $pattern = '/' . preg_quote($site_url, '/') . '\/site\-(\d+)\//';
+    if ($site_base_url) {
+      $pattern = '/' . preg_quote($site_base_url, '/') . '\/site\-(\d+)\//';
     }
-    return preg_replace($pattern, $site_url . '/', $path['alias']);
+    return preg_replace($pattern, $site_base_url . '/', $path['alias']);
   }
 
   /**
@@ -151,27 +185,43 @@ class AliasStorageHelper {
    *   The Path array.
    * @param \Drupal\node\NodeInterface|null $node
    *   The node (optional).
+   * @param int[] $site_ids
+   *   The list of site to create alias (optional).
    */
-  public function createSiteAliases($path, NodeInterface $node = NULL) {
+  public function createSiteAliases($path, NodeInterface $node = NULL, array $site_ids = []) {
     if (!$node) {
       $node = $this->getNodeFromPath($path);
     }
 
     if ($node) {
+      $this->getAliasUniquifier();
+
       $aliases = $this->getAllSiteAliases($path, $node);
+
+      if (!empty($site_ids)) {
+        $site_ids = array_combine($site_ids, $site_ids);
+        array_intersect_key($aliases, $site_ids);
+      }
+
       foreach ($aliases as $alias) {
-        $existing_alias = $this->aliasStorage->load([
-          'alias' => $alias,
-          'source'  => $path['source'],
-          'langcode' => $path['langcode'],
-        ]);
-        if (!$existing_alias) {
-          try {
+        try {
+          $original_alias = $alias;
+
+          $existing_path = $this->isAliasExists($alias, $path['langcode']);
+          if ($existing_path) {
+            if ($existing_path['source'] != $path['source']) {
+              $this->uniquify($alias, $path['langcode']);
+              if ($original_alias != $alias) {
+                $this->aliasStorage->save($path['source'], $alias, $path['langcode'], NULL, FALSE);
+              }
+            }
+          }
+          else {
             $this->aliasStorage->save($path['source'], $alias, $path['langcode'], NULL, FALSE);
           }
-          catch (\Exception $exception) {
-            watchdog_exception('tide_site', $exception);
-          }
+        }
+        catch (\Exception $exception) {
+          watchdog_exception('tide_site', $exception);
         }
       }
     }
@@ -182,33 +232,35 @@ class AliasStorageHelper {
    *
    * @param array|mixed $path
    *   The new path.
-   * @param array|mixed $old_path
-   *   The old path.
+   * @param array|mixed $original_path
+   *   The original path.
    */
-  public function updateSiteAliases($path, $old_path) {
-    if (!is_array($path) || !is_array($old_path)) {
+  public function updateSiteAliases($path, $original_path) {
+    if (!is_array($path) || !is_array($original_path)) {
       return;
     }
 
     $node = $this->getNodeFromPath($path);
     if ($node) {
       $aliases = $this->getAllSiteAliases($path, $node);
-      $old_aliases = $this->getAllSiteAliases($old_path, $node);
+      $original_aliases = $this->getAllSiteAliases($original_path, $node);
       foreach ($aliases as $site_id => $alias) {
         if ($alias == $path['alias']) {
           // This alias already exists.
           continue;
         }
-        // Find the old alias to update.
-        $old_alias = $this->aliasStorage->load([
+        // Find the old path to update.
+        $old_path = $this->aliasStorage->load([
           'source' => $path['source'],
-          'alias' => $old_aliases[$site_id],
+          'alias' => $original_aliases[$site_id],
         ]);
-        if (!$old_alias) {
-          $old_alias['pid'] = NULL;
+        if (!$old_path) {
+          $old_path['pid'] = NULL;
         }
         try {
-          $this->aliasStorage->save($path['source'], $alias, $path['langcode'], $old_alias['pid'], FALSE);
+          if (!$this->isAliasExists($alias, $path['langcode'])) {
+            $this->aliasStorage->save($path['source'], $alias, $path['langcode'], $old_path['pid'], FALSE);
+          }
         }
         catch (\Exception $exception) {
           watchdog_exception('tide_site', $exception);
@@ -246,8 +298,10 @@ class AliasStorageHelper {
    *
    * @param \Drupal\node\NodeInterface $node
    *   The node.
+   * @param int[] $site_ids
+   *   List if site to regenerate.
    */
-  public function regenerateNodeSiteAliases(NodeInterface $node) {
+  public function regenerateNodeSiteAliases(NodeInterface $node, array $site_ids = []) {
     // Collect all existing aliases of the node.
     $aliases = [];
     $path_aliases = $this->aliasStorage->loadAll(['source' => '/node/' . $node->id()]);
@@ -258,8 +312,56 @@ class AliasStorageHelper {
     }
     // Regenerate aliases.
     foreach ($aliases as $path) {
-      $this->createSiteAliases($path, $node);
+      $this->createSiteAliases($path, $node, $site_ids);
     }
+  }
+
+  /**
+   * Check if an alias exists.
+   *
+   * @param string $alias
+   *   The alias.
+   * @param string $langcode
+   *   The language code.
+   *
+   * @return array|false
+   *   FALSE if does not exist.
+   */
+  public function isAliasExists($alias, $langcode = '') {
+    $conditions = ['alias' => $alias];
+    if ($langcode) {
+      $conditions['langcode'] = $langcode;
+    }
+    $path = $this->aliasStorage->load($conditions);
+
+    return $path ?: FALSE;
+  }
+
+  /**
+   * Attempt to generate a unique alias.
+   *
+   * @param string $alias
+   *   The alias.
+   * @param string $langcode
+   *   The language code.
+   */
+  public function uniquify(&$alias, $langcode) {
+    if (!$this->isAliasExists($alias, $langcode)) {
+      return;
+    }
+
+    // If the alias already exists, generate a new, hopefully unique, variant.
+    $maxlength = static::ALIAS_SCHEMA_MAX_LENGTH;
+    $separator = '-';
+    $original_alias = $alias;
+
+    $i = 0;
+    do {
+      // Append an incrementing numeric suffix until we find a unique alias.
+      $unique_suffix = $separator . $i;
+      $alias = Unicode::truncate($original_alias, $maxlength - Unicode::strlen($unique_suffix), TRUE) . $unique_suffix;
+      $i++;
+    } while ($this->isAliasExists($alias, $langcode));
   }
 
 }

@@ -84,7 +84,7 @@ class Canonical extends LinkitCanonical implements ContainerFactoryPluginInterfa
           $url = Url::fromUri('internal:' . $alias)->toString(TRUE);
         }
         else {
-          $site_url = $this->helper->getEntityPrimarySiteUrl($entity);
+          $site_url = $this->helper->getEntityPrimarySiteBaseUrl($entity);
           $alias = $this->helper->getNodeUrlFromPrimarySite($entity);
           $alias = $this->aliasHelper->getPathAliasWithoutSitePrefix(['alias' => $alias], $site_url);
           // The path alias is an absolute URL.

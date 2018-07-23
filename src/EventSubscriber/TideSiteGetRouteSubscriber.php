@@ -98,7 +98,7 @@ class TideSiteGetRouteSubscriber implements EventSubscriberInterface {
             // Ignore the current response
             // because each site has its own homepage.
             $site_term = $helper->getSiteById($site_id);
-            $entity = $helper->getSiteHomepage($site_term);
+            $entity = $helper->getSiteHomepageEntity($site_term);
 
             // The site does not have a homepage,
             // load the global frontpage instead.

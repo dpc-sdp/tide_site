@@ -18,8 +18,6 @@ settings:
   handler: 'default:node'
   handler_settings:
     target_bundles:
-      landing_page: landing_page
-      page: page
     sort:
       field: _none
     auto_create: false
