@@ -1,0 +1,25 @@
+<?php
+
+/**
+ * @file
+ * Tide Site Simple Sitemap functions.
+ */
+
+/**
+ * Implements hook_ENTITY_TYPE_delete().
+ */
+function tide_site_simple_sitemap_taxonomy_term_delete($term) {
+  // Remove the sitemap of the deleted site term¡.
+  try {
+    /** @var \Drupal\taxonomy\TermInterface $term */
+    if ($term->bundle() == 'sites') {
+      \Drupal::database()
+        ->delete('simple_sitemap_site')
+        ->condition('site_id', $term->id())
+        ->execute();
+    }
+  }
+  catch (Exception $exception) {
+    watchdog_exception('tide_site_simple_sitemap', $exception);
+  }
+}

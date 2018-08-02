@@ -1,0 +1,63 @@
+<?php
+
+/**
+ * @file
+ * Install file.
+ */
+
+/**
+ * Implements hook_schema().
+ */
+function tide_site_simple_sitemap_schema() {
+  $schema['simple_sitemap_site'] = [
+    'description' => 'Holds XML sitemaps of each site as strings for quick retrieval.',
+    'fields' => [
+      'id' => [
+        'description' => 'Sitemap chunk unique identifier.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'unsigned' => TRUE,
+      ],
+      'site_id' => [
+        'description' => 'Site ID.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'unsigned' => TRUE,
+      ],
+      'sitemap_string' => [
+        'description' => 'XML sitemap chunk string.',
+        'type' => 'text',
+        'size' => 'big',
+        'not null' => TRUE,
+      ],
+      'sitemap_created' => [
+        'description' => 'Timestamp of sitemap chunk generation.',
+        'type' => 'int',
+        'default' => 0,
+        'not null' => TRUE,
+        'unsigned' => TRUE,
+      ],
+    ],
+    'primary key' => ['id', 'site_id'],
+  ];
+
+  return $schema;
+}
+
+/**
+ * Implements hook_requirements().
+ */
+function tide_site_simple_sitemap_requirements($phase) {
+  $requirements = [];
+  if ($phase == 'runtime') {
+    if (\Drupal::moduleHandler()->moduleExists('domain_simple_sitemap')) {
+      $requirements['tide_site_simple_sitemap'] = [
+        'title' => t('Tide Site - Simple Sitemap'),
+        'description' => t('Tide Site Simple Sitemap may not work properly when Domain Access Simple Sitemap is enabled.'),
+        'severity' => REQUIREMENT_ERROR,
+        'value' => t('Domain Access Simple Sitemap is enabled'),
+      ];
+    }
+  }
+  return $requirements;
+}
