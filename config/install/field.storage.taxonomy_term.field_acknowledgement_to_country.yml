@@ -1,16 +1,15 @@
-uuid: 76ac08c2-9c61-473e-91b1-5c36fb24cea7
 langcode: en
 status: true
 dependencies:
   module:
     - taxonomy
-    - text
-id: taxonomy_term.field_field_site_acknowledgement
-field_name: field_field_site_acknowledgement
+id: taxonomy_term.field_acknowledgement_to_country
+field_name: field_acknowledgement_to_country
 entity_type: taxonomy_term
-type: text_long
-settings: {  }
-module: text
+type: string_long
+settings:
+  case_sensitive: false
+module: core
 locked: false
 cardinality: 1
 translatable: true

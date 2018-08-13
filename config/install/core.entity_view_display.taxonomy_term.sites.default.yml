@@ -1,9 +1,8 @@
-uuid: c39ab218-87a3-44f9-8c0d-e11f09dd2b8e
 langcode: en
 status: true
 dependencies:
   config:
-    - field.field.taxonomy_term.sites.field_field_site_acknowledgement
+    - field.field.taxonomy_term.sites.field_acknowledgement_to_country
     - field.field.taxonomy_term.sites.field_site_domains
     - field.field.taxonomy_term.sites.field_site_footer_menu
     - field.field.taxonomy_term.sites.field_site_footer_text
@@ -22,12 +21,12 @@ targetEntityType: taxonomy_term
 bundle: sites
 mode: default
 content:
-  field_field_site_acknowledgement:
+  field_acknowledgement_to_country:
     weight: 7
     label: above
     settings: {  }
     third_party_settings: {  }
-    type: text_default
+    type: basic_string
     region: content
   field_site_domains:
     weight: 3
