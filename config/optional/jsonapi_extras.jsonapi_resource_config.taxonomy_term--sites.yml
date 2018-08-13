@@ -98,3 +98,9 @@ resourceFields:
     enhancer:
       id: ''
     disabled: false
+  field_acknowledgement_to_country:
+    fieldName: field_acknowledgement_to_country
+    publicName: field_acknowledgement_to_country
+    enhancer:
+      id: ''
+    disabled: false
