@@ -2,6 +2,7 @@ langcode: en
 status: true
 dependencies:
   config:
+    - field.field.taxonomy_term.sites.field_acknowledgement_to_country
     - field.field.taxonomy_term.sites.field_site_domains
     - field.field.taxonomy_term.sites.field_site_footer_menu
     - field.field.taxonomy_term.sites.field_site_footer_text
@@ -20,6 +21,13 @@ targetEntityType: taxonomy_term
 bundle: sites
 mode: default
 content:
+  field_acknowledgement_to_country:
+    weight: 7
+    label: above
+    settings: {  }
+    third_party_settings: {  }
+    type: basic_string
+    region: content
   field_site_domains:
     weight: 3
     label: above
