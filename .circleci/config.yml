@@ -17,7 +17,7 @@ aliases:
       - checkout
       - setup_remote_docker:
           docker_layer_caching: true
-          version: 17.06.0-cet
+          version: 17.06.0-ce
       - run:
           name: Composer validate
           # @dev
