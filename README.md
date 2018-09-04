@@ -23,6 +23,7 @@ The Tide Site module provides the functionality to post to multiple sites and se
 
 # INSTALLATION
 Include the Tide Site module in your composer.json file
+
 ```bash
 composer require dpc-sdp/tide_site
 ```
