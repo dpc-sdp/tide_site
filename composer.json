@@ -4,7 +4,7 @@
     "type": "drupal-module",
     "license": "GPL-2.0+",
     "require": {
-        "dpc-sdp/tide_core": "@dev"
+        "dpc-sdp/tide_core": "dev-feature/SDPA-940-Add-aditional-local-sub-footer"
     },
     "require-dev": {
         "dpc-sdp/tide_test": "@dev"
