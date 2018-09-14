@@ -24,11 +24,7 @@ bundle: sites
 mode: default
 content:
   field_acknowledgement_to_country:
-<<<<<<< HEAD
     weight: 8
-=======
-    weight: 7
->>>>>>> master
     label: above
     settings: {  }
     third_party_settings: {  }
