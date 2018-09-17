@@ -5,13 +5,12 @@
     "license": "GPL-2.0+",
     "require": {
         "dpc-sdp/tide_core": "dev-feature/SDPA-940-Add-aditional-local-sub-footer",
-	"dpc-sdp/tide_media": "@dev"
+	    "dpc-sdp/tide_media": "@dev"
     },
     "require-dev": {
         "dpc-sdp/tide_test": "@dev"
     },
     "suggest": {
-        "dpc-sdp/tide_media": "@dev",
         "dpc-sdp/tide_api": "@dev"
     },
     "repositories": {
