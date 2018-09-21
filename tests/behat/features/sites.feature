@@ -17,3 +17,4 @@ Feature: Sites taxonomy vocabulary
     And I see field "Footer menu"
     And I see field "Homepage"
     And I don't see field "Description"
+    And I see field "Footer logos"
