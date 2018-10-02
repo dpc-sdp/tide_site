@@ -54,7 +54,9 @@ resourceFields:
     fieldName: created
     publicName: created
     enhancer:
-      id: ''
+      id: 'date_time'
+      settings:
+        dateTimeFormat: 'Y-m-d\TH:i:sP'
     disabled: false
   revision_uid:
     fieldName: revision_uid
