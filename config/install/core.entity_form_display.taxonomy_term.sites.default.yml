@@ -14,6 +14,7 @@ dependencies:
     - image.style.thumbnail
     - taxonomy.vocabulary.sites
   module:
+    - tide_core
     - image
     - maxlength
     - paragraphs
