@@ -11,8 +11,8 @@ Post content to multiple sites and sections.
 * Installation
 
 # INTRODUCTION
-The Tide Site module provides the functionality to post to multiple sites and sections from
- a single content server.
+The Tide Site module provides the functionality to post to multiple sites and 
+ sections from a single content server.
 
 # REQUIREMENTS
 * [Tide Core](https://github.com/dpc-sdp/tide_core)
@@ -30,5 +30,6 @@ composer require dpc-sdp/tide_site
 
 # Caveats
 
-Tide Site is on the alpha release, use with caution. APIs are likely to change before the stable version, that there will be breaking changes and that we're not supporting it for external production sites at the moment.
-
+Tide Site is on the alpha release, use with caution. APIs are likely to change 
+ before the stable version, that there will be breaking changes and that we're 
+ not supporting it for external production sites at the moment.
