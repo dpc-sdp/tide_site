@@ -4,6 +4,7 @@ dependencies:
   config:
     - field.field.taxonomy_term.sites.field_acknowledgement_to_country
     - field.field.taxonomy_term.sites.field_site_domains
+    - field.field.taxonomy_term.sites.field_site_footer_logos
     - field.field.taxonomy_term.sites.field_site_footer_menu
     - field.field.taxonomy_term.sites.field_site_footer_text
     - field.field.taxonomy_term.sites.field_site_homepage
@@ -13,8 +14,10 @@ dependencies:
     - image.style.thumbnail
     - taxonomy.vocabulary.sites
   module:
+    - tide_core
     - image
     - maxlength
+    - paragraphs
     - text
 _core:
   default_config_hash: xZvoDK_EdPuzorsfSLsZmydRAtPA5XN64lLlYnZEzww
@@ -24,7 +27,7 @@ bundle: sites
 mode: default
 content:
   field_acknowledgement_to_country:
-    weight: 8
+    weight: 9
     settings:
       rows: 5
       placeholder: ''
@@ -32,7 +35,7 @@ content:
     type: string_textarea
     region: content
   field_site_domains:
-    weight: 4
+    weight: 3
     settings:
       rows: 3
       placeholder: ''
@@ -44,8 +47,20 @@ content:
         maxlength_js_truncate_html: false
     type: string_textarea
     region: content
+  field_site_footer_logos:
+    type: entity_reference_paragraphs
+    weight: 7
+    settings:
+      title: Paragraph
+      title_plural: Paragraphs
+      edit_mode: open
+      add_mode: dropdown
+      form_display_mode: default
+      default_paragraph_type: _none
+    third_party_settings: {  }
+    region: content
   field_site_footer_menu:
-    weight: 6
+    weight: 5
     settings:
       match_operator: CONTAINS
       size: 60
@@ -54,7 +69,7 @@ content:
     type: entity_reference_autocomplete
     region: content
   field_site_footer_text:
-    weight: 3
+    weight: 6
     settings:
       rows: 5
       placeholder: ''
@@ -62,7 +77,7 @@ content:
     type: text_textarea
     region: content
   field_site_homepage:
-    weight: 7
+    weight: 8
     settings:
       match_operator: CONTAINS
       size: 60
@@ -79,7 +94,7 @@ content:
     type: image_image
     region: content
   field_site_main_menu:
-    weight: 5
+    weight: 4
     settings:
       match_operator: CONTAINS
       size: 60
