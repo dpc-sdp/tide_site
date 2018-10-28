@@ -1,0 +1,6 @@
+services:
+  tide_site.commands:
+    class: \Drupal\tide_site\Commands\TideSiteCommands
+    arguments: ['@tide_site.migrator']
+    tags:
+      - { name: drush.command }
