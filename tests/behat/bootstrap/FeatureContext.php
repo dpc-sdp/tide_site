@@ -3,8 +3,6 @@
 /**
  * @file
  * MYSITE Drupal context for Behat testing.
- *
- * @codingStandardsIgnoreStart
  */
 
 use Drupal\DrupalExtension\Context\DrupalContext;
