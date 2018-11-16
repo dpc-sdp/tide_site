@@ -69,7 +69,7 @@ content:
     type: entity_reference_autocomplete
     region: content
   field_site_footer_text:
-    weight: 3
+    weight: 6
     settings:
       rows: 5
       placeholder: ''
