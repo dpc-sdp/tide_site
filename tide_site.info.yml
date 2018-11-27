@@ -25,8 +25,7 @@ config_devel:
     - field.field.paragraph.call_to_action_image.field_paragraph_cta
     - field.field.paragraph.call_to_action_image.field_paragraph_media
     - field.field.taxonomy_term.sites.field_site_footer_logos
-    - field.storage.taxonomy_term.field_site_footer_logos
-    - paragraphs.paragraphs_type.call_to_action_image.yml
+    - field.field.taxonomy_term.sites.field_site_show_exit_site
     - field.field.taxonomy_term.sites.field_site_domains
     - field.field.taxonomy_term.sites.field_site_footer_text
     - field.field.taxonomy_term.sites.field_site_logo
@@ -40,5 +39,8 @@ config_devel:
     - field.storage.taxonomy_term.field_site_slogan
     - field.storage.taxonomy_term.field_site_main_menu
     - field.storage.taxonomy_term.field_site_footer_menu
+    - field.storage.taxonomy_term.field_site_footer_logos
+    - field.storage.taxonomy_term.field_site_show_exit_site
     - field.storage.taxonomy_term.field_acknowledgement_to_country
     - field.storage.media.field_media_site
+    - paragraphs.paragraphs_type.call_to_action_image.yml
