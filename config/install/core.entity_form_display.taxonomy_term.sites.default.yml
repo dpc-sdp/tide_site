@@ -10,6 +10,7 @@ dependencies:
     - field.field.taxonomy_term.sites.field_site_homepage
     - field.field.taxonomy_term.sites.field_site_logo
     - field.field.taxonomy_term.sites.field_site_main_menu
+    - field.field.taxonomy_term.sites.field_site_show_exit_site
     - field.field.taxonomy_term.sites.field_site_slogan
     - image.style.thumbnail
     - taxonomy.vocabulary.sites
@@ -19,15 +20,13 @@ dependencies:
     - maxlength
     - paragraphs
     - text
-_core:
-  default_config_hash: xZvoDK_EdPuzorsfSLsZmydRAtPA5XN64lLlYnZEzww
 id: taxonomy_term.sites.default
 targetEntityType: taxonomy_term
 bundle: sites
 mode: default
 content:
   field_acknowledgement_to_country:
-    weight: 9
+    weight: 10
     settings:
       rows: 5
       placeholder: ''
@@ -101,6 +100,13 @@ content:
       placeholder: ''
     third_party_settings: {  }
     type: entity_reference_autocomplete
+    region: content
+  field_site_show_exit_site:
+    weight: 9
+    settings:
+      display_label: true
+    third_party_settings: {  }
+    type: boolean_checkbox
     region: content
   field_site_slogan:
     weight: 1
