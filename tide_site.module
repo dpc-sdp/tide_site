@@ -9,6 +9,8 @@ use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Link;
+use Drupal\node\Entity\Node;
+use Drupal\search_api\IndexInterface;
 use Drupal\taxonomy\Entity\Term;
 use Drupal\tide_site\TideSiteFields;
 use Drupal\tide_site\TideSiteMenuAutocreate;
@@ -615,18 +617,13 @@ function tide_site_linkit_substitution_alter(&$data) {
 }
 
 /**
- * Implements hook_search_api_index_items_alter()
- *
- * @param \Drupal\search_api\IndexInterface $index
- *   The search index on which items will be indexed.
- * @param \Drupal\search_api\Item\ItemInterface[] $items
- *   The items that will be indexed.
+ * Implements hook_search_api_index_items_alter().
  */
-function tide_site_search_api_index_items_alter(\Drupal\search_api\IndexInterface $index, array &$items) {
+function tide_site_search_api_index_items_alter(IndexInterface $index, array &$items) {
   foreach ($items as $item_id => $item) {
 
     // Add all urls to the url field.
-    $url = $item->getField("url");
+    $url = $item->getField('url');
 
     /** @var \Drupal\tide_site\AliasStorageHelper $alias_helper */
     $alias_helper = \Drupal::service('tide_site.alias_storage_helper');
@@ -634,16 +631,16 @@ function tide_site_search_api_index_items_alter(\Drupal\search_api\IndexInterfac
     /** @var \Drupal\tide_site\AliasStorage $alias_storage */
     $alias_storage = \Drupal::service('tide_site.alias_storage');
 
-    if (!is_null($item->getField("nid"))) {
-      $nid = $item->getField("nid")->getValues()[0];
-      $node = \Drupal\node\Entity\Node::load($nid);
-      $path = $alias_storage->load(['source' => "/node/" . $nid]);
+    if (!is_null($item->getField('nid'))) {
+      $nid = $item->getField('nid')->getValues()[0];
+      $node = Node::load($nid);
+      $path = $alias_storage->load(['source' => '/node/' . $nid]);
       if ($path) {
-          $aliases = $alias_helper->getAllSiteAliases($path, $node);
-        }
-      if ($aliases){
+        $aliases = $alias_helper->getAllSiteAliases($path, $node);
+      }
+      if ($aliases) {
         $url->setValues($aliases);
-        $item->setField("url", $url);
+        $item->setField('url', $url);
       }
     }
   }
