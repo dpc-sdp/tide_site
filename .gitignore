@@ -1,8 +1,7 @@
-vendor
-vendor-local
 /composer.lock
-build
+/composer.build.json
+/composer.build.lock
+/docroot
+/dpc-sdp
 screenshots
-composer.dev.json
-composer.build.json
-composer.build.lock
+vendor
