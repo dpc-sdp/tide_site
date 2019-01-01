@@ -634,15 +634,17 @@ function tide_site_search_api_index_items_alter(\Drupal\search_api\IndexInterfac
     /** @var \Drupal\tide_site\AliasStorage $alias_storage */
     $alias_storage = \Drupal::service('tide_site.alias_storage');
 
-    $nid = $item->getField("nid")->getValues()[0];
-    $node = \Drupal\node\Entity\Node::load($nid);
-    $path = $alias_storage->load(['source' => "/node/" . $nid]);
+    if (!is_null($item->getField("nid"))) {
+      $nid = $item->getField("nid")->getValues()[0];
+      $node = \Drupal\node\Entity\Node::load($nid);
+      $path = $alias_storage->load(['source' => "/node/" . $nid]);
       if ($path) {
-        $aliases = $alias_helper->getAllSiteAliases($path, $node);
-      }
+          $aliases = $alias_helper->getAllSiteAliases($path, $node);
+        }
       if ($aliases){
         $url->setValues($aliases);
         $item->setField("url", $url);
       }
+    }
   }
 }

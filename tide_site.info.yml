@@ -13,25 +13,34 @@ dependencies:
   - drupal:user
   - pathauto:pathauto
   - dpc-sdp:tide_core
+  - dpc-sdp:tide_media
+  - entity_browser:entity_browser
+  - entity_browser:entity_browser_entity_form
 config_devel:
   install:
     - core.entity_view_display.taxonomy_term.sites.default
     - core.entity_form_display.taxonomy_term.sites.default
+    - core.entity_form_display.paragraph.call_to_action_image.default
+    - core.entity_view_display.paragraph.call_to_action_image.default
+    - field.field.paragraph.call_to_action_image.field_paragraph_cta
+    - field.field.paragraph.call_to_action_image.field_paragraph_media
+    - field.field.taxonomy_term.sites.field_site_footer_logos
+    - field.field.taxonomy_term.sites.field_site_show_exit_site
     - field.field.taxonomy_term.sites.field_site_domains
     - field.field.taxonomy_term.sites.field_site_footer_text
     - field.field.taxonomy_term.sites.field_site_logo
     - field.field.taxonomy_term.sites.field_site_slogan
     - field.field.taxonomy_term.sites.field_site_main_menu
     - field.field.taxonomy_term.sites.field_site_footer_menu
-    - field.field.taxonomy_term.sites.field_acknowledgement_to_country.yml
+    - field.field.taxonomy_term.sites.field_acknowledgement_to_country
     - field.storage.taxonomy_term.field_site_domains
     - field.storage.taxonomy_term.field_site_footer_text
     - field.storage.taxonomy_term.field_site_logo
     - field.storage.taxonomy_term.field_site_slogan
     - field.storage.taxonomy_term.field_site_main_menu
     - field.storage.taxonomy_term.field_site_footer_menu
-    - field.storage.taxonomy_term.field_acknowledgement_to_country.yml
+    - field.storage.taxonomy_term.field_site_footer_logos
+    - field.storage.taxonomy_term.field_site_show_exit_site
+    - field.storage.taxonomy_term.field_acknowledgement_to_country
     - field.storage.media.field_media_site
-    - field.storage.node.field_node_site
-    - field.storage.node.field_node_primary_site
-    - taxonomy.vocabulary.sites
+    - paragraphs.paragraphs_type.call_to_action_image.yml

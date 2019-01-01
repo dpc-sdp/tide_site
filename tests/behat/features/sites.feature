@@ -17,3 +17,11 @@ Feature: Sites taxonomy vocabulary
     And I see field "Footer menu"
     And I see field "Homepage"
     And I don't see field "Description"
+
+    And I should see text matching "Footer logos"
+    And I should see text matching "No Paragraph added yet.."
+
+    And I see field "Show Exit Site?"
+    And I should see an "input#edit-field-site-show-exit-site-value" element
+    And I should not see an "input#edit-field-site-show-exit-site-value.required" element
+

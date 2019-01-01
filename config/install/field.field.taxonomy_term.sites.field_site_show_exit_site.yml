@@ -1,0 +1,22 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.taxonomy_term.field_site_show_exit_site
+    - taxonomy.vocabulary.sites
+id: taxonomy_term.sites.field_site_show_exit_site
+field_name: field_site_show_exit_site
+entity_type: taxonomy_term
+bundle: sites
+label: 'Show Exit Site?'
+description: ''
+required: false
+translatable: false
+default_value:
+  -
+    value: 0
+default_value_callback: ''
+settings:
+  on_label: 'On'
+  off_label: 'Off'
+field_type: boolean
