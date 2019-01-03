@@ -10,8 +10,8 @@
     "suggest": {
         "dpc-sdp/tide_api:dev-ci": "Allows to use Drupal in headless mode",
         "dpc-sdp/tide_page:dev-ci": "Page content type and related configuration for Tide Drupal 8 distribution",
-        "dpc-sdp/tide_landing_page:dev-ci": "Landing Page content type and related configuration for Tide Drupal 8 distribution",
-        "dpc-sdp/tide_news:dev-ci": "News content type and related configuration for Tide Drupal 8 distribution"
+        "dpc-sdp/tide_news:dev-ci": "News content type and related configuration for Tide Drupal 8 distribution",
+        "dpc-sdp/tide_landing_page:dev-ci": "Landing Page content type and related configuration for Tide Drupal 8 distribution"
     },
     "repositories": {
         "drupal": {
