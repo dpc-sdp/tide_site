@@ -33,6 +33,12 @@ class AliasStorage extends CoreAliasStorage {
       'langcode' => $langcode,
     ];
 
+    $site_prefix_in_url = (boolean) preg_match('/^\/site\-(\d+)\//', $alias);
+    if (!$site_prefix_in_url) {
+      // This is the default alias coming from pathauto.
+      unset($pid);
+    }
+
     // Insert or update the alias.
     if (empty($pid)) {
       $try_again = FALSE;
