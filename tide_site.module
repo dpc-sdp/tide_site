@@ -187,6 +187,7 @@ function tide_site_views_pre_view(ViewExecutable $view, $display_id, array &$arg
       'media_browser',
       'image_browser',
       'document_browser',
+      'embedded_video_browser',
     ],
   ];
 
