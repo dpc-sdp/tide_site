@@ -87,8 +87,7 @@ class AliasStorage extends CoreAliasStorage {
     if ($pid) {
       if ($invokeHooks) {
         // @todo Switch to using an event for this instead of a hook.
-        // @todo Disable invoke all for path_update becaue generate an infinity redirect
-        // $this->moduleHandler->invokeAll('path_' . $operation, [$fields]);
+        $this->moduleHandler->invokeAll('path_' . $operation, [$fields]);
       }
       Cache::invalidateTags(['route_match']);
       return $fields;
