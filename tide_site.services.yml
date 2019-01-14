@@ -27,3 +27,6 @@ services:
       - [setContainer, ['@service_container']]
     tags:
       - {name: event_subscriber}
+  tide_site.migrator:
+    class: Drupal\tide_site\Migrator
+    arguments: ['@entity_type.manager', '@tide_site.helper', '@string_translation', '@datetime.time']

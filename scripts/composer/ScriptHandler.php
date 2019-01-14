@@ -1,11 +1,12 @@
 <?php
 
+namespace DrupalProject\composer;
+
 /**
  * @file
  * Contains \DrupalProject\composer\ScriptHandler.
+ * @codingStandardsIgnoreStart
  */
-
-namespace DrupalProject\composer;
 
 use Composer\Script\Event;
 use Composer\Semver\Comparator;
