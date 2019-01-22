@@ -1,4 +1,3 @@
-@tide
 Feature: Site fields on media
 
   As a site administrator, I want to know that Site field automatically added
@@ -40,5 +39,3 @@ Feature: Site fields on media
     And I should not see an "#edit-field-media-site--wrapper.required" element
     And I should not see an "#edit-field-media-primary-site--wrapper" element
     And I should not see a "#edit-field-media-primary-site--wrapper.required" element
-
-    And no "mymediatest" media type

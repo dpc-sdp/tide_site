@@ -1,9 +1,8 @@
-@tide
 Feature: Sites taxonomy vocabulary
 
   As a site administrator, I want to know that Sites vocabulary exists.
 
-  @api @nosuggest
+  @api
   Scenario: Sites taxonomy vocabulary exists
     Given vocabulary "sites" with name "Sites" exists
     When I am logged in as a user with the "administer taxonomy" permission

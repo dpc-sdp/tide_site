@@ -1,4 +1,4 @@
-@tide @jsonapi
+@jsonapi
 Feature: Link Enhancer with Site
 
   @api @suggest

@@ -1,4 +1,4 @@
-@tide @jsonapi
+@jsonapi
 Feature: Route lookup
 
   @api @suggest

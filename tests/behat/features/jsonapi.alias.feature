@@ -1,4 +1,3 @@
-@tide
 Feature: Node path alias with site prefix in JSONAPI.
 
   @api @suggest

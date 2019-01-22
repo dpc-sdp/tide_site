@@ -1,7 +1,7 @@
 @tide
 Feature: Node path alias with site prefix
 
-  @api @nosuggest
+  @api
   Scenario: Check for Site URL Path Settings
     Given topic terms:
       | name       |

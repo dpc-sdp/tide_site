@@ -1,10 +1,9 @@
-@tide
 Feature: Site and Primary Site fields on nodes
 
   As a site administrator, I want to know that Site and Primary Site fields
   automatically added to new content types upon creation.
 
-  @api @nosuggest
+  @api
   Scenario: Site and Primary Site fields are added to content types upon creation.
     Given no "sitetest" content type
     When I am logged in as a user with the "administer content types, administer node fields, administer node display, administer node form display" permission

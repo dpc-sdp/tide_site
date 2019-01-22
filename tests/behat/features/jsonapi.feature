@@ -1,4 +1,4 @@
-@tide @jsonapi
+@jsonapi
 Feature: JSONAPI exposure
 
   As a site administrator, I want to know that Sites vocabulary and terms are

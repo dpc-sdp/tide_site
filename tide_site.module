@@ -180,6 +180,11 @@ function tide_site_form_taxonomy_term_form_submit(array $form, FormStateInterfac
  * Implements hook_views_pre_view().
  */
 function tide_site_views_pre_view(ViewExecutable $view, $display_id, array &$args) {
+  $moduleHandler = \Drupal::service('module_handler');
+  if (!$moduleHandler->moduleExists('tide_media')) {
+    return;
+  }
+
   // Add Site field and exposed filter to the supported views.
   $views = [
     'media' => [

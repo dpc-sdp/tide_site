@@ -1,4 +1,3 @@
-@tide
 Feature: Page
 
   @api @suggest
