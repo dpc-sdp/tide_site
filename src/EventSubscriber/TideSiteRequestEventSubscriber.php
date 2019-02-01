@@ -7,6 +7,7 @@ use Drupal\Core\Cache\CacheableResponseInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Url;
+use Drupal\jsonapi\Routing\Routes;
 use Drupal\jsonapi_extras\ResourceType\ConfigurableResourceType;
 use Drupal\tide_site\TideSiteFields;
 use Drupal\tide_site\TideSiteHelper;
@@ -115,7 +116,7 @@ class TideSiteRequestEventSubscriber implements EventSubscriberInterface {
     }
 
     // Only works with JSON API routes.
-    if ($controller != 'jsonapi.request_handler:handle') {
+    if (!Routes::isJsonApiRequest($request->attributes->all())) {
       return;
     }
 
@@ -131,7 +132,7 @@ class TideSiteRequestEventSubscriber implements EventSubscriberInterface {
 
     $field_site_name = $this->buildFieldName($entity_type);
 
-    $entity = $request->get($entity_type);
+    $entity = $request->attributes->get('entity');
     // The current route has an entity in its params,
     // it's to retrieve an individual entity.
     if ($entity) {
@@ -238,20 +239,7 @@ class TideSiteRequestEventSubscriber implements EventSubscriberInterface {
   protected function setSiteFilterToJsonApi(Request $request, array $site_filter, ConfigurableResourceType $resource_type) {
     $filter = $request->query->get('filter', []);
     $filter['site'] = $site_filter;
-
-    // Convert the filter query to JSON API Filter object.
-    $context = [
-      'entity_type_id' => $resource_type->getEntityTypeId(),
-      'bundle' => $resource_type->getBundle(),
-    ];
-    /** @var \Symfony\Component\Serializer\Normalizer\DenormalizerInterface $filter_normalizer */
-    $filter_normalizer = $this->container->get('serializer.normalizer.filter.jsonapi');
-    $jsonapi_filter = $filter_normalizer->denormalize($filter, '\Drupal\jsonapi\Query\Filter', NULL, $context);
-
-    // Update the filter of JSON API.
-    $route_params = $request->attributes->get('_route_params');
-    $route_params['_json_api_params']['filter'] = $jsonapi_filter;
-    $request->attributes->set('_route_params', $route_params);
+    $request->query->set('filter', $filter);
   }
 
   /**
@@ -267,7 +255,9 @@ class TideSiteRequestEventSubscriber implements EventSubscriberInterface {
   protected function setEventErrorResponse(GetResponseEvent $event, $error_message, $code = Response::HTTP_BAD_REQUEST) {
     $json_response = [
       'links' => [
-        'self' => Url::fromRoute('<current>')->setAbsolute()->toString(),
+        'self' => [
+          'href' => Url::fromRoute('<current>')->setAbsolute()->toString(),
+        ],
       ],
       'errors' => [$error_message],
     ];

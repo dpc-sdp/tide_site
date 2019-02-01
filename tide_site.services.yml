@@ -18,12 +18,3 @@ services:
     arguments: ['@entity_type.manager', '@entity.repository']
     calls:
       - [setContainer, ['@service_container']]
-  tide_site.request_event_subscriber:
-    class: Drupal\tide_site\EventSubscriber\TideSiteRequestEventSubscriber
-    arguments:
-      - '@module_handler'
-      - '@tide_site.helper'
-    calls:
-      - [setContainer, ['@service_container']]
-    tags:
-      - {name: event_subscriber}

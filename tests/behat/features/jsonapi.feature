@@ -16,13 +16,12 @@ Feature: JSONAPI exposure
     Then the rest response status code should be 200
     And the response should be in JSON
     And the JSON node "jsonapi.version" should be equal to "1.0"
-    And the JSON node "links.self" should contain "api/v1/taxonomy_term/sites"
+    And the JSON node "links.self.href" should contain "api/v1/taxonomy_term/sites"
     And the JSON node "meta.count" should exist
     And the JSON node "data" should exist
     And the JSON node "data[0].type" should be equal to "taxonomy_term--sites"
     And the JSON node "data[0].id" should exist
-    And the JSON node "data[0].attributes.tid" should exist
-    And the JSON node "data[0].attributes.uuid" should exist
+    And the JSON node "data[0].attributes.drupal_internal__tid" should exist
     And the JSON node "data[0].attributes.field_site_domains" should be equal to "www.example.com"
     And the JSON node "data[0].attributes.field_site_slogan.value" should be equal to "Test site slogan"
     And the JSON node "data[0].attributes.field_site_footer_text.value" should be equal to "test site footer"

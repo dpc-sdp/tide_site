@@ -73,8 +73,8 @@ class Canonical extends LinkitCanonical implements ContainerFactoryPluginInterfa
 
     // Remove the site prefix from path alias when responding from
     // JSONAPI entity resource with site parameter.
-    $controller = $this->request->attributes->get('_controller');
-    if ($controller == 'jsonapi.request_handler:handle') {
+    $is_jsonapi = $this->request->attributes->get('_is_jsonapi', FALSE);
+    if ($is_jsonapi) {
       $site_id = $this->request->get('site');
       if ($site_id && $entity instanceof NodeInterface) {
         if ($this->helper->isEntityBelongToSite($entity, $site_id)) {
