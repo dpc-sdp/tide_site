@@ -22,9 +22,9 @@ Feature: Node path alias with site prefix in JSONAPI.
     When I send a GET request to "api/v1/route?site=100001&path=/test-page-1"
     Then the rest response status code should be 200
     And the response should be in JSON
-    And the JSON node "data.bundle" should contain "test"
-    And the JSON node "data.endpoint" should contain "api/v1/node/test"
-    And the JSON node "data.uuid" should be equal to "99999999-aaaa-bbbb-ccc-000000000001"
+    And the JSON node "data.attributes.bundle" should contain "test"
+    And the JSON node "data.attributes.endpoint" should contain "api/v1/node/test"
+    And the JSON node "data.attributes.uuid" should be equal to "99999999-aaaa-bbbb-ccc-000000000001"
     And the JSON node "errors" should not exist
 
     # Query Page 1 (Site 1). Current site is Site 2.
@@ -37,18 +37,18 @@ Feature: Node path alias with site prefix in JSONAPI.
     When I send a GET request to "api/v1/route?site=100001&path=/test-page-2"
     Then the rest response status code should be 200
     And the response should be in JSON
-    And the JSON node "data.bundle" should contain "test"
-    And the JSON node "data.endpoint" should contain "api/v1/node/test"
-    And the JSON node "data.uuid" should be equal to "99999999-aaaa-bbbb-ccc-000000000002"
+    And the JSON node "data.attributes.bundle" should contain "test"
+    And the JSON node "data.attributes.endpoint" should contain "api/v1/node/test"
+    And the JSON node "data.attributes.uuid" should be equal to "99999999-aaaa-bbbb-ccc-000000000002"
     And the JSON node "errors" should not exist
 
     # Query Page 2 (Site 1, Site 2). Current site is Site 2.
     When I send a GET request to "api/v1/route?site=100002&path=/test-page-2"
     Then the rest response status code should be 200
     And the response should be in JSON
-    And the JSON node "data.bundle" should contain "test"
-    And the JSON node "data.endpoint" should contain "api/v1/node/test"
-    And the JSON node "data.uuid" should be equal to "99999999-aaaa-bbbb-ccc-000000000002"
+    And the JSON node "data.attributes.bundle" should contain "test"
+    And the JSON node "data.attributes.endpoint" should contain "api/v1/node/test"
+    And the JSON node "data.attributes.uuid" should be equal to "99999999-aaaa-bbbb-ccc-000000000002"
     And the JSON node "errors" should not exist
 
     # Test JSONAPI Entity API.

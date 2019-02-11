@@ -143,7 +143,7 @@ class TideSiteRequestEventSubscriber implements EventSubscriberInterface {
         if (!$site_id) {
           // This entity has Sites but our required parameter is missing,
           // so we stop processing and return a Bad Request 400 code.
-          $this->setEventErrorResponse($event, $this->t('URL query parameter "site" is required.'), Response::HTTP_BAD_REQUEST);
+          $this->setEventErrorResponse($event, $this->t("URL query parameter 'site' is required."), Response::HTTP_BAD_REQUEST);
           return;
         }
         // Check if the entity belongs to the requested site.
@@ -259,7 +259,12 @@ class TideSiteRequestEventSubscriber implements EventSubscriberInterface {
           'href' => Url::fromRoute('<current>')->setAbsolute()->toString(),
         ],
       ],
-      'errors' => [$error_message],
+      'errors' => [
+        [
+          'status' => $code,
+          'title' => $error_message,
+        ],
+      ],
     ];
     $response = new JsonResponse($json_response, $code);
     $event->setResponse($response);
