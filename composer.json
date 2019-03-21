@@ -4,12 +4,12 @@
     "type": "drupal-module",
     "license": "GPL-2.0-or-later",
     "require": {
-        "dpc-sdp/tide_core": "dev-feature/SDPA-1213_metatag_upgrade as 1.0"
+        "dpc-sdp/tide_core": "dev-develop"
     },
     "suggest": {
-        "dpc-sdp/tide_media:dev-feature/SDPA-1213_jsonapi_upgrade": "Media and related configuration for Tide Drupal 8 distribution",
-        "dpc-sdp/tide_api:dev-feature/SDPA-1213_jsonapi_upgrade": "Allows to use Drupal in headless mode",
-        "dpc-sdp/tide_page:dev-feature/SDPA-1213_jsonapi_upgrade": "Page content type and related configuration for Tide Drupal 8 distribution",
+        "dpc-sdp/tide_media:dev-develop": "Media and related configuration for Tide Drupal 8 distribution",
+        "dpc-sdp/tide_api:dev-develop": "Allows to use Drupal in headless mode",
+        "dpc-sdp/tide_page:dev-develop": "Page content type and related configuration for Tide Drupal 8 distribution",
         "dpc-sdp/tide_news:dev-feature/SDPA-1213_jsonapi_upgrade": "News content type and related configuration for Tide Drupal 8 distribution",
         "dpc-sdp/tide_landing_page:dev-feature/SDPA-1213_jsonapi_upgrade": "Landing Page content type and related configuration for Tide Drupal 8 distribution"
     },
