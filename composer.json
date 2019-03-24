@@ -10,8 +10,8 @@
         "dpc-sdp/tide_media:dev-develop": "Media and related configuration for Tide Drupal 8 distribution",
         "dpc-sdp/tide_api:dev-develop": "Allows to use Drupal in headless mode",
         "dpc-sdp/tide_page:dev-develop": "Page content type and related configuration for Tide Drupal 8 distribution",
-        "dpc-sdp/tide_news:dev-feature/SDPA-1213_jsonapi_upgrade": "News content type and related configuration for Tide Drupal 8 distribution",
-        "dpc-sdp/tide_landing_page:dev-feature/SDPA-1213_jsonapi_upgrade": "Landing Page content type and related configuration for Tide Drupal 8 distribution"
+        "dpc-sdp/tide_news:dev-develop": "News content type and related configuration for Tide Drupal 8 distribution",
+        "dpc-sdp/tide_landing_page:dev-develop": "Landing Page content type and related configuration for Tide Drupal 8 distribution"
     },
     "repositories": {
         "drupal": {
