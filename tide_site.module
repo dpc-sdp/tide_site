@@ -221,6 +221,7 @@ function tide_site_views_pre_view(ViewExecutable $view, $display_id, array &$arg
       'reduce_duplicates' => TRUE,
       'limit' => TRUE,
       'hierarchy' => TRUE,
+      'alter' => [],
     ];
     $view->addHandler($display_id, 'filter', 'media__field_media_site', 'field_media_site_target_id', $site_filter, 'field_media_site_target_id');
 
@@ -229,6 +230,7 @@ function tide_site_views_pre_view(ViewExecutable $view, $display_id, array &$arg
       'group_rows' => TRUE,
       'multi_type' => 'ul',
       'plugin_id' => 'field',
+      'alter' => [],
     ];
     $view->addHandler($display_id, 'field', 'media__field_media_site', 'field_media_site', $site_field, 'field_media_site');
   }
