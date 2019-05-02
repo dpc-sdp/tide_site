@@ -50,6 +50,18 @@ class TideSiteServiceProvider extends ServiceProviderBase {
         ->addTag('event_subscriber')
         ->addMethodCall('setContainer', [new Reference('service_container')])
         ->addMethodCall('setStringTranslation', [new Reference('string_translation')]);
+
+    }
+
+    if (isset($modules['jsonapi']) && isset($modules['jsonapi_extras'])) {
+      $container->register('tide_site.request_event_subscriber', 'Drupal\tide_site\EventSubscriber\TideSiteRequestEventSubscriber')
+        ->addTag('event_subscriber')
+        ->setArguments([
+          new Reference('module_handler'),
+          new Reference('tide_site.helper'),
+        ])
+        ->addMethodCall('setContainer', [new Reference('service_container')])
+        ->addMethodCall('setStringTranslation', [new Reference('string_translation')]);
     }
   }
 

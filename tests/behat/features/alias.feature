@@ -1,4 +1,3 @@
-@tide
 Feature: Node path alias with site prefix
 
   @api
@@ -18,9 +17,9 @@ Feature: Node path alias with site prefix
 
     When I edit test "[TEST] Test content"
 
-    Then I should see the text "URL PATH SETTINGS"
+    Then I should see the text "URL ALIAS"
     # The default path/pathauto form elements should be disabled.
-    And I should not see an "#edit-path-settings" element
+    And I should not see an "#edit-path-0" element
     And I should not see the text "Specify an alternative path by which this data can be accessed."
     And I should not see an "#edit-path-0-alias" element
     And I should not see the text "Generate automatic URL alias"
