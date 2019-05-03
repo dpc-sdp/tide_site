@@ -4,8 +4,8 @@
     "type": "drupal-module",
     "license": "GPL-2.0-or-later",
     "require": {
-        "dpc-sdp/tide_core": "dev-release/1.1.0"
-        "dpc-sdp/tide_media:dev-release/1.2.0": "Media and related configuration for Tide Drupal 8 distribution",
+        "dpc-sdp/tide_core": "dev-release/1.1.0",
+        "dpc-sdp/tide_media": "dev-release/1.2.0"
     },
     "suggest": {
         "dpc-sdp/tide_api:dev-release/1.2.0": "Allows to use Drupal in headless mode",
