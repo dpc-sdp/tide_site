@@ -4,14 +4,14 @@
     "type": "drupal-module",
     "license": "GPL-2.0-or-later",
     "require": {
-        "dpc-sdp/tide_core": "dev-develop"
+        "dpc-sdp/tide_core": "1.1.0",
+        "dpc-sdp/tide_media": "1.2.0"
     },
     "suggest": {
-        "dpc-sdp/tide_media:dev-develop": "Media and related configuration for Tide Drupal 8 distribution",
-        "dpc-sdp/tide_api:dev-develop": "Allows to use Drupal in headless mode",
-        "dpc-sdp/tide_page:dev-develop": "Page content type and related configuration for Tide Drupal 8 distribution",
-        "dpc-sdp/tide_news:dev-develop": "News content type and related configuration for Tide Drupal 8 distribution",
-        "dpc-sdp/tide_landing_page:dev-develop": "Landing Page content type and related configuration for Tide Drupal 8 distribution"
+        "dpc-sdp/tide_api:1.2.0": "Allows to use Drupal in headless mode",
+        "dpc-sdp/tide_page:1.2.0": "Page content type and related configuration for Tide Drupal 8 distribution",
+        "dpc-sdp/tide_news:1.1.0": "News content type and related configuration for Tide Drupal 8 distribution",
+        "dpc-sdp/tide_landing_page:1.1.0": "Landing Page content type and related configuration for Tide Drupal 8 distribution"
     },
     "repositories": {
         "drupal": {
