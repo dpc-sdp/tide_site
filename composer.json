@@ -4,8 +4,8 @@
     "type": "drupal-module",
     "license": "GPL-2.0-or-later",
     "require": {
-        "dpc-sdp/tide_core": "dev-hotfix/1.2.0",
-        "dpc-sdp/tide_media": "dev-hotfix/1.2.1"
+        "dpc-sdp/tide_core": "1.2.0",
+        "dpc-sdp/tide_media": "1.2.1"
     },
     "suggest": {
         "dpc-sdp/tide_api:1.2.0": "Allows to use Drupal in headless mode",
