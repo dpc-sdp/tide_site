@@ -11,10 +11,10 @@ use Drupal\Core\Render\BubbleableMetadata;
  * Implements hook_token_info_alter().
  */
 function tide_site_token_info_alter(&$data) {
-  $data['tokens']['url']['path-no-site-prefix'] = array(
+  $data['tokens']['url']['path-no-site-prefix'] = [
     'name' => t('Path without Site Prefix'),
     'description' => t('The base path component without site prefix.'),
-  );
+  ];
 }
 
 /**
