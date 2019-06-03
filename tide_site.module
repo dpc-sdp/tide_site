@@ -380,8 +380,8 @@ function tide_site_form_node_form_alter(&$form, FormStateInterface $form_state) 
   $node = $form_state->getFormObject()->getEntity();
   $form['tide_site_path_settings'] = [
     '#type' => 'details',
-    '#title' => t('URL path settings'),
-    '#open' => !empty($form['path']['widget'][0]['alias']['#value']),
+    '#title' => t('URL alias'),
+    '#open' => !empty($form['path']['widget'][0]['alias']['#default_value']),
     '#group' => 'advanced',
     '#access' => !empty($form['path']['#access']) && $node->hasField('path') && $node->get('path')->access('edit'),
     '#attributes' => [
@@ -444,7 +444,9 @@ function tide_site_form_node_form_alter(&$form, FormStateInterface $form_state) 
  */
 function tide_site_form_node_form_after_build(array $form, FormStateInterface $form_state) {
   // Hide the Path/Pathauto URL settings from all users.
-  $form['path_settings']['#access'] = FALSE;
+  $form['path']['#access'] = FALSE;
+  $form['path']['widget']['#access'] = FALSE;
+  $form['path']['widget'][0]['#access'] = FALSE;
   // If the node has no alias, always generate one via pathauto.
   if (empty($form['tide_site_path_settings']['aliases'])) {
     $path = $form_state->getValue('path');
@@ -628,7 +630,7 @@ function tide_site_linkit_substitution_alter(&$data) {
  * Implements hook_search_api_index_items_alter().
  */
 function tide_site_search_api_index_items_alter(IndexInterface $index, array &$items) {
-  foreach ($items as $item_id => $item) {
+  foreach ($items as $item) {
 
     // Add all urls to the url field.
     $url = $item->getField('url');
@@ -652,4 +654,11 @@ function tide_site_search_api_index_items_alter(IndexInterface $index, array &$i
       }
     }
   }
+}
+
+/**
+ * Implements hook_tide_api_jsonapi_custom_query_parameters_alter().
+ */
+function tide_site_tide_api_jsonapi_custom_query_parameters_alter(&$custom_params) {
+  $custom_params[] = 'site';
 }
