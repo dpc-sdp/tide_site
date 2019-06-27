@@ -577,8 +577,8 @@ function tide_site_node_presave($node) {
     $old_node = $node->original;
     /** @var \Drupal\tide_site\TideSiteHelper $helper */
     $helper = \Drupal::service('tide_site.helper');
-    $new_sites = $helper->getEntitySites($node, TRUE) ?: ['ids' => []];
     $old_sites = $helper->getEntitySites($old_node, TRUE) ?: ['ids' => []];
+    $new_sites = $helper->getEntitySites($node, TRUE) ?: ['ids' => []];
 
     $unassigned_sites = array_diff($old_sites['ids'], $new_sites['ids']);
     if ($unassigned_sites) {
