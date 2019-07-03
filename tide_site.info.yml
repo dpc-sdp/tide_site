@@ -18,12 +18,8 @@ dependencies:
   - entity_browser:entity_browser_entity_form
 config_devel:
   install:
-    - core.entity_form_display.paragraph.call_to_action_image.default
     - core.entity_form_display.taxonomy_term.sites.default
-    - core.entity_view_display.paragraph.call_to_action_image.default
     - core.entity_view_display.taxonomy_term.sites.default
-    - field.field.paragraph.call_to_action_image.field_paragraph_cta
-    - field.field.paragraph.call_to_action_image.field_paragraph_media
     - field.field.taxonomy_term.sites.field_acknowledgement_to_country
     - field.field.taxonomy_term.sites.field_site_domains
     - field.field.taxonomy_term.sites.field_site_footer_logos
@@ -47,9 +43,6 @@ config_devel:
     - field.storage.taxonomy_term.field_site_main_menu
     - field.storage.taxonomy_term.field_site_show_exit_site
     - field.storage.taxonomy_term.field_site_slogan
-    - paragraphs.paragraphs_type.call_to_action_image
     - taxonomy.vocabulary.sites
   optional:
-    - jsonapi_extras.jsonapi_resource_config.paragraph--call_to_action_image
     - jsonapi_extras.jsonapi_resource_config.taxonomy_term--sites
-    - user.role.anonymous
