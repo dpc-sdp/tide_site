@@ -7,6 +7,7 @@ dependencies:
     - taxonomy.vocabulary.sites
   module:
     - entity_reference_revisions
+    - paragraphs
 id: taxonomy_term.sites.field_site_footer_logos
 field_name: field_site_footer_logos
 entity_type: taxonomy_term
@@ -27,73 +28,4 @@ settings:
       call_to_action_image:
         enabled: true
         weight: 25
-      accordion:
-        weight: 26
-        enabled: false
-      accordion_content:
-        weight: 27
-        enabled: false
-      banner:
-        weight: 28
-        enabled: false
-      basic_text:
-        weight: 29
-        enabled: false
-      call_to_action:
-        weight: 30
-        enabled: false
-      card_event:
-        weight: 31
-        enabled: false
-      card_keydates:
-        weight: 32
-        enabled: false
-      card_navigation:
-        weight: 33
-        enabled: false
-      card_navigation_auto:
-        weight: 34
-        enabled: false
-      card_navigation_featured:
-        weight: 35
-        enabled: false
-      card_navigation_featured_auto:
-        weight: 36
-        enabled: false
-      card_promotion:
-        weight: 37
-        enabled: false
-      card_promotion_auto:
-        weight: 38
-        enabled: false
-      contact_us:
-        weight: 39
-        enabled: false
-      embedded_webform:
-        weight: 40
-        enabled: false
-      featured_news:
-        weight: 41
-        enabled: false
-      keydates:
-        weight: 42
-        enabled: false
-      key_journeys:
-        weight: 43
-        enabled: false
-      links:
-        weight: 44
-        enabled: false
-      news_listing:
-        weight: 45
-        enabled: false
-      phone:
-        weight: 46
-        enabled: false
-      related_links:
-        weight: 47
-        enabled: false
-      social_link:
-        weight: 48
-        enabled: false
 field_type: entity_reference_revisions
