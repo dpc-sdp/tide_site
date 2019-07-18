@@ -8,7 +8,7 @@
         "dpc-sdp/tide_media": "^1.2.5"
     },
     "suggest": {
-        "dpc-sdp/tide_api:dev-feature/SDPA-2735_fix_interdependencies": "Allows to use Drupal in headless mode"
+        "dpc-sdp/tide_api:1.2.8": "Allows to use Drupal in headless mode"
     },
     "repositories": {
         "drupal": {
