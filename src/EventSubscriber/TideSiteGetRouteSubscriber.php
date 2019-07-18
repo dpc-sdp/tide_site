@@ -6,6 +6,8 @@ use Drupal\Core\Cache\Cache;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\tide_api\Event\GetRouteEvent;
 use Drupal\tide_api\TideApiEvents;
+use Drupal\tide_api\TideApiHelper;
+use Drupal\tide_site\TideSiteHelper;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Response;
@@ -18,6 +20,33 @@ use Symfony\Component\HttpFoundation\Response;
 class TideSiteGetRouteSubscriber implements EventSubscriberInterface {
   use ContainerAwareTrait;
   use StringTranslationTrait;
+
+  /**
+   * Tide Site Helper.
+   *
+   * @var \Drupal\tide_site\TideSiteHelper
+   */
+  protected $siteHelper;
+
+  /**
+   * Tide Api Helper.
+   *
+   * @var \Drupal\tide_api\TideApiHelper
+   */
+  protected $apiHelper;
+
+  /**
+   * TideSiteGetRouteSubscriber constructor.
+   *
+   * @param \Drupal\tide_site\TideSiteHelper $site_helper
+   *   Tide Site Helper.
+   * @param \Drupal\tide_api\TideApiHelper $api_helper
+   *   Tide API Helper.
+   */
+  public function __construct(TideSiteHelper $site_helper, TideApiHelper $api_helper) {
+    $this->siteHelper = $site_helper;
+    $this->apiHelper = $api_helper;
+  }
 
   /**
    * {@inheritdoc}
@@ -41,24 +70,26 @@ class TideSiteGetRouteSubscriber implements EventSubscriberInterface {
     }
 
     $request = $event->getRequest();
-    $path = $request->query->get('path');
+    $path = $this->apiHelper->getRequestedPath($request);
 
     $response = $event->getJsonResponse();
     if (empty($response['data']) && $path !== '/') {
       return;
     }
 
-    /** @var \Drupal\tide_site\TideSiteHelper $helper */
-    $helper = $this->container->get('tide_site.helper');
-    /** @var \Drupal\tide_api\TideApiHelper $api_helper */
-    $api_helper = $this->container->get('tide_api.helper');
-
     try {
       $uuid = isset($response['data']['id']) ? $response['data']['id'] : NULL;
 
+      /** @var \Drupal\Core\Entity\EntityInterface $entity */
+      $entity = $event->getEntity();
+      if ($entity && $entity->getEntityTypeId() == 'redirect') {
+        $this->processGetRouteRedirect($event);
+        return;
+      }
+
       $entity_type = isset($response['data']['attributes']['entity_type']) ? $response['data']['attributes']['entity_type'] : NULL;
       // Do nothing if this is not a restricted entity type.
-      if (!$helper->isRestrictedEntityType($entity_type) && $path !== '/') {
+      if (!$this->siteHelper->isRestrictedEntityType($entity_type) && $path !== '/') {
         return;
       }
 
@@ -66,36 +97,33 @@ class TideSiteGetRouteSubscriber implements EventSubscriberInterface {
       // No Site ID provided, should we return a 400 status code?
       if (empty($site_id)) {
         // Fetch the entity.
-        $entity = $event->getEntity();
+        /** @var \Drupal\Core\Entity\FieldableEntityInterface $entity */
         // The Entity maybe empty as TideApi loaded its route data from cache.
         if (!$entity) {
-          $entity = $helper->getEntityByUuid($uuid, $entity_type);
+          $entity = $this->siteHelper->getEntityByUuid($uuid, $entity_type);
         }
-        if ($entity && $helper->isRestrictedEntityType($entity->getEntityTypeId())) {
-          $sites = $helper->getEntitySites($entity);
+        if ($entity && $this->siteHelper->isRestrictedEntityType($entity->getEntityTypeId())) {
+          $sites = $this->siteHelper->getEntitySites($entity);
           // This entity has Sites and is restricted from being accessed by Site
           // but our required Site parameter is missing,
           // so we stop processing and return a Bad Request 400 code.
           if ($sites) {
             $event->setCode(Response::HTTP_BAD_REQUEST);
-            $response['errors'] = [
-              [
-                'status' => Response::HTTP_BAD_REQUEST,
-                'title' => $this->t("URL query parameter 'site' is required."),
-              ],
-            ];
-            unset($response['data']);
+            $this->apiHelper->setJsonResponseError($response, $event->getCode(), $this->t("URL query parameter 'site' is required."));
           }
         }
       }
       // Fetch the entity and validate its Site.
       else {
         // Attempt to load the response from data cache.
-        $cid = 'tide_site:api:route:path:' . hash('sha256', $path) . ':site:' . $site_id;
+        $cid = $this->siteHelper->getRouteCacheId($path, $site_id);
         $cache_response = $this->cache('data')->get($cid);
         if ($cache_response) {
           $event->setCode($cache_response->data['code']);
           $response = $cache_response->data['response'];
+          if (!empty($cache_response->tags) && is_array($cache_response->tags)) {
+            $event->getCacheableMetadata()->addCacheTags($cache_response->tags);
+          }
         }
         // Cache miss.
         else {
@@ -103,31 +131,23 @@ class TideSiteGetRouteSubscriber implements EventSubscriberInterface {
           if ($path == '/') {
             // Ignore the current response
             // because each site has its own homepage.
-            $site_term = $helper->getSiteById($site_id);
-            $entity = $helper->getSiteHomepageEntity($site_term);
+            $site_term = $this->siteHelper->getSiteById($site_id);
+            $entity = $this->siteHelper->getSiteHomepageEntity($site_term);
 
             // The site does not have a homepage,
             // load the global frontpage instead.
             if (!$entity) {
-              $frontpage = $api_helper->getFrontPagePath();
-              $frontpage_url = $api_helper->findUrlFromPath($frontpage);
+              $frontpage = $this->apiHelper->getFrontPagePath();
+              $frontpage_url = $this->apiHelper->findUrlFromPath($frontpage);
               if ($frontpage_url) {
-                $entity = $api_helper->findEntityFromUrl($frontpage_url);
+                $entity = $this->apiHelper->findEntityFromUrl($frontpage_url);
               }
             }
 
             // Now we have the homepage entity, override response data.
             if ($entity) {
               // Override response data with site homepage.
-              $endpoint = $api_helper->findEndpointFromEntity($entity);
-              $entity_type = $entity->getEntityTypeId();
-              $response['data']['attributes'] = [
-                'entity_type' => $entity_type,
-                'entity_id' => $entity->id(),
-                'bundle' => $entity->bundle(),
-                'uuid' => $entity->uuid(),
-                'endpoint' => $endpoint,
-              ];
+              $this->apiHelper->setJsonResponseDataAttributesFromEntity($response, $entity, $event->getCacheableMetadata());
             }
           }
           // Not homepage, fetch the entity from the response.
@@ -135,29 +155,23 @@ class TideSiteGetRouteSubscriber implements EventSubscriberInterface {
             $entity = $event->getEntity();
             // The Entity maybe empty as TideApi loaded its data from cache.
             if (!$entity) {
-              $entity = $helper->getEntityByUuid($uuid, $entity_type);
+              $entity = $this->siteHelper->getEntityByUuid($uuid, $entity_type);
             }
           }
 
           // The entity is missing for some reasons.
           if (!$entity) {
             $event->setCode(Response::HTTP_NOT_FOUND);
-            $response['errors'] = [
-              [
-                'status' => Response::HTTP_NOT_FOUND,
-                'title' => $this->t('Path not found.'),
-              ],
-            ];
-            unset($response['data']);
+            $this->apiHelper->setJsonResponseError($response, $event->getCode());
           }
           // Now we have the entity, check if its Site ID matches the request.
           // Again, only works with restricted entity types.
-          elseif ($helper->isRestrictedEntityType($entity->getEntityTypeId())) {
+          elseif ($this->siteHelper->isRestrictedEntityType($entity->getEntityTypeId())) {
             $cache_tags = [$site_id => 'taxonomy_term:' . $site_id];
-            $valid = $helper->isEntityBelongToSite($entity, $site_id);
+            $valid = $this->siteHelper->isEntityBelongToSite($entity, $site_id);
             // It belongs to the right Site.
             if ($valid) {
-              $sites = $helper->getEntitySites($entity);
+              $sites = $this->siteHelper->getEntitySites($entity);
               // Add Section ID to the response.
               $section_id = $sites['sections'][$site_id];
               $response['data']['attributes']['section'] = $section_id;
@@ -168,13 +182,7 @@ class TideSiteGetRouteSubscriber implements EventSubscriberInterface {
             // The entity does not belong to the requested Site.
             else {
               $event->setCode(Response::HTTP_NOT_FOUND);
-              $response['errors'] = [
-                [
-                  'status' => Response::HTTP_NOT_FOUND,
-                  'title' => $this->t('Path not found.'),
-                ],
-              ];
-              unset($response['data']);
+              $this->apiHelper->setJsonResponseError($response, Response::HTTP_NOT_FOUND);
             }
 
             $this->cache('data')->set($cid, [
@@ -195,6 +203,47 @@ class TideSiteGetRouteSubscriber implements EventSubscriberInterface {
     // The API call does not pass Site filter, stop propagating the event.
     if (!$event->isOk()) {
       $event->stopPropagation();
+    }
+  }
+
+  /**
+   * Process the redirect from the GetRoute event.
+   *
+   * @param \Drupal\tide_api\Event\GetRouteEvent $event
+   *   The event object.
+   */
+  protected function processGetRouteRedirect(GetRouteEvent $event) {
+    $response = $event->getJsonResponse();
+    // Only process the redirect to internal paths.
+    if ($response['data']['attributes']['redirect_type'] != 'internal') {
+      return;
+    }
+
+    $redirect_url = $response['data']['attributes']['redirect_url'];
+    $prefix_site_id = $this->siteHelper->getSiteIdFromSitePrefix($redirect_url);
+    // This destination path does not have the site prefix, bail out early.
+    if (!$prefix_site_id) {
+      return;
+    }
+
+    $destination_site = $this->siteHelper->getSiteById($prefix_site_id);
+    if ($destination_site) {
+      $prefix = $this->siteHelper->getSitePathPrefix($destination_site);
+      $current_site_id = $event->getRequest()->query->get('site');
+      // Remove the site prefix and returns if the redirect belongs to the
+      // same site.
+      $redirect_url = str_replace($prefix, '', $redirect_url);
+      if ($current_site_id == $destination_site->id()) {
+        $response['data']['attributes']['redirect_url'] = $redirect_url;
+      }
+      // Otherwise treat it as an external path, and return the full URL
+      // of the destination site.
+      else {
+        $response['data']['attributes']['redirect_type'] = 'external';
+        $response['data']['attributes']['redirect_url'] = $this->siteHelper->getSiteBaseUrl($destination_site) . $redirect_url;
+      }
+      $event->setJsonResponse($response);
+      $event->getCacheableMetadata()->addCacheableDependency($destination_site);
     }
   }
 
