@@ -18,3 +18,7 @@ services:
     arguments: ['@entity_type.manager', '@entity.repository']
     calls:
       - [setContainer, ['@service_container']]
+  tide_site.event_subscriber:
+    class: Drupal\tide_site\EventSubscriber\TideSiteRouteAlter
+    tags:
+      - { name: event_subscriber }

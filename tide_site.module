@@ -662,3 +662,37 @@ function tide_site_search_api_index_items_alter(IndexInterface $index, array &$i
 function tide_site_tide_api_jsonapi_custom_query_parameters_alter(&$custom_params) {
   $custom_params[] = 'site';
 }
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function tide_site_form_views_exposed_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+  if (Drupal::routeMatch()->getRouteName() == 'system.admin_content' && _has_target_site_fields()) {
+    $primary_sites_term_options = [];
+    $storage = Drupal::entityTypeManager()->getStorage('taxonomy_term');
+    $primary_sites_terms = $storage->loadTree('sites', 0, 1, TRUE);
+    foreach ($primary_sites_terms as $term) {
+      $primary_sites_term_options[$term->id()] = $term->getName();
+    }
+    $options = ['All' => t('- Any -')] + $primary_sites_term_options;
+    $form['field_node_primary_site_target_id']['#options'] = $options;
+  }
+}
+
+/**
+ * Check if field_node_primary_site and field_node_site in the database.
+ */
+function _has_target_site_fields() {
+  $node_fields = Drupal::entityQuery('field_storage_config')
+    ->condition('entity_type', 'node')
+    ->condition('type', 'entity_reference')
+    ->execute();
+  $target_fields = [
+    'node.' . TideSiteFields::normaliseFieldName(TideSiteFields::FIELD_PRIMARY_SITE, 'node'),
+    'node.' . TideSiteFields::normaliseFieldName(TideSiteFields::FIELD_SITE, 'node'),
+  ];
+  if (count(array_intersect($node_fields, $target_fields)) == count($target_fields)) {
+    return TRUE;
+  }
+  return FALSE;
+}
