@@ -668,6 +668,7 @@ function tide_site_tide_api_jsonapi_custom_query_parameters_alter(&$custom_param
  */
 function tide_site_form_views_exposed_form_alter(&$form, FormStateInterface $form_state, $form_id) {
   if (Drupal::routeMatch()->getRouteName() == 'system.admin_content' && _has_target_site_fields()) {
+    $form['#attached']['library'][] = 'tide_site/tide_site_layout';
     $primary_sites_term_options = [];
     $storage = Drupal::entityTypeManager()->getStorage('taxonomy_term');
     $primary_sites_terms = $storage->loadTree('sites', 0, 1, TRUE);

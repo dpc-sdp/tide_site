@@ -1,0 +1,4 @@
+tide_site_layout:
+  css:
+    theme:
+      css/tide_site_layout.css: {}

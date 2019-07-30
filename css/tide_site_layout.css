@@ -1,0 +1,7 @@
+.form--inline .form-item {
+  min-height: 52px;
+}
+
+.js input.form-autocomplete {
+  max-width: 300px;
+}
