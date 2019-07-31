@@ -6,9 +6,9 @@ use Drupal\Core\Routing\RouteSubscriberBase;
 use Symfony\Component\Routing\RouteCollection;
 
 /**
- * Class TideSiteRedirection.
+ * Class TideSiteRouteAlter.
  *
- * @package Drupal\tide_site\RouteSubscriber
+ * @package Drupal\tide_site
  */
 class TideSiteRouteAlter extends RouteSubscriberBase {
 
@@ -18,12 +18,10 @@ class TideSiteRouteAlter extends RouteSubscriberBase {
    * {@inheritDoc}.
    */
   protected function alterRoutes(RouteCollection $collection) {
-    if ($route = $collection->get('system.admin_content')) {
-      /** @var \Drupal\Core\Routing\RouteProvider $route_provider */
-      $route_provider = \Drupal::service('router.route_provider');
-      if (count($route_provider->getRoutesByNames(['view.summary_contents.page'])) === 1) {
-        $collection->add('system.admin_content', clone $collection->get('view.summary_contents.page'));
-      }
+    $route = $collection->get('system.admin_content');
+    $summary_contents_route = $collection->get('view.summary_contents.page');
+    if ($route && $summary_contents_route) {
+      $collection->add('system.admin_content', clone $summary_contents_route);
     }
   }
 

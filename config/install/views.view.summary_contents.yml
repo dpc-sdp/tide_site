@@ -1073,7 +1073,7 @@ display:
     position: 1
     display_options:
       display_extenders: {  }
-      path: summary_contents/node
+      path: admin/content/node
       display_description: ''
       menu:
         type: 'default tab'
