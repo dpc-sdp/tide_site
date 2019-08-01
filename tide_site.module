@@ -678,6 +678,9 @@ function tide_site_form_views_exposed_form_alter(&$form, FormStateInterface $for
       foreach ($primary_sites_terms as $term) {
         $primary_sites_term_options[$term->id()] = $term->getName();
       }
+      if (isset($form['moderation_state']['#options']['Editorial']) && in_array('Published', $form['moderation_state']['#options']['Editorial'])) {
+        unset($form['moderation_state']['#options']['Editorial']['editorial-published']);
+      }
       $options = ['All' => t('- Any -')] + $primary_sites_term_options;
       $form['field_node_primary_site_target_id']['#options'] = $options;
     }
