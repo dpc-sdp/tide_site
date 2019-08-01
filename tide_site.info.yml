@@ -16,3 +16,33 @@ dependencies:
   - dpc-sdp:tide_media
   - entity_browser:entity_browser
   - entity_browser:entity_browser_entity_form
+config_devel:
+  install:
+    - core.entity_form_display.taxonomy_term.sites.default
+    - core.entity_view_display.taxonomy_term.sites.default
+    - field.field.taxonomy_term.sites.field_acknowledgement_to_country
+    - field.field.taxonomy_term.sites.field_site_domains
+    - field.field.taxonomy_term.sites.field_site_footer_logos
+    - field.field.taxonomy_term.sites.field_site_footer_menu
+    - field.field.taxonomy_term.sites.field_site_footer_text
+    - field.field.taxonomy_term.sites.field_site_homepage
+    - field.field.taxonomy_term.sites.field_site_logo
+    - field.field.taxonomy_term.sites.field_site_main_menu
+    - field.field.taxonomy_term.sites.field_site_show_exit_site
+    - field.field.taxonomy_term.sites.field_site_slogan
+    - field.storage.media.field_media_site
+    - field.storage.node.field_node_primary_site
+    - field.storage.node.field_node_site
+    - field.storage.taxonomy_term.field_acknowledgement_to_country
+    - field.storage.taxonomy_term.field_site_domains
+    - field.storage.taxonomy_term.field_site_footer_logos
+    - field.storage.taxonomy_term.field_site_footer_menu
+    - field.storage.taxonomy_term.field_site_footer_text
+    - field.storage.taxonomy_term.field_site_homepage
+    - field.storage.taxonomy_term.field_site_logo
+    - field.storage.taxonomy_term.field_site_main_menu
+    - field.storage.taxonomy_term.field_site_show_exit_site
+    - field.storage.taxonomy_term.field_site_slogan
+    - taxonomy.vocabulary.sites
+  optional:
+    - jsonapi_extras.jsonapi_resource_config.taxonomy_term--sites

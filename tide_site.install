@@ -5,6 +5,8 @@
  * Install file for tide_site.
  */
 
+use Drupal\Core\Config\FileStorage;
+
 /**
  * Implements hook_install().
  */
@@ -75,4 +77,15 @@ function tide_site_update_8002(&$sandbox) {
   if ($sandbox['#finished'] >= 1) {
     \Drupal::messenger()->addStatus(t('The batch URL Alias update is finished.'));
   }
+}
+
+/**
+ * Import summary_contents and summary_media views.
+ */
+function tide_site_update_8003() {
+  $view = 'views.view.summary_contents';
+  $config_path = drupal_get_path('module', 'tide_site') . '/config/install';
+  $source = new FileStorage($config_path);
+  $config_storage = \Drupal::service('config.storage');
+  $config_storage->write($view, $source->read($view));
 }
