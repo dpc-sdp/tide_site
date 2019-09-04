@@ -233,6 +233,14 @@ function tide_site_views_pre_view(ViewExecutable $view, $display_id, array &$arg
       'alter' => [],
     ];
     $view->addHandler($display_id, 'field', 'media__field_media_site', 'field_media_site', $site_field, 'field_media_site');
+
+    // Access to node_bulk_form should be restricted to the site_admin role.
+    if ($view->id() === 'summary_contents') {
+      $current_user = \Drupal::currentUser();
+      if (!in_array('site_admin', $current_user->getRoles())) {
+        $view->removeHandler('page', 'field', 'node_bulk_form');
+      }
+    }
   }
 }
 
