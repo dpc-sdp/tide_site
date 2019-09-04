@@ -28,6 +28,7 @@ config_devel:
     - field.field.taxonomy_term.sites.field_site_homepage
     - field.field.taxonomy_term.sites.field_site_logo
     - field.field.taxonomy_term.sites.field_site_main_menu
+    - field.field.taxonomy_term.sites.field_site_og_image
     - field.field.taxonomy_term.sites.field_site_show_exit_site
     - field.field.taxonomy_term.sites.field_site_slogan
     - field.storage.media.field_media_site
@@ -41,8 +42,10 @@ config_devel:
     - field.storage.taxonomy_term.field_site_homepage
     - field.storage.taxonomy_term.field_site_logo
     - field.storage.taxonomy_term.field_site_main_menu
+    - field.storage.taxonomy_term.field_site_og_image
     - field.storage.taxonomy_term.field_site_show_exit_site
     - field.storage.taxonomy_term.field_site_slogan
     - taxonomy.vocabulary.sites
   optional:
     - jsonapi_extras.jsonapi_resource_config.taxonomy_term--sites
+    - metatag.metatag_defaults.taxonomy_term__sites
