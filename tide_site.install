@@ -6,6 +6,8 @@
  */
 
 use Drupal\Core\Config\FileStorage;
+use Drupal\scheduled_transitions\ScheduledTransitionsPermissions;
+use Drupal\user\Entity\Role;
 
 /**
  * Implements hook_install().
@@ -98,4 +100,23 @@ function tide_site_update_8004() {
   $config = $config_factory->getEditable('system.action.node_delete_action');
   $config->set('plugin', 'entity:delete_action:node');
   $config->save();
+}
+
+/**
+ * Imports default permissions to approver and site_admin.
+ */
+function tide_site_update_8005() {
+  $roles = ['approver', 'site_admin'];
+  $node_types = \Drupal::entityTypeManager()
+    ->getStorage('node_type')
+    ->loadMultiple();
+  foreach ($roles as $role) {
+    $permissions = [];
+    foreach ($node_types as $type => $details) {
+      $permissions[] = ScheduledTransitionsPermissions::viewScheduledTransitionsPermission('node', $type);
+      $permissions[] = ScheduledTransitionsPermissions::addScheduledTransitionsPermission('node', $type);
+    }
+    $permissions[] = 'view all scheduled transitions';
+    user_role_grant_permissions(Role::load($role)->id(), $permissions);
+  }
 }
