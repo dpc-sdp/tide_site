@@ -149,3 +149,13 @@ function tide_site_update_8005() {
     }
   }
 }
+
+/**
+ * Updating summary_contents view.
+ */
+function tide_site_update_8006() {
+  $config_path = drupal_get_path('module', 'tide_site') . '/config/install';
+  $source = new FileStorage($config_path);
+  $config_storage = \Drupal::service('config.storage');
+  $config_storage->write('views.view.summary_contents', $source->read('views.view.summary_contents'));
+}
