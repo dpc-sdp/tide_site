@@ -32,9 +32,9 @@ function drush_tide_site_env_domain_update() {
 
   try {
     $environment = getenv('LAGOON_GIT_BRANCH');
-    drush_print('Environment' . $environment);
-    if ($environment == 'production) {
-        drush_print('This command cannot run in Lagoon production environments.');
+    drush_print('Environment ' . $environment);
+    if ($environment == 'production') {
+      drush_print('This command cannot run in Lagoon production environments.');
     }
     else {
       $fe_domains = getenv('FE_DOMAINS');
