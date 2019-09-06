@@ -31,18 +31,25 @@ function tide_site_drush_command() {
 function drush_tide_site_env_domain_update() {
 
   try {
-    $fe_domains = getenv('FE_DOMAINS');
-    if (!empty($fe_domains)) {
-      foreach (explode(',', $fe_domains) as $fe_domain) {
-        $domain = explode('|', $fe_domain);
-        $term = Term::load($domain[0]);
-        $term->set('field_site_domains', str_replace('<br/>', "\r\n", $domain[1]));
-        $term->save();
-      }
-      drush_print('Domains Updated.');
+    $environment = getenv('LAGOON_GIT_BRANCH');
+    drush_print('Environment' . $environment);
+    if ($environment == 'production) {
+        drush_print('This command cannot run in Lagoon production environments.');
     }
     else {
-      drush_print('No site specific domains were found in this environment.');
+      $fe_domains = getenv('FE_DOMAINS');
+      if (!empty($fe_domains)) {
+        foreach (explode(',', $fe_domains) as $fe_domain) {
+          $domain = explode('|', $fe_domain);
+          $term = Term::load($domain[0]);
+          $term->set('field_site_domains', str_replace('<br/>', "\r\n", $domain[1]));
+          $term->save();
+        }
+        drush_print('Domains Updated.');
+      }
+      else {
+        drush_print('No site specific domains were found in this environment.');
+      }
     }
   }
   catch (ConsoleException $exception) {
