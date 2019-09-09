@@ -21,6 +21,7 @@ config_devel:
     - core.entity_form_display.taxonomy_term.sites.default
     - core.entity_view_display.taxonomy_term.sites.default
     - field.field.taxonomy_term.sites.field_acknowledgement_to_country
+    - field.field.taxonomy_term.sites.field_prominence_ack_to_country
     - field.field.taxonomy_term.sites.field_site_domains
     - field.field.taxonomy_term.sites.field_site_footer_logos
     - field.field.taxonomy_term.sites.field_site_footer_menu
@@ -35,6 +36,7 @@ config_devel:
     - field.storage.node.field_node_primary_site
     - field.storage.node.field_node_site
     - field.storage.taxonomy_term.field_acknowledgement_to_country
+    - field.storage.taxonomy_term.field_prominence_ack_to_country
     - field.storage.taxonomy_term.field_site_domains
     - field.storage.taxonomy_term.field_site_footer_logos
     - field.storage.taxonomy_term.field_site_footer_menu
