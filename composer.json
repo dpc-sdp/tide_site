@@ -8,7 +8,7 @@
         "dpc-sdp/tide_media": "^1.2.6"
     },
     "suggest": {
-        "dpc-sdp/tide_api:^1.2.8": "Allows to use Drupal in headless mode"
+        "dpc-sdp/tide_api": "^1.2.11"
     },
     "repositories": {
         "drupal": {

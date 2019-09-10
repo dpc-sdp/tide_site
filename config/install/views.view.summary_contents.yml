@@ -11,7 +11,7 @@ dependencies:
     - taxonomy
     - user
 id: summary_contents
-label: 'Content'
+label: Content
 module: views
 description: 'Find and moderate content.'
 tag: ''
@@ -83,12 +83,18 @@ display:
           summary: ''
           description: ''
           columns:
+            node_bulk_form: node_bulk_form
             title: title
             type: type
             name: name
             moderation_state: moderation_state
             changed: changed
           info:
+            node_bulk_form:
+              align: ''
+              separator: ''
+              empty_column: false
+              responsive: ''
             title:
               sortable: true
               default_sort_order: asc
@@ -129,6 +135,22 @@ display:
       row:
         type: fields
       fields:
+        node_bulk_form:
+          id: node_bulk_form
+          table: node
+          field: node_bulk_form
+          label: ''
+          exclude: false
+          alter:
+            alter_text: false
+          element_class: ''
+          element_default_classes: true
+          empty: ''
+          hide_empty: false
+          empty_zero: false
+          hide_alter_empty: true
+          plugin_id: node_bulk_form
+          entity_type: node
         title:
           id: title
           table: node_field_revision
@@ -194,11 +216,11 @@ display:
           entity_type: node
           entity_field: title
           plugin_id: field
-        field_node_primary_site-revision_id:
-          id: field_node_primary_site-revision_id
-          table: node_revision__field_node_primary_site
-          field: field_node_primary_site-revision_id
-          relationship: none
+        field_node_primary_site:
+          id: field_node_primary_site
+          table: node__field_node_primary_site
+          field: field_node_primary_site
+          relationship: nid
           group_type: group
           admin_label: ''
           label: Site
@@ -257,11 +279,11 @@ display:
           separator: ', '
           field_api_classes: false
           plugin_id: field
-        field_node_site-revision_id:
-          id: field_node_site-revision_id
-          table: node_revision__field_node_site
-          field: field_node_site-revision_id
-          relationship: none
+        field_node_site:
+          id: field_node_site
+          table: node__field_node_site
+          field: field_node_site
+          relationship: nid
           group_type: group
           admin_label: ''
           label: Sub-Site
@@ -711,9 +733,9 @@ display:
           plugin_id: string
         field_node_primary_site_target_id:
           id: field_node_primary_site_target_id
-          table: node_revision__field_node_primary_site
+          table: node__field_node_primary_site
           field: field_node_primary_site_target_id
-          relationship: none
+          relationship: nid
           group_type: group
           admin_label: ''
           operator: or
@@ -762,9 +784,9 @@ display:
           plugin_id: taxonomy_index_tid
         field_node_site_target_id:
           id: field_node_site_target_id
-          table: node_revision__field_node_site
+          table: node__field_node_site
           field: field_node_site_target_id
-          relationship: none
+          relationship: nid
           group_type: group
           admin_label: ''
           operator: or
@@ -773,7 +795,7 @@ display:
           exposed: true
           expose:
             operator_id: field_node_site_target_id_op
-            label: Sub-site
+            label: Sub-Site
             description: ''
             use_operator: false
             operator: field_node_site_target_id_op
@@ -815,7 +837,7 @@ display:
           id: uid
           table: users_field_data
           field: uid
-          relationship: uid
+          relationship: revision_uid
           group_type: group
           admin_label: ''
           operator: in
@@ -910,7 +932,6 @@ display:
           value:
             editorial-draft: editorial-draft
             editorial-needs_review: editorial-needs_review
-            editorial-published: editorial-published
             editorial-archived: editorial-archived
           group: 1
           exposed: true
@@ -996,7 +1017,7 @@ display:
           entity_field: status
           plugin_id: boolean
       sorts: {  }
-      title: 'Content'
+      title: Content
       header: {  }
       footer: {  }
       empty:
@@ -1069,7 +1090,7 @@ display:
   page:
     display_plugin: page
     id: page
-    display_title: 'Content'
+    display_title: Content
     position: 1
     display_options:
       display_extenders: {  }
