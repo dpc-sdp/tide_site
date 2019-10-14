@@ -32,7 +32,6 @@ config_devel:
     - field.field.taxonomy_term.sites.field_site_og_image
     - field.field.taxonomy_term.sites.field_site_show_exit_site
     - field.field.taxonomy_term.sites.field_site_slogan
-    - field.storage.media.field_media_site
     - field.storage.node.field_node_primary_site
     - field.storage.node.field_node_site
     - field.storage.taxonomy_term.field_acknowledgement_to_country

@@ -5,7 +5,7 @@
     "license": "GPL-2.0-or-later",
     "require": {
         "dpc-sdp/tide_core": "^1.2.6",
-        "dpc-sdp/tide_media": "^1.2.6"
+        "dpc-sdp/tide_media": "dev-feature/SDPA-2673-Adding-image-is-missing-the-ability-to-add-sites-to-publish as 1.2.6"
     },
     "suggest": {
         "dpc-sdp/tide_api": "^1.2.11"
