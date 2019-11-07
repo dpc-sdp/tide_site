@@ -235,7 +235,7 @@ function tide_site_views_pre_view(ViewExecutable $view, $display_id, array &$arg
     $view->addHandler($display_id, 'field', 'media__field_media_site', 'field_media_site', $site_field, 'field_media_site');
 
     // Access to node_bulk_form should be restricted to the site_admin role.
-    if ($view->id() === 'summary_contents') {
+    if ($view->id() === 'summary_contents_filters') {
       $current_user = \Drupal::currentUser();
       if (!in_array('site_admin', $current_user->getRoles())) {
         $view->removeHandler('page', 'field', 'node_bulk_form');
@@ -677,7 +677,7 @@ function tide_site_tide_api_jsonapi_custom_query_parameters_alter(&$custom_param
 function tide_site_form_views_exposed_form_alter(&$form, FormStateInterface $form_state, $form_id) {
   $view = $form_state->get('view');
   if ($view && $view instanceof ViewExecutable) {
-    if ($view->id() == 'summary_contents' && $view->current_display == 'page') {
+    if ($view->id() == 'summary_contents_filters' && $view->current_display == 'page_1') {
       $form['#attached']['library'][] = 'tide_site/tide_site_layout';
       /** @var \Drupal\tide_site\TideSiteHelper $helper */
       $helper = \Drupal::service('tide_site.helper');
