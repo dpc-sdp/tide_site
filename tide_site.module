@@ -601,6 +601,12 @@ function tide_site_node_update($node) {
       ], FALSE, FALSE);
     }
   }
+  $new_assigned_sites = array_diff($new_sites['ids'], $old_sites['ids']);
+  if ($new_assigned_sites) {
+    /** @var \Drupal\tide_site\AliasStorageHelper $alias_helper */
+    $alias_helper = \Drupal::service('tide_site.alias_storage_helper');
+    $alias_helper->regenerateNodeSiteAliases($node, $new_assigned_sites);
+  }
 }
 
 /**
