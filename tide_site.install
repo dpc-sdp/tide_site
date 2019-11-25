@@ -5,8 +5,6 @@
  * Install file for tide_site.
  */
 
-use Drupal\Core\Config\FileStorage;
-
 /**
  * Implements hook_install().
  */
