@@ -575,42 +575,6 @@ function tide_site_taxonomy_term_delete($term) {
 }
 
 /**
- * Implements hook_ENTITY_TYPE_presave().
- */
-function tide_site_node_presave($node) {
-  // Delete site aliases of the unassigned sites.
-  /** @var \Drupal\node\NodeInterface $node */
-  if (!$node->isNew()) {
-    /** @var \Drupal\node\NodeInterface $old_node */
-    $old_node = $node->original;
-    /** @var \Drupal\tide_site\TideSiteHelper $helper */
-    $helper = \Drupal::service('tide_site.helper');
-    $old_sites = $helper->getEntitySites($old_node, TRUE) ?: ['ids' => []];
-    $new_sites = $helper->getEntitySites($node, TRUE) ?: ['ids' => []];
-
-    $unassigned_sites = array_diff($old_sites['ids'], $new_sites['ids']);
-    if ($unassigned_sites) {
-      /** @var \Drupal\tide_site\AliasStorage $alias_storage */
-      $alias_storage = \Drupal::service('tide_site.alias_storage');
-      foreach ($unassigned_sites as $unassigned_site_id) {
-        $site_prefix = $helper->getSitePathPrefix($unassigned_site_id);
-        $alias_storage->delete([
-          'alias' => $site_prefix . '/%',
-          'source' => '/node/' . $node->id(),
-        ], FALSE, FALSE);
-      }
-    }
-
-    $new_assigned_sites = array_diff($new_sites['ids'], $old_sites['ids']);
-    if ($new_assigned_sites) {
-      /** @var \Drupal\tide_site\AliasStorageHelper $alias_helper */
-      $alias_helper = \Drupal::service('tide_site.alias_storage_helper');
-      $alias_helper->regenerateNodeSiteAliases($node, $new_assigned_sites);
-    }
-  }
-}
-
-/**
  * Implements hook_ENTITY_TYPE_update().
  */
 function tide_site_node_update($node) {
@@ -622,6 +586,26 @@ function tide_site_node_update($node) {
     /** @var \Drupal\tide_site\AliasStorageHelper $alias_helper */
     $alias_helper = \Drupal::service('tide_site.alias_storage_helper');
     $alias_helper->regenerateNodeSiteAliases($node);
+  }
+  $old_node = $node->original;
+  $helper = \Drupal::service('tide_site.helper');
+  $old_sites = $helper->getEntitySites($old_node, TRUE) ?: ['ids' => []];
+  $new_sites = $helper->getEntitySites($node, TRUE) ?: ['ids' => []];
+  $unassigned_sites = array_diff($old_sites['ids'], $new_sites['ids']);
+  if ($unassigned_sites) {
+    foreach ($unassigned_sites as $unassigned_site_id) {
+      $site_prefix = $helper->getSitePathPrefix($unassigned_site_id);
+      $alias_storage->delete([
+        'alias' => $site_prefix . '/%',
+        'source' => '/node/' . $node->id(),
+      ], FALSE, FALSE);
+    }
+  }
+  $new_assigned_sites = array_diff($new_sites['ids'], $old_sites['ids']);
+  if ($new_assigned_sites) {
+    /** @var \Drupal\tide_site\AliasStorageHelper $alias_helper */
+    $alias_helper = \Drupal::service('tide_site.alias_storage_helper');
+    $alias_helper->regenerateNodeSiteAliases($node, $new_assigned_sites);
   }
 }
 
