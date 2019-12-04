@@ -7,7 +7,7 @@ use Drupal\tide_api\TideApiEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
- * Class TideSiteGetRouteSubscriber.
+ * Class TideSiteGetCacheIdSubscriber.
  *
  * @package Drupal\tide_site\EventSubscriber
  */
