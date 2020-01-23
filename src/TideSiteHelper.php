@@ -378,23 +378,12 @@ class TideSiteHelper {
               if (count($trail) == 1) {
                 $sites['ids'][$term_id] = $term_id;
               }
+              $sites['sections'][$term_id] = $term_id;
               $cache_tags[] = 'taxonomy_term:' . $term_id;
             }
             if (empty($sites['ids'])) {
               $sites = ['ids' => [], 'sections' => []];
             }
-            // Build the sections. Each Site should only have one section.
-            foreach ($sites['ids'] as $site_id) {
-              $sites['sections'][$site_id] = $site_id;
-              foreach ($trails as $trail) {
-                $trail_start = reset($trail);
-                $trail_end = end($trail);
-                if ($trail_end != $site_id) {
-                  $sites['sections'][$trail_start] = $trail_end;
-                }
-              }
-            }
-
             // Cache the results.
             if (!$reset) {
               $this->cache('data')->set($cid, $sites, Cache::PERMANENT, Cache::mergeTags($cache_tags, $entity->getCacheTags()));

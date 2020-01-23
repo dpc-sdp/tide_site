@@ -34,8 +34,8 @@ Feature: Route lookup
     Then the rest response status code should be 200
     And the response should be in JSON
     And the JSON node "data" should exist
-    And the JSON node "data.attributes.section" should not contain "10001"
-    And the JSON node "data.attributes.section" should contain "10011"
+    And the JSON node "data.attributes.section" should contain "10001"
+    And the JSON node "data.attributes.section" should not contain "10011"
     And the JSON node "errors" should not exist
 
     When I send a GET request to "api/v1/route?path=/test-article-one-site&site=10011"
