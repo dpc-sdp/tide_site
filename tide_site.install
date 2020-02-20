@@ -206,6 +206,11 @@ function tide_site_update_8009() {
     ->load($view)
     ->setStatus(FALSE)
     ->save();
+
+  \Drupal::entityTypeManager()->getStorage('view')
+    ->load($view)->delete();
+  \Drupal::configFactory()->getEditable('views.view.summary_contents')->delete();
+
 }
 
 /**
