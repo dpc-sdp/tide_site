@@ -15,6 +15,7 @@ use Drupal\taxonomy\Entity\Term;
 use Drupal\tide_site\TideSiteFields;
 use Drupal\tide_site\TideSiteMenuAutocreate;
 use Drupal\views\ViewExecutable;
+use Drupal\field\Entity\FieldConfig;
 
 /**
  * Implements hook_entity_bundle_create().
@@ -44,6 +45,9 @@ function tide_site_entity_bundle_create($entity_type_id, $bundle) {
         // Create/update form display. View display is not created to avoid
         // unexpected fields appearing in UI.
         $field_config = $fields_helper->provisionField($field_name, $entity_type_id, $bundle);
+        $field = FieldConfig::loadByName($entity_type_id, $bundle, $field_config['field_name']);
+        $field->set('required', TRUE);
+        $field->save();
         \Drupal::messenger()->addMessage(t('Added field %name to the %bundle %entity_type entity and form display.', [
           '%name' => $field_config['field_name'],
           '%entity_type' => $entity_type_id,

@@ -35,7 +35,34 @@ Feature: Site fields on media
     When I go to "media/add/mymediatest"
     And I should see an "input#edit-name-0-value" element
     And I should see an "input#edit-name-0-value.required" element
-    And I should see an "#edit-field-media-site--wrapper" element
-    And I should not see an "#edit-field-media-site--wrapper.required" element
+    And I should see an "#edit-field-media-site--wrapper.required" element
     And I should not see an "#edit-field-media-primary-site--wrapper" element
     And I should not see a "#edit-field-media-primary-site--wrapper.required" element
+
+  @api @suggest
+  Scenario: Ensure that sites field are required.
+    Given sites terms:
+      | name                 | parent          | tid   | uuid                                  |
+      | Test Site 1          | 0               | 10010 | 11dede11-10c0-111e1-1100-000000000031 |
+      | Test Section 11      | Test Site 1     | 10011 | 11dede11-10d0-111e1-1100-000000000032 |
+      | Test Section 12      | Test Site 1     | 10014 | 11dede11-10g0-111e1-1100-000000000035 |
+      | Test Site 2          | 0               | 10015 | 11dede11-10h0-111e1-1100-000000000036 |
+      | Test Site 3          | 0               | 10016 | 11dede11-10i0-111e1-1100-000000000037 |
+    And users:
+      | name        | status | uid    | mail                    | pass         | field_user_site | roles  |
+      | test.editor |      1 | 999999 | test.editor@example.com | L9dx9IJz3'M* | Test Section 11 | Editor |
+
+    When I am logged in as "test.editor"
+    And I go to "media/add/audio"
+    Then save screenshot
+    And I should see an "fieldset#edit-field-media-site--wrapper.required" element
+    When I go to "media/add/document"
+    And I should see an "fieldset#edit-field-media-site--wrapper.required" element
+    When I go to "media/add/embedded_video"
+    And I should see an "fieldset#edit-field-media-site--wrapper.required" element
+    When I go to "media/add/file"
+    And I should see an "fieldset#edit-field-media-site--wrapper.required" element
+    When I go to "media/add/image"
+    And I should see an "fieldset#edit-field-media-site--wrapper.required" element
+    When I go to "media/add/video"
+    And I should see an "fieldset#edit-field-media-site--wrapper.required" element
