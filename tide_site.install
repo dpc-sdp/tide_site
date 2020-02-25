@@ -82,10 +82,10 @@ function tide_site_update_8002(&$sandbox) {
 }
 
 /**
- * Import summary_contents and summary_media views.
+ * Import summary_contents_filters views.
  */
 function tide_site_update_8003() {
-  $view = 'views.view.summary_contents';
+  $view = 'views.view.summary_contents_filters';
   $config_path = drupal_get_path('module', 'tide_site') . '/config/install';
   $source = new FileStorage($config_path);
   $config_storage = \Drupal::service('config.storage');
