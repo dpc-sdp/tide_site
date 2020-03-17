@@ -6,6 +6,8 @@
  */
 
 use Drupal\Core\Config\FileStorage;
+use Drupal\field\Entity\FieldStorageConfig;
+use Drupal\field\Entity\FieldConfig;
 
 /**
  * Implements hook_install().
@@ -184,4 +186,56 @@ function tide_site_update_8006() {
 
     $entity_form_display->save();
   }
+}
+
+/**
+ * Change field_media_site to be required.
+ */
+function tide_site_update_8007() {
+  $entity_type = 'media';
+  $field_name = 'field_media_site';
+  $field_storage = FieldStorageConfig::loadByName($entity_type, $field_name);
+  foreach ($field_storage->getBundles() as $bundle) {
+    $field = FieldConfig::loadByName($entity_type, $bundle, $field_name);
+    $field->set('required', TRUE);
+    $field->save();
+  }
+}
+
+/**
+ * Disable default content view.
+ */
+function tide_site_update_8008() {
+  $view = 'content';
+  \Drupal::entityTypeManager()->getStorage('view')
+    ->load($view)
+    ->setStatus(FALSE)
+    ->save();
+}
+
+/**
+ * Disable summary_contents view.
+ */
+function tide_site_update_8009() {
+  $view = 'summary_contents';
+  \Drupal::entityTypeManager()->getStorage('view')
+    ->load($view)
+    ->setStatus(FALSE)
+    ->save();
+
+  \Drupal::entityTypeManager()->getStorage('view')
+    ->load($view)->delete();
+  \Drupal::configFactory()->getEditable('views.view.summary_contents')->delete();
+
+}
+
+/**
+ * Import summary_contents_filters.
+ */
+function tide_site_update_8010() {
+  $view = 'views.view.summary_contents_filters';
+  $config_path = drupal_get_path('module', 'tide_site') . '/config/install';
+  $source = new FileStorage($config_path);
+  $config_storage = \Drupal::service('config.storage');
+  $config_storage->write($view, $source->read($view));
 }
