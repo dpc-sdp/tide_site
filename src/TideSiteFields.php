@@ -103,7 +103,7 @@ class TideSiteFields extends TideCoreFields {
    * Config for 'Site' filed on media entity type.
    */
   protected function getFieldMediaSiteConfig() {
-    return ['required' => FALSE] + $this->getFieldSiteConfig();
+    return ['required' => TRUE] + $this->getFieldSiteConfig();
   }
 
   /**
