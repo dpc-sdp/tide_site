@@ -218,15 +218,19 @@ function tide_site_update_8008() {
  */
 function tide_site_update_8009() {
   $view = 'summary_contents';
-  \Drupal::entityTypeManager()->getStorage('view')
-    ->load($view)
-    ->setStatus(FALSE)
-    ->save();
+  $content_view = \Drupal::entityTypeManager()->getStorage('view')
+    ->load($view);
+  if (!empty($content_view)) {
+    $content_view
+      ->setStatus(FALSE)
+      ->save();
+    $content_view->delete();
+  }
 
-  \Drupal::entityTypeManager()->getStorage('view')
-    ->load($view)->delete();
-  \Drupal::configFactory()->getEditable('views.view.summary_contents')->delete();
-
+  $content_config = \Drupal::configFactory()->getEditable('views.view.summary_contents');
+  if (!empty($content_config)) {
+    $content_config->delete();
+  }
 }
 
 /**
