@@ -67,3 +67,19 @@ To start local development stack:
 
 ## License
 This project is licensed under [GPL2](https://github.com/dpc-sdp/tide_site/blob/master/LICENSE.txt)
+
+# DRUSH
+The Drush command `tide-site-env-domain-update`, alias `tide-si-domup`, will
+update one or more taxonomy terms in the Sites vocabulary with new Domains.
+This command expects an environment variable `FE_DOMAINS` to exist. The var
+must be in this format:
+```
+FE_DOMAINS="4|develop.premier.vic.gov.au,174|temp.exmaple.com<br/>example.com,172|dddtemp.exmaple.com<br/>dsa.example.com"
+```
+The var will get split into an array based on commas, each value being an
+array of tids and domain values. This will then be split into an array based
+on pipes. The key being the tid and value being a list of domains separated by
+<br>, which will be converted into new lines. 
+
+This command can be used to ensure the preview and url enhancer features will
+work on headless sites on non production environments.

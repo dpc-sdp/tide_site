@@ -5,6 +5,10 @@
  * Install file for tide_site.
  */
 
+use Drupal\Core\Config\FileStorage;
+use Drupal\field\Entity\FieldStorageConfig;
+use Drupal\field\Entity\FieldConfig;
+
 /**
  * Implements hook_install().
  */
@@ -75,4 +79,163 @@ function tide_site_update_8002(&$sandbox) {
   if ($sandbox['#finished'] >= 1) {
     \Drupal::messenger()->addStatus(t('The batch URL Alias update is finished.'));
   }
+}
+
+/**
+ * Import summary_contents and summary_media views.
+ */
+function tide_site_update_8003() {
+  $view = 'views.view.summary_contents';
+  $config_path = drupal_get_path('module', 'tide_site') . '/config/install';
+  $source = new FileStorage($config_path);
+  $config_storage = \Drupal::service('config.storage');
+  $config_storage->write($view, $source->read($view));
+}
+
+/**
+ * Fixes node_delete_action plugin issue.
+ */
+function tide_site_update_8004() {
+  $config_factory = \Drupal::configFactory();
+  $config = $config_factory->getEditable('system.action.node_delete_action');
+  $config->set('plugin', 'entity:delete_action:node');
+  $config->save();
+}
+
+/**
+ * Update og:image metatag for taxonomy_term:sites.
+ */
+function tide_site_update_8005() {
+  module_load_include('inc', 'tide_core', 'includes/helpers');
+  $module_path = drupal_get_path('module', 'tide_site');
+  $config_location = [$module_path . '/config/install'];
+  _tide_import_single_config('field.storage.taxonomy_term.field_site_og_image', $config_location);
+  _tide_import_single_config('field.field.taxonomy_term.sites.field_site_og_image', $config_location);
+
+  /** @var \Drupal\Core\Entity\Display\EntityFormDisplayInterface $entity_form_display */
+  $entity_form_display = \Drupal::entityTypeManager()
+    ->getStorage('entity_form_display')
+    ->load('taxonomy_term.sites.default');
+  if ($entity_form_display) {
+    $entity_form_display->setComponent('field_site_og_image', [
+      'weight' => 11,
+      'settings' => [
+        'entity_browser' => 'tide_image_browser',
+        'field_widget_display' => 'rendered_entity',
+        'field_widget_display_settings' => [
+          'view_mode' => 'media_browser_preview',
+        ],
+        'field_widget_edit' => TRUE,
+        'field_widget_remove' => TRUE,
+        'selection_mode' => 'selection_append',
+        'field_widget_replace' => FALSE,
+        'open' => FALSE,
+      ],
+      'third_party_settings' => [],
+      'type' => 'entity_browser_entity_reference',
+      'region' => 'content',
+    ]);
+    $entity_form_display->save();
+  }
+
+  $metatag = \Drupal::configFactory()->getEditable('metatag.metatag_defaults.taxonomy_term__sites');
+  if ($metatag->isNew()) {
+    $config_location = [$module_path . '/config/optional'];
+    _tide_import_single_config('metatag.metatag_defaults.taxonomy_term__sites', $config_location);
+  }
+  else {
+    $og_image = $metatag->get('tags.og_image');
+    if (!$og_image) {
+      $metatag->set('tags.og_image', '[term:field_site_og_image:entity:field_media_image:entity:url]')
+        ->save();
+    }
+  }
+}
+
+/**
+ * Add Prominence of Acknowledgement of Country field.
+ */
+function tide_site_update_8006() {
+  module_load_include('inc', 'tide_core', 'includes/helpers');
+  $module_path = drupal_get_path('module', 'tide_site');
+  $config_location = [$module_path . '/config/install'];
+  _tide_import_single_config('field.storage.taxonomy_term.field_prominence_ack_to_country', $config_location);
+  _tide_import_single_config('field.field.taxonomy_term.sites.field_prominence_ack_to_country', $config_location);
+
+  /** @var \Drupal\Core\Entity\Display\EntityFormDisplayInterface $entity_form_display */
+  $entity_form_display = \Drupal::entityTypeManager()
+    ->getStorage('entity_form_display')
+    ->load('taxonomy_term.sites.default');
+  if ($entity_form_display) {
+    $entity_form_display->setComponent('field_prominence_ack_to_country', [
+      'weight' => 11,
+      'settings' => [
+        'row' => 5,
+        'placeholder' => '',
+      ],
+      'third_party_settings' => [],
+      'type' => 'string_textarea',
+      'region' => 'content',
+    ]);
+
+    $og_image = $entity_form_display->getComponent('field_site_og_image');
+    if ($og_image) {
+      $og_image['weight'] = 12;
+      $entity_form_display->setComponent('field_site_og_image', $og_image);
+    }
+
+    $entity_form_display->save();
+  }
+}
+
+/**
+ * Change field_media_site to be required.
+ */
+function tide_site_update_8007() {
+  $entity_type = 'media';
+  $field_name = 'field_media_site';
+  $field_storage = FieldStorageConfig::loadByName($entity_type, $field_name);
+  foreach ($field_storage->getBundles() as $bundle) {
+    $field = FieldConfig::loadByName($entity_type, $bundle, $field_name);
+    $field->set('required', TRUE);
+    $field->save();
+  }
+}
+
+/**
+ * Disable default content view.
+ */
+function tide_site_update_8008() {
+  $view = 'content';
+  \Drupal::entityTypeManager()->getStorage('view')
+    ->load($view)
+    ->setStatus(FALSE)
+    ->save();
+}
+
+/**
+ * Disable summary_contents view.
+ */
+function tide_site_update_8009() {
+  $view = 'summary_contents';
+  \Drupal::entityTypeManager()->getStorage('view')
+    ->load($view)
+    ->setStatus(FALSE)
+    ->save();
+
+  \Drupal::entityTypeManager()->getStorage('view')
+    ->load($view)->delete();
+  \Drupal::configFactory()->getEditable('views.view.summary_contents')->delete();
+
+}
+
+/**
+ * Import summary_contents_filters.
+ */
+function tide_site_update_8010() {
+  $view = 'views.view.summary_contents_filters';
+  $config_path = drupal_get_path('module', 'tide_site') . '/config/install';
+  $source = new FileStorage($config_path);
+  $config_storage = \Drupal::service('config.storage');
+  $config_storage->write($view, $source->read($view));
 }

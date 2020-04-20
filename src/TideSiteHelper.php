@@ -6,6 +6,7 @@ use Drupal\Core\Cache\Cache;
 use Drupal\Core\Entity\EntityRepositoryInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\FieldableEntityInterface;
+use Drupal\Core\Entity\RevisionableInterface;
 use Drupal\node\NodeInterface;
 use Drupal\taxonomy\TermInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
@@ -271,6 +272,36 @@ class TideSiteHelper {
   }
 
   /**
+   * Check if an internal path has site prefix.
+   *
+   * @param string $path
+   *   The path to check.
+   *
+   * @return bool
+   *   TRUE if the path has site prefix.
+   */
+  public function hasSitePrefix($path) {
+    return preg_match("/^\/site\-(\d+)\//", $path);
+  }
+
+  /**
+   * Retrieve the Site ID from the Site Prefix of an internal path.
+   *
+   * @param string $path
+   *   The path to check.
+   *
+   * @return int|null
+   *   The site ID. Null if the path does not have site prefix.
+   */
+  public function getSiteIdFromSitePrefix($path) {
+    if (preg_match("/^\/site\-(\d+)\//", $path, $matches) && !empty($matches[1])) {
+      return $matches[1];
+    }
+
+    return NULL;
+  }
+
+  /**
    * Return the absolute URL of a site using its production domain.
    *
    * @param \Drupal\taxonomy\TermInterface $site
@@ -318,7 +349,7 @@ class TideSiteHelper {
     $sites = NULL;
 
     if ($this->isSupportedEntityType($entity_type)) {
-      $cid = 'tide_site:entity:' . $entity_type . ':' . $entity->id() . ':sites';
+      $cid = $this->getSitesCacheId($entity);
       if ($reset) {
         $this->cache('data')->delete($cid);
       }
@@ -640,6 +671,41 @@ class TideSiteHelper {
    */
   protected function cache($bin = 'default') {
     return $this->container->get('cache.' . $bin);
+  }
+
+  /**
+   * Return the cache ID for an entity.
+   *
+   * @param \Drupal\Core\Entity\FieldableEntityInterface $entity
+   *   The entity.
+   *
+   * @return string
+   *   The cache ID.
+   */
+  public function getSitesCacheId(FieldableEntityInterface $entity) {
+    $cid = 'tide_site:entity:' . $entity->getEntityTypeId() . ':' . $entity->id();
+    if ($entity instanceof RevisionableInterface) {
+      $cid .= ':' . $entity->getRevisionId();
+    }
+    $cid .= ':sites';
+
+    return $cid;
+  }
+
+  /**
+   * Return the cache ID for GetRoute.
+   *
+   * @param string $path
+   *   The requested path.
+   * @param int $site_id
+   *   The site ID.
+   *
+   * @return string
+   *   The cache ID.
+   */
+  public function getRouteCacheId($path, $site_id) {
+    $cid = 'tide_site:api:route:path:' . substr($path, 0, 128) . hash('sha256', $path) . ':site:' . $site_id;
+    return $cid;
   }
 
 }

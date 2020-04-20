@@ -11,6 +11,7 @@ use Drupal\jsonapi\Routing\Routes;
 use Drupal\jsonapi_extras\ResourceType\ConfigurableResourceType;
 use Drupal\tide_site\TideSiteFields;
 use Drupal\tide_site\TideSiteHelper;
+use Symfony\Cmf\Component\Routing\RouteObjectInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -96,17 +97,18 @@ class TideSiteRequestEventSubscriber implements EventSubscriberInterface {
 
     $site_id = $request->query->get('site');
 
-    $controller = $request->attributes->get('_controller');
-
+    $route = $request->attributes->get(RouteObjectInterface::ROUTE_NAME);
     // Prefix path with Site if the controller is TideApiController.
-    if ($controller == '\\Drupal\\tide_api\\Controller\\TideApiController::getRoute' && $site_id) {
-      $path = $request->query->get('path');
+    if ($route == 'jsonapi.tide_api.route' && $site_id) {
+      /** @var \Drupal\tide_api\TideApiHelper $api_helper */
+      $api_helper = $this->container->get('tide_api.helper');
+      $path = $api_helper->getRequestedPath($request);
       // Only prefix non-homepage and unrouted path.
       if ($path !== '/') {
         try {
           $url = Url::fromUri('internal:' . $path);
-          if (!$url->isRouted()) {
-            $request->query->set('path', $this->helper->getSitePathPrefix($site_id) . $path);
+          if (!$url->isRouted() && !$this->helper->hasSitePrefix($path)) {
+            $api_helper->overrideRequestedPath($request, $this->helper->getSitePathPrefix($site_id) . $path);
           }
         }
         catch (\Exception $exception) {

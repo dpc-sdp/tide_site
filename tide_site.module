@@ -233,6 +233,14 @@ function tide_site_views_pre_view(ViewExecutable $view, $display_id, array &$arg
       'alter' => [],
     ];
     $view->addHandler($display_id, 'field', 'media__field_media_site', 'field_media_site', $site_field, 'field_media_site');
+
+    // Access to node_bulk_form should be restricted to the site_admin role.
+    if ($view->id() === 'summary_contents') {
+      $current_user = \Drupal::currentUser();
+      if (!in_array('site_admin', $current_user->getRoles())) {
+        $view->removeHandler('page', 'field', 'node_bulk_form');
+      }
+    }
   }
 }
 
@@ -567,42 +575,6 @@ function tide_site_taxonomy_term_delete($term) {
 }
 
 /**
- * Implements hook_ENTITY_TYPE_presave().
- */
-function tide_site_node_presave($node) {
-  // Delete site aliases of the unassigned sites.
-  /** @var \Drupal\node\NodeInterface $node */
-  if (!$node->isNew()) {
-    /** @var \Drupal\node\NodeInterface $old_node */
-    $old_node = $node->original;
-    /** @var \Drupal\tide_site\TideSiteHelper $helper */
-    $helper = \Drupal::service('tide_site.helper');
-    $new_sites = $helper->getEntitySites($node, TRUE) ?: ['ids' => []];
-    $old_sites = $helper->getEntitySites($old_node, TRUE) ?: ['ids' => []];
-
-    $unassigned_sites = array_diff($old_sites['ids'], $new_sites['ids']);
-    if ($unassigned_sites) {
-      /** @var \Drupal\tide_site\AliasStorage $alias_storage */
-      $alias_storage = \Drupal::service('tide_site.alias_storage');
-      foreach ($unassigned_sites as $unassigned_site_id) {
-        $site_prefix = $helper->getSitePathPrefix($unassigned_site_id);
-        $alias_storage->delete([
-          'alias' => $site_prefix . '/%',
-          'source' => '/node/' . $node->id(),
-        ], FALSE, FALSE);
-      }
-    }
-
-    $new_assigned_sites = array_diff($new_sites['ids'], $old_sites['ids']);
-    if ($new_assigned_sites) {
-      /** @var \Drupal\tide_site\AliasStorageHelper $alias_helper */
-      $alias_helper = \Drupal::service('tide_site.alias_storage_helper');
-      $alias_helper->regenerateNodeSiteAliases($node, $new_assigned_sites);
-    }
-  }
-}
-
-/**
  * Implements hook_ENTITY_TYPE_update().
  */
 function tide_site_node_update($node) {
@@ -614,6 +586,26 @@ function tide_site_node_update($node) {
     /** @var \Drupal\tide_site\AliasStorageHelper $alias_helper */
     $alias_helper = \Drupal::service('tide_site.alias_storage_helper');
     $alias_helper->regenerateNodeSiteAliases($node);
+  }
+  $old_node = $node->original;
+  $helper = \Drupal::service('tide_site.helper');
+  $old_sites = $helper->getEntitySites($old_node, TRUE) ?: ['ids' => []];
+  $new_sites = $helper->getEntitySites($node, TRUE) ?: ['ids' => []];
+  $unassigned_sites = array_diff($old_sites['ids'], $new_sites['ids']);
+  if ($unassigned_sites) {
+    foreach ($unassigned_sites as $unassigned_site_id) {
+      $site_prefix = $helper->getSitePathPrefix($unassigned_site_id);
+      $alias_storage->delete([
+        'alias' => $site_prefix . '/%',
+        'source' => '/node/' . $node->id(),
+      ], FALSE, FALSE);
+    }
+  }
+  $new_assigned_sites = array_diff($new_sites['ids'], $old_sites['ids']);
+  if ($new_assigned_sites) {
+    /** @var \Drupal\tide_site\AliasStorageHelper $alias_helper */
+    $alias_helper = \Drupal::service('tide_site.alias_storage_helper');
+    $alias_helper->regenerateNodeSiteAliases($node, $new_assigned_sites);
   }
 }
 
@@ -661,4 +653,28 @@ function tide_site_search_api_index_items_alter(IndexInterface $index, array &$i
  */
 function tide_site_tide_api_jsonapi_custom_query_parameters_alter(&$custom_params) {
   $custom_params[] = 'site';
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ */
+function tide_site_form_views_exposed_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+  $view = $form_state->get('view');
+  if ($view && $view instanceof ViewExecutable) {
+    if ($view->id() == 'summary_contents' && $view->current_display == 'page') {
+      $form['#attached']['library'][] = 'tide_site/tide_site_layout';
+      /** @var \Drupal\tide_site\TideSiteHelper $helper */
+      $helper = \Drupal::service('tide_site.helper');
+      $primary_sites_terms = $helper->getAllSites();
+      $primary_sites_term_options = [];
+      foreach ($primary_sites_terms as $term) {
+        $primary_sites_term_options[$term->id()] = $term->getName();
+      }
+      if (isset($form['moderation_state']['#options']['Editorial']) && in_array('Published', $form['moderation_state']['#options']['Editorial'])) {
+        unset($form['moderation_state']['#options']['Editorial']['editorial-published']);
+      }
+      $options = ['All' => t('- Any -')] + $primary_sites_term_options;
+      $form['field_node_primary_site_target_id']['#options'] = $options;
+    }
+  }
 }
