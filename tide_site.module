@@ -15,6 +15,9 @@ use Drupal\taxonomy\Entity\Term;
 use Drupal\tide_site\TideSiteFields;
 use Drupal\tide_site\TideSiteMenuAutocreate;
 use Drupal\views\ViewExecutable;
+use Drupal\Core\Session\AccountInterface;
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Access\AccessResult;
 
 /**
  * Implements hook_entity_bundle_create().
@@ -675,6 +678,17 @@ function tide_site_form_views_exposed_form_alter(&$form, FormStateInterface $for
       }
       $options = ['All' => t('- Any -')] + $primary_sites_term_options;
       $form['field_node_primary_site_target_id']['#options'] = $options;
+    }
+  }
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_access().
+ */
+function tide_site_taxonomy_term_access(EntityInterface $entity, $operation, AccountInterface $account) {
+  if ($entity->bundle() == 'sites' && $operation == 'delete') {
+    if (!in_array('administrator', $account->getRoles())) {
+      return AccessResult::forbidden();
     }
   }
 }
