@@ -239,3 +239,16 @@ function tide_site_update_8010() {
   $config_storage = \Drupal::service('config.storage');
   $config_storage->write($view, $source->read($view));
 }
+
+/**
+ * Enable alt field for site logo.
+ */
+function tide_site_update_8011() {
+  $entity_type = 'taxonomy_term';
+  $bundle = 'sites';
+  $field_name = 'field_site_logo';
+  $field = FieldConfig::loadByName($entity_type, $bundle, $field_name);
+  if ($field) {
+    $field->setSetting('alt_field', TRUE)->save();
+  }
+}
