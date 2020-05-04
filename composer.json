@@ -4,7 +4,7 @@
     "type": "drupal-module",
     "license": "GPL-2.0-or-later",
     "require": {
-        "dpc-sdp/tide_core": "^1.5.6",
+        "dpc-sdp/tide_core": "^1.5.8",
         "dpc-sdp/tide_media": "^1.5.2"
     },
     "suggest": {
