@@ -8,6 +8,7 @@
 use Drupal\Core\Config\FileStorage;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\field\Entity\FieldConfig;
+use Drupal\taxonomy\TaxonomyPermissions;
 
 /**
  * Implements hook_install().
@@ -241,9 +242,34 @@ function tide_site_update_8010() {
 }
 
 /**
- * Enable alt field for site logo.
+ * Update approver and site_admin roles permissions.
+ *
+ * 1. approver and site_admin cannot delete sites terms.
+ * 2. revoke `administer taxonomy` permission.
+ * 3. assign `access taxonomy overview` permission.
  */
 function tide_site_update_8011() {
+  $roles = ['approver', 'site_admin'];
+  $taxonomy_permissions = new TaxonomyPermissions(\Drupal::entityManager());
+  foreach ($roles as $role_id) {
+    $assigned_permissions = ['access taxonomy overview'];
+    foreach ($taxonomy_permissions->permissions() as $permission => $details) {
+      $exploded = explode(' ', trim($permission));
+      $vocabulary = $exploded[count($exploded) - 1];
+      if ($exploded[0] == 'delete' && $vocabulary == 'sites') {
+        continue;
+      }
+      $assigned_permissions[] = $permission;
+    }
+    user_role_revoke_permissions($role_id, ['administer taxonomy']);
+    user_role_grant_permissions($role_id, $assigned_permissions);
+  }
+}
+
+/**
+ * Enable alt field for site logo.
+ */
+function tide_site_update_8012() {
   $entity_type = 'taxonomy_term';
   $bundle = 'sites';
   $field_name = 'field_site_logo';
