@@ -3,6 +3,7 @@
 namespace Drupal\tide_site;
 
 use Drupal\Core\Cache\Cache;
+use Drupal\Core\Database\DatabaseException;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Path\AliasStorage as CoreAliasStorage;
 
@@ -169,6 +170,92 @@ class AliasStorage extends CoreAliasStorage {
     catch (\Exception $e) {
       $this->catchException($e);
       return FALSE;
+    }
+  }
+
+  /**
+   * Defines the schema for the {url_alias} table.
+   */
+  public static function schemaDefinition() {
+    return [
+      'description' => 'A list of URL aliases for Drupal paths; a user may visit either the source or destination path.',
+      'fields' => [
+        'pid' => [
+          'description' => 'A unique path alias identifier.',
+          'type' => 'serial',
+          'unsigned' => TRUE,
+          'not null' => TRUE,
+        ],
+        'source' => [
+          'description' => 'The Drupal path this alias is for; e.g. node/12.',
+          'type' => 'varchar',
+          'length' => 255,
+          'not null' => TRUE,
+          'default' => '',
+        ],
+        'alias' => [
+          'description' => 'The alias for this path; e.g. title-of-the-story.',
+          'type' => 'varchar',
+          'length' => 255,
+          'not null' => TRUE,
+          'default' => '',
+        ],
+        'langcode' => [
+          'description' => "The language code this alias is for; if 'und', the alias will be used for unknown languages. Each Drupal path can have an alias for each supported language.",
+          'type' => 'varchar_ascii',
+          'length' => 12,
+          'not null' => TRUE,
+          'default' => '',
+        ],
+      ],
+      'primary key' => [
+        'pid',
+      ],
+      'indexes' => [
+        'alias_langcode_pid' => [
+          'alias',
+          'langcode',
+          'pid',
+        ],
+        'source_langcode_pid' => [
+          'source',
+          'langcode',
+          'pid',
+        ],
+      ],
+    ];
+  }
+
+  /**
+   * Check if the table exists and create it if not.
+   */
+  protected function ensureTableExists() {
+    try {
+      $database_schema = $this->connection
+        ->schema();
+      if (!$database_schema
+        ->tableExists(static::TABLE)) {
+        $schema_definition = $this
+          ->schemaDefinition();
+        $database_schema
+          ->createTable(static::TABLE, $schema_definition);
+        return TRUE;
+      }
+    }
+    catch (DatabaseException $e) {
+      return TRUE;
+    }
+    return FALSE;
+  }
+
+  /**
+   * Act on an exception when url_alias might be stale.
+   */
+  protected function catchException(\Exception $e) {
+    if ($this->connection
+      ->schema()
+      ->tableExists(static::TABLE)) {
+      throw $e;
     }
   }
 
