@@ -6,6 +6,7 @@ use Drupal\Component\Utility\Unicode;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Url;
 use Drupal\node\NodeInterface;
+use Drupal\path_alias\PathAliasInterface;
 use Drupal\pathauto\AliasUniquifierInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
@@ -89,30 +90,30 @@ class AliasStorageHelper {
   /**
    * Check if an alias is a site alias.
    *
-   * @param array $path
-   *   The path array.
+   * @param \Drupal\path_alias\Entity\PathAliasInterface $path
+   *   The path.
    *
    * @return bool
    *   TRUE if site alias.
    */
-  public function isPathHasSitePrefix(array $path) {
-    return (boolean) preg_match('/^\/site\-(\d+)\//', $path['alias']);
+  public function isPathHasSitePrefix(PathAliasInterface $path) {
+    return (boolean) preg_match('/^\/site\-(\d+)\//', $path->getAlias());
   }
 
   /**
    * Load the node from a path.
    *
-   * @param array|mixed $path
+   * @param \Drupal\path_alias\Entity\PathAliasInterface $path
    *   The path.
    *
    * @return \Drupal\node\NodeInterface|null
    *   The node object, or NULL.
    */
-  public function getNodeFromPath($path) {
+  public function getNodeFromPath(PathAliasInterface $path) {
     $node = NULL;
-    if (!empty($path['source'])) {
+    if ($path->getPath()) {
       try {
-        $uri = Url::fromUri('internal:' . $path['source']);
+        $uri = Url::fromUri('internal:' . $path->getPath());
         if ($uri->isRouted() && $uri->getRouteName() == 'entity.node.canonical') {
           $params = $uri->getRouteParameters();
           if (isset($params['node'])) {
@@ -150,7 +151,7 @@ class AliasStorageHelper {
   /**
    * Retrieve a list of aliases with site prefix from a path.
    *
-   * @param array|mixed $path
+   * @param \Drupal\path_alias\Entity\PathAliasInterface $path
    *   The path.
    * @param \Drupal\node\NodeInterface|null $node
    *   The node (optional).
@@ -158,14 +159,14 @@ class AliasStorageHelper {
    * @return string[]
    *   The list of aliases, keyed by site ID.
    */
-  public function getAllSiteAliases($path, NodeInterface $node = NULL) {
+  public function getAllSiteAliases(PathAliasInterface $path, NodeInterface $node = NULL) {
     $aliases = [];
     if (!$node) {
       $node = $this->getNodeFromPath($path);
     }
 
     if ($node) {
-      $original_alias = $this->getPathAliasWithoutSitePrefix($path);
+      $original_alias = $this->getPathAliasWithoutSitePrefix(['alias' => $path->getAlias()]);
       $sites = $this->helper->getEntitySites($node, TRUE);
       if ($sites) {
         foreach ($sites['ids'] as $site_id) {
@@ -181,21 +182,22 @@ class AliasStorageHelper {
   /**
    * Create all site aliases of a path.
    *
-   * @param array|mixed $path
+   * @param \Drupal\path_alias\Entity\PathAliasInterface $path
    *   The Path array.
    * @param \Drupal\node\NodeInterface|null $node
    *   The node (optional).
    * @param int[] $site_ids
    *   The list of site to create alias (optional).
    */
-  public function createSiteAliases($path, NodeInterface $node = NULL, array $site_ids = []) {
+  public function createSiteAliases(PathAliasInterface $path, NodeInterface $node = NULL, array $site_ids = []) {
     if (!$node) {
       $node = $this->getNodeFromPath($path);
     }
-
+    /** @var \Drupal\Core\Entity\EntityStorageInterface $path_storage */
+    $path_storage = \Drupal::entityTypeManager()->getStorage('path_alias');
     if ($node) {
       $this->getAliasUniquifier();
-
+      /** @var string[] $aliases */
       $aliases = $this->getAllSiteAliases($path, $node);
 
       if (!empty($site_ids)) {
@@ -206,65 +208,34 @@ class AliasStorageHelper {
       foreach ($aliases as $alias) {
         try {
           $original_alias = $alias;
-
-          $existing_path = $this->isAliasExists($alias, $path['langcode']);
+          $existing_path = $this->isAliasExists($alias, $path->language()
+            ->getId());
           if ($existing_path) {
-            if ($existing_path['source'] != $path['source']) {
-              $this->uniquify($alias, $path['langcode']);
+            if ($existing_path->getPath() != $path->getPath()) {
+              $this->uniquify($alias, $path->language()->getId());
               if ($original_alias != $alias) {
-                $this->aliasStorage->save($path['source'], $alias, $path['langcode'], NULL, FALSE);
+                $path_storage->create([
+                  'path' => $path->getPath(),
+                  'alias' => $alias,
+                  'langcode' => $path->language()->getId(),
+                ])->save();
               }
             }
           }
           else {
-            $this->aliasStorage->save($path['source'], $alias, $path['langcode'], NULL, FALSE);
+            $path_storage->create([
+              'path' => $path->getPath(),
+              'alias' => $alias,
+              'langcode' => $path->language()->getId(),
+            ])->save();
           }
         }
         catch (\Exception $exception) {
           watchdog_exception('tide_site', $exception);
         }
       }
-    }
-  }
-
-  /**
-   * Update all site aliases of a path.
-   *
-   * @param array|mixed $path
-   *   The new path.
-   * @param array|mixed $original_path
-   *   The original path.
-   */
-  public function updateSiteAliases($path, $original_path) {
-    if (!is_array($path) || !is_array($original_path)) {
-      return;
-    }
-
-    $node = $this->getNodeFromPath($path);
-    if ($node) {
-      $aliases = $this->getAllSiteAliases($path, $node);
-      $original_aliases = $this->getAllSiteAliases($original_path, $node);
-      foreach ($aliases as $site_id => $alias) {
-        if ($alias == $path['alias']) {
-          // This alias already exists.
-          continue;
-        }
-        // Find the old path to update.
-        $old_path = $this->aliasStorage->load([
-          'source' => $path['source'],
-          'alias' => $original_aliases[$site_id],
-        ]);
-        if (!$old_path) {
-          $old_path['pid'] = NULL;
-        }
-        try {
-          if (!$this->isAliasExists($alias, $path['langcode'])) {
-            $this->aliasStorage->save($path['source'], $alias, $path['langcode'], $old_path['pid'], FALSE);
-          }
-        }
-        catch (\Exception $exception) {
-          watchdog_exception('tide_site', $exception);
-        }
+      if (!$this->isPathHasSitePrefix($path)) {
+        $path->delete();
       }
     }
   }
@@ -272,23 +243,20 @@ class AliasStorageHelper {
   /**
    * Delete all site copies of a path alias.
    *
-   * @param array|bool $path
+   * @param \Drupal\path_alias\Entity\PathAliasInterface $path
    *   The Path array.
    */
-  public function deleteSiteAliases($path) {
+  public function deleteSiteAliases(PathAliasInterface $path) {
     $node = $this->getNodeFromPath($path);
     if ($node) {
-      $aliases = $this->getAllSiteAliases($path, $node);
-      foreach ($aliases as $alias) {
-        try {
-          $this->aliasStorage->delete([
-            'source' => $path['source'],
-            'alias' => $alias,
-          ], FALSE);
-        }
-        catch (\Exception $exception) {
-          watchdog_exception('tide_site', $exception);
-        }
+      /** @var \Drupal\Core\Entity\EntityStorageInterface $path_storage */
+      $path_storage = \Drupal::entityTypeManager()->getStorage('path_alias');
+      $path_alias_entities = $path_storage->loadByProperties(['path' => $path->getPath()]);
+      try {
+        $path_storage->delete($path_alias_entities);
+      }
+      catch (\Exception $exception) {
+        watchdog_exception('tide_site', $exception);
       }
     }
   }
@@ -304,11 +272,11 @@ class AliasStorageHelper {
   public function regenerateNodeSiteAliases(NodeInterface $node, array $site_ids = []) {
     // Collect all existing aliases of the node.
     $aliases = [];
-    $path_aliases = $this->aliasStorage->loadAll(['source' => '/node/' . $node->id()]);
+    $path_aliases = $this->aliasStorage->loadAll(['path' => '/node/' . $node->id()]);
     foreach ($path_aliases as $path) {
       // Group them by language and original alias without site prefix.
-      $alias = $this->getPathAliasWithoutSitePrefix($path);
-      $aliases[$path['langcode'] . ':' . $alias] = $path;
+      $alias = $this->getPathAliasWithoutSitePrefix(['alias' => $path->getAlias()]);
+      $aliases[$path->language()->getId() . ':' . $alias] = $path;
     }
     // Regenerate aliases.
     foreach ($aliases as $path) {
@@ -324,7 +292,7 @@ class AliasStorageHelper {
    * @param string $langcode
    *   The language code.
    *
-   * @return array|false
+   * @return \Drupal\path_alias\Entity\PathAliasInterface|false
    *   FALSE if does not exist.
    */
   public function isAliasExists($alias, $langcode = '') {
@@ -332,9 +300,9 @@ class AliasStorageHelper {
     if ($langcode) {
       $conditions['langcode'] = $langcode;
     }
-    $path = $this->aliasStorage->load($conditions);
-
-    return $path ?: FALSE;
+    $path_storage = \Drupal::entityTypeManager()->getStorage('path_alias');
+    $path = $path_storage->loadByProperties($conditions);
+    return reset($path) ?: FALSE;
   }
 
   /**
@@ -359,7 +327,7 @@ class AliasStorageHelper {
     do {
       // Append an incrementing numeric suffix until we find a unique alias.
       $unique_suffix = $separator . $i;
-      $alias = Unicode::truncate($original_alias, $maxlength - Unicode::strlen($unique_suffix), TRUE) . $unique_suffix;
+      $alias = Unicode::truncate($original_alias, $maxlength - mb_strlen($unique_suffix), TRUE) . $unique_suffix;
       $i++;
     } while ($this->isAliasExists($alias, $langcode));
   }

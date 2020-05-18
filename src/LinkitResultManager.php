@@ -2,21 +2,20 @@
 
 namespace Drupal\tide_site;
 
-use Drupal\Core\Path\AliasStorageInterface;
 use Drupal\linkit\ProfileInterface;
-use Drupal\linkit\ResultManager;
+use Drupal\linkit\SuggestionManager;
 
 /**
  * Class LinkitResultManager.
  *
  * @package Drupal\tide_site
  */
-class LinkitResultManager extends ResultManager {
+class LinkitResultManager extends SuggestionManager {
 
   /**
    * The Alias Storage service.
    *
-   * @var \Drupal\Core\Path\AliasStorageInterface
+   * @var \Drupal\tide_site\AliasStorage
    */
   protected $aliasStorage;
 
@@ -30,7 +29,7 @@ class LinkitResultManager extends ResultManager {
   /**
    * {@inheritdoc}
    */
-  public function __construct(AliasStorageInterface $alias_storage, AliasStorageHelper $alias_helper) {
+  public function __construct(AliasStorage $alias_storage, AliasStorageHelper $alias_helper) {
     $this->aliasStorage = $alias_storage;
     $this->aliasHelper = $alias_helper;
   }
@@ -38,19 +37,22 @@ class LinkitResultManager extends ResultManager {
   /**
    * {@inheritdoc}
    */
-  public function getResults(ProfileInterface $linkitProfile, $search_string) {
-    $matches = parent::getResults($linkitProfile, $search_string);
-    foreach ($matches as &$match) {
-      $path = $this->aliasStorage->load(['alias' => $match['path']]);
-      if ($path) {
-        $node = $this->aliasHelper->getNodeFromPath($path);
-        if ($node) {
-          $match['path'] = '/node/' . $node->id();
+  public function getSuggestions(ProfileInterface $linkitProfile, $search_string) {
+    $suggestions = parent::getSuggestions($linkitProfile, $search_string);
+    foreach ($suggestions->getSuggestions() as $suggestion) {
+      /** @var \Drupal\path_alias\PathAliasInterface[] $paths */
+      $paths = $this->aliasStorage->loadAll(['path' => $suggestion->getPath()]);
+      if ($paths) {
+        foreach ($paths as $path) {
+          $node = $this->aliasHelper->getNodeFromPath($path);
+          if ($node) {
+            $suggestion->setPath('/node/' . $node->id());
+          }
         }
       }
     }
 
-    return $matches;
+    return $suggestions;
   }
 
 }
