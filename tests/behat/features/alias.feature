@@ -42,8 +42,8 @@ Feature: Node path alias with site prefix
 
     # Add a custom alias for the node.
     Then I visit "/admin/config/search/path/add"
-    And I fill in "Existing system path" with "/node/999999"
-    And I fill in "Path alias" with "/another-alias-for-test"
+    And I fill in "System path" with "/node/999999"
+    And I fill in "URL alias" with "/another-alias-for-test"
     And I press "Save"
     And I edit test "[TEST] Test content"
     # Site path aliases for Site 1 and Site 3 should be available.
