@@ -196,10 +196,14 @@ function tide_site_update_8007() {
   $entity_type = 'media';
   $field_name = 'field_media_site';
   $field_storage = FieldStorageConfig::loadByName($entity_type, $field_name);
-  foreach ($field_storage->getBundles() as $bundle) {
-    $field = FieldConfig::loadByName($entity_type, $bundle, $field_name);
-    $field->set('required', TRUE);
-    $field->save();
+  if ($field_storage) {
+    foreach ($field_storage->getBundles() as $bundle) {
+      $field = FieldConfig::loadByName($entity_type, $bundle, $field_name);
+      if ($field) {
+        $field->set('required', TRUE);
+        $field->save();
+      }
+    }
   }
 }
 
@@ -207,27 +211,29 @@ function tide_site_update_8007() {
  * Disable default content view.
  */
 function tide_site_update_8008() {
-  $view = 'content';
-  \Drupal::entityTypeManager()->getStorage('view')
-    ->load($view)
-    ->setStatus(FALSE)
-    ->save();
+  $view_id = 'content';
+  $view = \Drupal::entityTypeManager()->getStorage('view')->load($view_id);
+  if ($view) {
+    $view->setStatus(FALSE)->save();
+  }
 }
 
 /**
  * Disable summary_contents view.
  */
 function tide_site_update_8009() {
-  $view = 'summary_contents';
-  \Drupal::entityTypeManager()->getStorage('view')
-    ->load($view)
-    ->setStatus(FALSE)
-    ->save();
+  $view_id = 'summary_contents';
+  $view = \Drupal::entityTypeManager()->getStorage('view')->load($view_id);
+  if ($view) {
+    $view->setStatus(FALSE)->save();
 
-  \Drupal::entityTypeManager()->getStorage('view')
-    ->load($view)->delete();
-  \Drupal::configFactory()->getEditable('views.view.summary_contents')->delete();
-
+    $view->delete();
+    $config = \Drupal::configFactory()
+      ->getEditable('views.view.summary_contents');
+    if ($config) {
+      $config->delete();
+    }
+  }
 }
 
 /**
