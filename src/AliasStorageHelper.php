@@ -234,9 +234,6 @@ class AliasStorageHelper {
           watchdog_exception('tide_site', $exception);
         }
       }
-      if (!$this->isPathHasSitePrefix($path)) {
-        $path->delete();
-      }
     }
   }
 

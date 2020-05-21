@@ -5,6 +5,7 @@
  * Tide Site module functionality.
  */
 
+use Drupal\Core\Cache\Cache;
 use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Language\LanguageInterface;
@@ -332,7 +333,7 @@ function tide_site_tide_link_enhancer_transform_alter(&$value, &$context) {
  * @see \Drupal\tide_api\Plugin\jsonapi\FieldEnhancer\PathEnhancer::doUndoTransform()
  */
 function tide_site_tide_path_enhancer_undo_transform_alter(&$data, &$context) {
-  if (empty($data['id']) || empty($data['url'])) {
+  if (empty($data['pid']) || empty($data['url'])) {
     return;
   }
 
@@ -345,10 +346,9 @@ function tide_site_tide_path_enhancer_undo_transform_alter(&$data, &$context) {
   $data['alias'] = $alias_helper->getPathAliasWithoutSitePrefix($data);
 
   /** @var \Drupal\path_alias\Entity\PathAlias $path_entity */
-  $path_entity = PathAlias::load($data['id']);
-  $path = $path_entity->getPath();
-  if ($path) {
-    $node = $alias_helper->getNodeFromPath($path);
+  $path_entity = PathAlias::load($data['pid']);
+  if ($path_entity) {
+    $node = $alias_helper->getNodeFromPath($path_entity);
     if ($node) {
       // Get the Site ID parameter.
       $request = \Drupal::request();
@@ -508,6 +508,14 @@ function tide_site_path_alias_insert(PathAliasInterface $path) {
   $node = $alias_helper->getNodeFromPath($path);
   if ($node) {
     $alias_helper->createSiteAliases($path, $node);
+    /** @var \Drupal\tide_site\TideSiteHelper $helper */
+    $helper = \Drupal::service('tide_site.helper');
+    if ($helper->getEntitySites($node)) {
+      if (!$alias_helper->isPathHasSitePrefix($path)) {
+        $path->delete();
+      }
+    }
+    Cache::invalidateTags(['route_match']);
   }
 }
 
