@@ -6,6 +6,9 @@ use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\jsonapi\EventSubscriber\ResourceObjectNormalizationCacher;
 use Drupal\jsonapi\JsonApiResource\ResourceObject;
 
+/**
+ * Caches entity normalizations after the response has been sent.
+ */
 class TideSiteResourceObjectNormalizationCacher extends ResourceObjectNormalizationCacher {
 
   /**
@@ -17,15 +20,16 @@ class TideSiteResourceObjectNormalizationCacher extends ResourceObjectNormalizat
     $base = static::generateLookupRenderArray($object);
     $data_as_render_array = $base + [
         // The data we actually care about.
-        '#data' => $normalization_parts,
-        // Tell RenderCache to cache the #data property: the data we actually care
-        // about.
-        '#cache_properties' => ['#data'],
-        // These exist only to fulfill the requirements of the RenderCache, which
-        // is designed to work with render arrays only. We don't care about these.
-        '#markup' => '',
-        '#attached' => '',
-      ];
+      '#data' => $normalization_parts,
+        // Tell RenderCache to cache the #data property: the data we actually
+        // care about.
+      '#cache_properties' => ['#data'],
+        // These exist only to fulfill the requirements of the RenderCache,
+        // which is designed to work with render arrays only. We don't care
+        // about these.
+      '#markup' => '',
+      '#attached' => '',
+    ];
 
     // Merge the entity's cacheability metadata with that of the normalization
     // parts, so that RenderCache can take care of cache redirects for us.

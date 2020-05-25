@@ -33,7 +33,7 @@ class TideSiteServiceProvider extends ServiceProviderBase {
     }
 
     // Overrides jsonapi.normalization_cacher that introduced since drupal8.8.
-    if ($container->hasDefinition('jsonapi.normalization_cacher')){
+    if ($container->hasDefinition('jsonapi.normalization_cacher')) {
       $jsonapi_normalization_cacher = $container->getDefinition('jsonapi.normalization_cacher');
       $jsonapi_normalization_cacher->setClass('Drupal\tide_site\EventSubscriber\TideSiteResourceObjectNormalizationCacher');
     }
