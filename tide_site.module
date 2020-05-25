@@ -515,7 +515,6 @@ function tide_site_path_alias_insert(PathAliasInterface $path) {
         $path->delete();
       }
     }
-    Cache::invalidateTags(['route_match']);
   }
 }
 
