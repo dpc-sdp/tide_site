@@ -518,6 +518,26 @@ function tide_site_path_alias_insert(PathAliasInterface $path) {
 }
 
 /**
+ * Implements hook_ENTITY_TYPE_update().
+ */
+function tide_site_path_alias_update(PathAliasInterface $path) {
+  /** @var \Drupal\tide_site\AliasStorageHelper $alias_helper */
+  $alias_helper = \Drupal::service('tide_site.alias_storage_helper');
+  $node = $alias_helper->getNodeFromPath($path);
+  if ($node) {
+    $alias_helper->updateSiteAliases($path, $path->original);
+    /** @var \Drupal\tide_site\TideSiteHelper $helper */
+    $helper = \Drupal::service('tide_site.helper');
+    if ($helper->getEntitySites($node)) {
+      // Delete the current path if it does not have site prefix.
+      if (!$alias_helper->isPathHasSitePrefix($path)) {
+        $path->delete();
+      }
+    }
+  }
+}
+
+/**
  * Implements hook_ENTITY_TYPE_delete().
  */
 function tide_site_taxonomy_term_delete($term) {

@@ -228,22 +228,48 @@ class AliasStorageHelper {
   }
 
   /**
-   * Delete all site copies of a path alias.
+   * Update all site aliases of a path.
    *
-   * @param \Drupal\path_alias\Entity\PathAliasInterface $path
-   *   The Path array.
+   * @param \Drupal\path_alias\PathAliasInterface|mixed $path
+   *   The new path.
+   * @param \Drupal\path_alias\PathAliasInterface|mixed $original_path
+   *   The original path.
    */
-  public function deleteSiteAliases(PathAliasInterface $path) {
+  public function updateSiteAliases($path, $original_path) {
     $node = $this->getNodeFromPath($path);
     if ($node) {
-      /** @var \Drupal\Core\Entity\EntityStorageInterface $path_storage */
-      $path_storage = \Drupal::entityTypeManager()->getStorage('path_alias');
-      $path_alias_entities = $path_storage->loadByProperties(['path' => $path->getPath()]);
-      try {
-        $path_storage->delete($path_alias_entities);
-      }
-      catch (\Exception $exception) {
-        watchdog_exception('tide_site', $exception);
+      $aliases = $this->getAllSiteAliases($path, $node);
+      $original_aliases = $this->getAllSiteAliases($original_path, $node);
+      foreach ($aliases as $site_id => $alias) {
+        if ($alias == $path->getAlias()) {
+          // This alias already exists.
+          continue;
+        }
+        // Find the old path to update.
+        $old_path = $this->loadAll([
+          'path' => $path->getPath(),
+          'alias' => $original_aliases[$site_id],
+        ]);
+        $is_new = FALSE;
+        if (!$old_path) {
+          $is_new = TRUE;
+        }
+        /** @var \Drupal\Core\Entity\EntityStorageInterface $path_storage */
+        $path_storage = \Drupal::entityTypeManager()->getStorage('path_alias');
+        try {
+          if (!$this->isAliasExists($alias, $path->language()->getId())) {
+            if ($is_new) {
+              $path_storage->create([
+                'path' => $path->getPath(),
+                'alias' => $alias,
+                'langcode' => $path->language()->getId(),
+              ])->save();
+            }
+          }
+        }
+        catch (\Exception $exception) {
+          watchdog_exception('tide_site', $exception);
+        }
       }
     }
   }
