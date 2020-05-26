@@ -27,7 +27,6 @@ class TideSiteServiceProvider extends ServiceProviderBase {
       $linkit_definition = $container->getDefinition('linkit.suggestion_manager');
       $linkit_definition->setClass('Drupal\tide_site\LinkitResultManager');
       $linkit_definition->setArguments([
-        new Reference('tide_site.alias_storage'),
         new Reference('tide_site.alias_storage_helper'),
       ]);
     }

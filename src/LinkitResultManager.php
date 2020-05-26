@@ -13,13 +13,6 @@ use Drupal\linkit\SuggestionManager;
 class LinkitResultManager extends SuggestionManager {
 
   /**
-   * The Alias Storage service.
-   *
-   * @var \Drupal\tide_site\AliasStorage
-   */
-  protected $aliasStorage;
-
-  /**
    * The Alias Storage Helper service.
    *
    * @var \Drupal\tide_site\AliasStorageHelper
@@ -29,8 +22,7 @@ class LinkitResultManager extends SuggestionManager {
   /**
    * {@inheritdoc}
    */
-  public function __construct(AliasStorage $alias_storage, AliasStorageHelper $alias_helper) {
-    $this->aliasStorage = $alias_storage;
+  public function __construct(AliasStorageHelper $alias_helper) {
     $this->aliasHelper = $alias_helper;
   }
 
@@ -41,7 +33,7 @@ class LinkitResultManager extends SuggestionManager {
     $suggestions = parent::getSuggestions($linkitProfile, $search_string);
     foreach ($suggestions->getSuggestions() as $suggestion) {
       /** @var \Drupal\path_alias\PathAliasInterface[] $paths */
-      $paths = $this->aliasStorage->loadAll(['path' => $suggestion->getPath()]);
+      $paths = $this->aliasHelper->loadAll(['path' => $suggestion->getPath()]);
       if ($paths) {
         foreach ($paths as $path) {
           $node = $this->aliasHelper->getNodeFromPath($path);
