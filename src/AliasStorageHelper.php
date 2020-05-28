@@ -184,7 +184,7 @@ class AliasStorageHelper {
       $node = $this->getNodeFromPath($path);
     }
     /** @var \Drupal\Core\Entity\EntityStorageInterface $path_storage */
-    $path_storage = \Drupal::entityTypeManager()->getStorage('path_alias');
+    $path_storage = $this->entityTypeManager->getStorage('path_alias');
     if ($node) {
       $this->getAliasUniquifier();
       /** @var string[] $aliases */
@@ -255,7 +255,7 @@ class AliasStorageHelper {
           $is_new = TRUE;
         }
         /** @var \Drupal\Core\Entity\EntityStorageInterface $path_storage */
-        $path_storage = \Drupal::entityTypeManager()->getStorage('path_alias');
+        $path_storage = $this->entityTypeManager->getStorage('path_alias');
         try {
           if (!$this->isAliasExists($alias, $path->language()->getId())) {
             if ($is_new) {
@@ -313,7 +313,7 @@ class AliasStorageHelper {
     if ($langcode) {
       $conditions['langcode'] = $langcode;
     }
-    $path_storage = \Drupal::entityTypeManager()->getStorage('path_alias');
+    $path_storage = $this->entityTypeManager->getStorage('path_alias');
     $path = $path_storage->loadByProperties($conditions);
     return reset($path) ?: FALSE;
   }
