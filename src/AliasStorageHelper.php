@@ -107,7 +107,7 @@ class AliasStorageHelper {
    * @return \Drupal\node\NodeInterface|null
    *   The node object, or NULL.
    */
-  public function getNodeFromPath(PathAliasInterface $path) {
+  public function getNodeFromPathEntity(PathAliasInterface $path) {
     $node = NULL;
     if ($path->getPath()) {
       try {
@@ -160,7 +160,7 @@ class AliasStorageHelper {
   public function getAllSiteAliases(PathAliasInterface $path, NodeInterface $node = NULL) {
     $aliases = [];
     if (!$node) {
-      $node = $this->getNodeFromPath($path);
+      $node = $this->getNodeFromPathEntity($path);
     }
 
     if ($node) {
@@ -189,7 +189,7 @@ class AliasStorageHelper {
    */
   public function createSiteAliases(PathAliasInterface $path, NodeInterface $node = NULL, array $site_ids = []) {
     if (!$node) {
-      $node = $this->getNodeFromPath($path);
+      $node = $this->getNodeFromPathEntity($path);
     }
     /** @var \Drupal\Core\Entity\EntityStorageInterface $path_storage */
     $path_storage = $this->entityTypeManager->getStorage('path_alias');
@@ -244,7 +244,7 @@ class AliasStorageHelper {
    *   The original path.
    */
   public function updateSiteAliases($path, $original_path) {
-    $node = $this->getNodeFromPath($path);
+    $node = $this->getNodeFromPathEntity($path);
     if ($node) {
       $aliases = $this->getAllSiteAliases($path, $node);
       $original_aliases = $this->getAllSiteAliases($original_path, $node);

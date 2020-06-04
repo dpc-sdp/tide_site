@@ -45,7 +45,7 @@ class LinkitResultManager extends SuggestionManager {
       $paths = $this->pathAliasStorage->loadByProperties(['path' => $suggestion->getPath()]);
       if ($paths) {
         foreach ($paths as $path) {
-          $node = $this->aliasHelper->getNodeFromPath($path);
+          $node = $this->aliasHelper->getNodeFromPathEntity($path);
           if ($node) {
             $suggestion->setPath('/node/' . $node->id());
           }
