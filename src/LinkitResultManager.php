@@ -2,6 +2,7 @@
 
 namespace Drupal\tide_site;
 
+use Drupal\Core\Entity\EntityTypeManager;
 use Drupal\linkit\ProfileInterface;
 use Drupal\linkit\SuggestionManager;
 
@@ -20,10 +21,18 @@ class LinkitResultManager extends SuggestionManager {
   protected $aliasHelper;
 
   /**
+   * The Path alias entity storage.
+   *
+   * @var \Drupal\Core\Entity\EntityStorageInterface|mixed|object
+   */
+  protected $pathAliasStorage;
+
+  /**
    * {@inheritdoc}
    */
-  public function __construct(AliasStorageHelper $alias_helper) {
+  public function __construct(AliasStorageHelper $alias_helper, EntityTypeManager $entityTypeManager) {
     $this->aliasHelper = $alias_helper;
+    $this->pathAliasStorage = $entityTypeManager->getStorage('path_alias');
   }
 
   /**
@@ -33,7 +42,7 @@ class LinkitResultManager extends SuggestionManager {
     $suggestions = parent::getSuggestions($linkitProfile, $search_string);
     foreach ($suggestions->getSuggestions() as $suggestion) {
       /** @var \Drupal\path_alias\PathAliasInterface[] $paths */
-      $paths = $this->aliasHelper->loadAll(['path' => $suggestion->getPath()]);
+      $paths = $this->pathAliasStorage->loadByProperties(['path' => $suggestion->getPath()]);
       if ($paths) {
         foreach ($paths as $path) {
           $node = $this->aliasHelper->getNodeFromPath($path);

@@ -42,6 +42,13 @@ class AliasStorageHelper {
   protected $aliasUniquifier;
 
   /**
+   * The path alias entity storage.
+   *
+   * @var \Drupal\Core\Entity\EntityStorageInterface
+   */
+  protected $pathAliasEntityStorage;
+
+  /**
    * AliasStorageHelper constructor.
    *
    * @param \Drupal\tide_site\TideSiteHelper $helper
@@ -52,6 +59,7 @@ class AliasStorageHelper {
   public function __construct(TideSiteHelper $helper, EntityTypeManagerInterface $entity_type_manager) {
     $this->helper = $helper;
     $this->entityTypeManager = $entity_type_manager;
+    $this->pathAliasEntityStorage = $entity_type_manager->getStorage('path_alias');
   }
 
   /**
@@ -246,7 +254,7 @@ class AliasStorageHelper {
           continue;
         }
         // Find the old path to update.
-        $old_path = $this->loadAll([
+        $old_path = $this->pathAliasEntityStorage->loadByProperties([
           'path' => $path->getPath(),
           'alias' => $original_aliases[$site_id],
         ]);
@@ -285,7 +293,7 @@ class AliasStorageHelper {
   public function regenerateNodeSiteAliases(NodeInterface $node, array $site_ids = []) {
     // Collect all existing aliases of the node.
     $aliases = [];
-    $path_aliases = $this->loadAll(['path' => '/node/' . $node->id()]);
+    $path_aliases = $this->pathAliasEntityStorage->loadByProperties(['path' => '/node/' . $node->id()]);
     foreach ($path_aliases as $path) {
       // Group them by language and original alias without site prefix.
       $alias = $this->getPathAliasWithoutSitePrefix(['alias' => $path->getAlias()]);
@@ -343,32 +351,6 @@ class AliasStorageHelper {
       $alias = Unicode::truncate($original_alias, $maxlength - mb_strlen($unique_suffix), TRUE) . $unique_suffix;
       $i++;
     } while ($this->isAliasExists($alias, $langcode));
-  }
-
-  /**
-   * Fetches specific URL aliases from the database.
-   *
-   * The default implementation performs case-insensitive matching on the
-   * 'source' and 'alias' strings.
-   *
-   * @param array $conditions
-   *   An array of query conditions.
-   *
-   * @return \Drupal\path_alias\PathAliasInterface[]|false
-   *   FALSE if no alias was found or an associative array containing the
-   *   following keys:
-   *   - path (string): The internal system path with a starting slash.
-   *   - alias (string): The URL alias with a starting slash.
-   *   - id (int): Unique path alias identifier.
-   *   - langcode (string): The language code of the alias.
-   */
-  public function loadAll(array $conditions) {
-    $path_storage = $this->entityTypeManager->getStorage('path_alias');
-    $paths = $path_storage->loadByProperties($conditions);
-    if (!$paths) {
-      return FALSE;
-    }
-    return $paths;
   }
 
 }
