@@ -191,8 +191,6 @@ class AliasStorageHelper {
     if (!$node) {
       $node = $this->getNodeFromPathEntity($path);
     }
-    /** @var \Drupal\Core\Entity\EntityStorageInterface $path_storage */
-    $path_storage = $this->entityTypeManager->getStorage('path_alias');
     if ($node) {
       $this->getAliasUniquifier();
       /** @var string[] $aliases */
@@ -212,7 +210,7 @@ class AliasStorageHelper {
             if ($existing_path->getPath() != $path->getPath()) {
               $this->uniquify($alias, $path->language()->getId());
               if ($original_alias != $alias) {
-                $path_storage->create([
+                $this->pathAliasEntityStorage->create([
                   'path' => $path->getPath(),
                   'alias' => $alias,
                   'langcode' => $path->language()->getId(),
@@ -221,7 +219,7 @@ class AliasStorageHelper {
             }
           }
           else {
-            $path_storage->create([
+            $this->pathAliasEntityStorage->create([
               'path' => $path->getPath(),
               'alias' => $alias,
               'langcode' => $path->language()->getId(),
@@ -258,25 +256,10 @@ class AliasStorageHelper {
           'path' => $path->getPath(),
           'alias' => $original_aliases[$site_id],
         ]);
-        $is_new = FALSE;
-        if (!$old_path) {
-          $is_new = TRUE;
-        }
-        /** @var \Drupal\Core\Entity\EntityStorageInterface $path_storage */
-        $path_storage = $this->entityTypeManager->getStorage('path_alias');
-        try {
-          if (!$this->isAliasExists($alias, $path->language()->getId())) {
-            if ($is_new) {
-              $path_storage->create([
-                'path' => $path->getPath(),
-                'alias' => $alias,
-                'langcode' => $path->language()->getId(),
-              ])->save();
-            }
-          }
-        }
-        catch (\Exception $exception) {
-          watchdog_exception('tide_site', $exception);
+        if ($old_path) {
+          $old_path_alias = reset($old_path);
+          $old_path_alias->setAlias($alias);
+          $old_path_alias->save();
         }
       }
     }
@@ -321,8 +304,7 @@ class AliasStorageHelper {
     if ($langcode) {
       $conditions['langcode'] = $langcode;
     }
-    $path_storage = $this->entityTypeManager->getStorage('path_alias');
-    $path = $path_storage->loadByProperties($conditions);
+    $path = $this->pathAliasEntityStorage->loadByProperties($conditions);
     return reset($path) ?: FALSE;
   }
 
@@ -351,6 +333,17 @@ class AliasStorageHelper {
       $alias = Unicode::truncate($original_alias, $maxlength - mb_strlen($unique_suffix), TRUE) . $unique_suffix;
       $i++;
     } while ($this->isAliasExists($alias, $langcode));
+  }
+
+  /**
+   * Delete all site copies of a path alias.
+   *
+   * @param array|bool $path
+   *   The Path array.
+   */
+  public function deleteSiteAliases(PathAliasInterface $path) {
+    $path_entities = $this->pathAliasEntityStorage->loadByProperties(['path' => $path->getPath()]);
+    $this->pathAliasEntityStorage->delete($path_entities);
   }
 
 }
