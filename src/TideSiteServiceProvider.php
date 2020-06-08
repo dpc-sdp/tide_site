@@ -18,9 +18,11 @@ class TideSiteServiceProvider extends ServiceProviderBase {
    */
   public function alter(ContainerBuilder $container) {
     // Overrides path_alias.manager class to add site path prefix.
-    $alias_manager_definition = $container->getDefinition('path_alias.manager');
-    $alias_manager_definition->setClass('Drupal\tide_site\AliasManager')
-      ->addArgument(new Reference('tide_site.alias_storage_helper'));
+    if ($container->hasDefinition('path_alias.manager')) {
+      $alias_manager_definition = $container->getDefinition('path_alias.manager');
+      $alias_manager_definition->setClass('Drupal\tide_site\AliasManager')
+        ->addArgument(new Reference('tide_site.alias_storage_helper'));
+    }
 
     // Overrides linkit.suggestion_manager service (Linkit 5.x).
     if ($container->hasDefinition('linkit.suggestion_manager')) {

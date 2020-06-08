@@ -23,16 +23,16 @@ class LinkitResultManager extends SuggestionManager {
   /**
    * The Path alias entity storage.
    *
-   * @var \Drupal\Core\Entity\EntityStorageInterface|mixed|object
+   * @var Drupal\Core\Entity\EntityTypeManager
    */
-  protected $pathAliasStorage;
+  protected $entityTypeManager;
 
   /**
    * {@inheritdoc}
    */
   public function __construct(AliasStorageHelper $alias_helper, EntityTypeManager $entityTypeManager) {
     $this->aliasHelper = $alias_helper;
-    $this->pathAliasStorage = $entityTypeManager->getStorage('path_alias');
+    $this->entityTypeManager = $entityTypeManager;
   }
 
   /**
@@ -42,7 +42,8 @@ class LinkitResultManager extends SuggestionManager {
     $suggestions = parent::getSuggestions($linkitProfile, $search_string);
     foreach ($suggestions->getSuggestions() as $suggestion) {
       /** @var \Drupal\path_alias\PathAliasInterface[] $paths */
-      $paths = $this->pathAliasStorage->loadByProperties(['path' => $suggestion->getPath()]);
+      $paths = $this->entityTypeManager->getStorage('path_alias')
+        ->loadByProperties(['path' => $suggestion->getPath()]);
       if ($paths) {
         foreach ($paths as $path) {
           $node = $this->aliasHelper->getNodeFromPathEntity($path);

@@ -59,7 +59,6 @@ class AliasStorageHelper {
   public function __construct(TideSiteHelper $helper, EntityTypeManagerInterface $entity_type_manager) {
     $this->helper = $helper;
     $this->entityTypeManager = $entity_type_manager;
-    $this->pathAliasEntityStorage = $entity_type_manager->getStorage('path_alias');
   }
 
   /**
@@ -201,6 +200,7 @@ class AliasStorageHelper {
         array_intersect_key($aliases, $site_ids);
       }
 
+      $path_alias_storage = $this->entityTypeManager->getStorage('path_alias');
       foreach ($aliases as $alias) {
         try {
           $original_alias = $alias;
@@ -210,7 +210,7 @@ class AliasStorageHelper {
             if ($existing_path->getPath() != $path->getPath()) {
               $this->uniquify($alias, $path->language()->getId());
               if ($original_alias != $alias) {
-                $this->pathAliasEntityStorage->create([
+                $path_alias_storage->create([
                   'path' => $path->getPath(),
                   'alias' => $alias,
                   'langcode' => $path->language()->getId(),
@@ -219,7 +219,7 @@ class AliasStorageHelper {
             }
           }
           else {
-            $this->pathAliasEntityStorage->create([
+            $path_alias_storage->create([
               'path' => $path->getPath(),
               'alias' => $alias,
               'langcode' => $path->language()->getId(),
@@ -252,7 +252,7 @@ class AliasStorageHelper {
           continue;
         }
         // Find the old path to update.
-        $old_path = $this->pathAliasEntityStorage->loadByProperties([
+        $old_path = $this->entityTypeManager->getStorage('path_alias')->loadByProperties([
           'path' => $path->getPath(),
           'alias' => $original_aliases[$site_id],
         ]);
@@ -276,7 +276,7 @@ class AliasStorageHelper {
   public function regenerateNodeSiteAliases(NodeInterface $node, array $site_ids = []) {
     // Collect all existing aliases of the node.
     $aliases = [];
-    $path_aliases = $this->pathAliasEntityStorage->loadByProperties(['path' => '/node/' . $node->id()]);
+    $path_aliases = $this->entityTypeManager->getStorage('path_alias')->loadByProperties(['path' => '/node/' . $node->id()]);
     foreach ($path_aliases as $path) {
       // Group them by language and original alias without site prefix.
       $alias = $this->getPathAliasWithoutSitePrefix(['alias' => $path->getAlias()]);
@@ -304,7 +304,7 @@ class AliasStorageHelper {
     if ($langcode) {
       $conditions['langcode'] = $langcode;
     }
-    $path = $this->pathAliasEntityStorage->loadByProperties($conditions);
+    $path = $this->entityTypeManager->getStorage('path_alias')->loadByProperties($conditions);
     return reset($path) ?: FALSE;
   }
 
@@ -342,8 +342,9 @@ class AliasStorageHelper {
    *   The Path array.
    */
   public function deleteSiteAliases(PathAliasInterface $path) {
-    $path_entities = $this->pathAliasEntityStorage->loadByProperties(['path' => $path->getPath()]);
-    $this->pathAliasEntityStorage->delete($path_entities);
+    $path_alias_storage = $this->entityTypeManager->getStorage('path_alias');
+    $path_entities = $path_alias_storage->loadByProperties(['path' => $path->getPath()]);
+    $path_alias_storage->delete($path_entities);
   }
 
 }
