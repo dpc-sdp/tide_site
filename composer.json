@@ -5,10 +5,10 @@
     "license": "GPL-2.0-or-later",
     "require": {
         "dpc-sdp/tide_core": "dev-feature/SDPA-4225-Update-SDP-core-to-Drupal-8-8-5 as 1.5.9",
-        "dpc-sdp/tide_media": "^1.5.2"
+        "dpc-sdp/tide_media": "dev-feature/SDPA-4225-Update-SDP-core-to-Drupal-8-8-5 as 1.5.2"
     },
     "suggest": {
-        "dpc-sdp/tide_api": "^1.2.11"
+        "dpc-sdp/tide_api": "dev-feature/SDPA-4225-Update-SDP-core-to-Drupal-8-8-5 as 1.4.0"
     },
     "repositories": {
         "drupal": {
