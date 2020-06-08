@@ -484,16 +484,18 @@ function tide_site_form_alter(array &$form, FormStateInterface $form_state, $for
         $form['site_warning'] = [
           '#theme' => 'item_list',
           '#title' => t('The below site aliases will also be @action.', [
-            '@action' => ($form_id == 'path_admin_edit') ? 'updated' : 'deleted',
+            '@action' => ($form_id == 'path_alias_form') ? 'updated' : 'deleted',
           ]),
           '#list_type' => 'ul',
           '#items' => $aliases,
           '#wrapper_attributes' => ['class' => 'container'],
         ];
-        foreach (array_keys($form['actions']) as $action) {
-          if ($action != 'preview' && isset($form['actions'][$action]['#type']) && $form['actions'][$action]['#type'] === 'submit') {
-            $form_state->set('current_path_alias', $path_alias);
-            $form['actions'][$action]['#submit'][] = '_tide_site_delete_all_alias';
+        if ($form_id == 'path_alias_delete_form') {
+          foreach (array_keys($form['actions']) as $action) {
+            if ($action != 'preview' && isset($form['actions'][$action]['#type']) && $form['actions'][$action]['#type'] === 'submit') {
+              $form_state->set('current_path_alias', $path_alias);
+              $form['actions'][$action]['#submit'][] = '_tide_site_delete_all_alias';
+            }
           }
         }
       }
@@ -519,7 +521,7 @@ function tide_site_path_alias_insert(PathAliasInterface $path) {
   /** @var \Drupal\tide_site\AliasStorageHelper $alias_helper */
   $alias_helper = \Drupal::service('tide_site.alias_storage_helper');
   $node = $alias_helper->getNodeFromPathEntity($path);
-  if ($node) {
+  if ($node && !$alias_helper->isPathHasSitePrefix($path)) {
     $alias_helper->createSiteAliases($path, $node);
     /** @var \Drupal\tide_site\TideSiteHelper $helper */
     $helper = \Drupal::service('tide_site.helper');
