@@ -521,7 +521,7 @@ function tide_site_path_alias_insert(PathAliasInterface $path) {
   /** @var \Drupal\tide_site\AliasStorageHelper $alias_helper */
   $alias_helper = \Drupal::service('tide_site.alias_storage_helper');
   $node = $alias_helper->getNodeFromPathEntity($path);
-  if ($node && !$alias_helper->isPathHasSitePrefix($path)) {
+  if ($node) {
     $alias_helper->createSiteAliases($path, $node);
     /** @var \Drupal\tide_site\TideSiteHelper $helper */
     $helper = \Drupal::service('tide_site.helper');
@@ -577,9 +577,13 @@ function tide_site_taxonomy_term_delete($term) {
  */
 function tide_site_node_update($node) {
   // Regenerate site aliases of the updated node.
+  /** @var \Drupal\tide_site\AliasStorage $alias_storage */
+  $alias_storage_helper = \Drupal::service('tide_site.alias_storage_helper');
+
   $path_storage = \Drupal::entityTypeManager()->getStorage('path_alias');
+
   /** @var \Drupal\node\NodeInterface $node */
-  if (!$path_storage->loadByProperties(['path' => '/node/' . $node->id()])) {
+  if (!$alias_storage_helper->loadAll(['path' => '/node/' . $node->id()])) {
     /** @var \Drupal\tide_site\AliasStorageHelper $alias_helper */
     $alias_helper = \Drupal::service('tide_site.alias_storage_helper');
     $alias_helper->regenerateNodeSiteAliases($node);
