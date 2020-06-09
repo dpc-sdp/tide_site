@@ -371,4 +371,16 @@ class AliasStorageHelper {
     return $paths;
   }
 
+  /**
+   * Delete all site copies of a path alias.
+   *
+   * @param array|bool $path
+   *   The Path array.
+   */
+  public function deleteSiteAliases(PathAliasInterface $path) {
+    $path_alias_storage = $this->entityTypeManager->getStorage('path_alias');
+    $path_entities = $path_alias_storage->loadByProperties(['path' => $path->getPath()]);
+    $path_alias_storage->delete($path_entities);
+  }
+
 }
