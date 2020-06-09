@@ -64,5 +64,3 @@ Feature: Site fields on media
     And I should see an "fieldset#edit-field-media-site--wrapper.required" element
     When I go to "media/add/image"
     And I should see an "fieldset#edit-field-media-site--wrapper.required" element
-    When I go to "media/add/video"
-    And I should see an "fieldset#edit-field-media-site--wrapper.required" element
