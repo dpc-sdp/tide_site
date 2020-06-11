@@ -15,6 +15,8 @@ use Drupal\taxonomy\Entity\Term;
 use Drupal\tide_site\TideSiteFields;
 use Drupal\tide_site\TideSiteMenuAutocreate;
 use Drupal\views\ViewExecutable;
+use Drupal\path_alias\Entity\PathAlias;
+use Drupal\path_alias\PathAliasInterface;
 
 /**
  * Implements hook_entity_bundle_create().
@@ -336,17 +338,16 @@ function tide_site_tide_path_enhancer_undo_transform_alter(&$data, &$context) {
 
   /** @var \Drupal\tide_site\TideSiteHelper $helper */
   $helper = \Drupal::service('tide_site.helper');
-  /** @var \Drupal\tide_site\AliasStorage $alias_storage */
-  $alias_storage = \Drupal::service('tide_site.alias_storage');
   /** @var \Drupal\tide_site\AliasStorageHelper $alias_helper */
   $alias_helper = \Drupal::service('tide_site.alias_storage_helper');
 
   $data['origin_alias'] = $data['alias'];
   $data['alias'] = $alias_helper->getPathAliasWithoutSitePrefix($data);
 
-  $path = $alias_storage->load(['pid' => $data['pid']]);
-  if ($path) {
-    $node = $alias_helper->getNodeFromPath($path);
+  /** @var \Drupal\path_alias\Entity\PathAlias $path_entity */
+  $path_entity = PathAlias::load($data['pid']);
+  if ($path_entity) {
+    $node = $alias_helper->getNodeFromPathEntity($path_entity);
     if ($node) {
       // Get the Site ID parameter.
       $request = \Drupal::request();
@@ -404,24 +405,24 @@ function tide_site_form_node_form_alter(&$form, FormStateInterface $form_state) 
 
   // Display all aliases of the current node.
   if (!$node->isNew()) {
-    /** @var \Drupal\tide_site\AliasStorage $alias_storage */
-    $alias_storage = \Drupal::service('tide_site.alias_storage');
-    $aliases = $alias_storage->loadAll([
-      'source' => '/node/' . $node->id(),
-    ]);
+    $aliases = \Drupal::entityTypeManager()
+      ->getStorage('path_alias')
+      ->loadByProperties([
+        'path' => '/node/' . $node->id(),
+      ]);
     if ($aliases) {
       $alias_list = [];
       foreach ($aliases as $alias) {
-        if (!isset($alias_list[$alias['langcode']])) {
-          $alias_list[$alias['langcode']] = [
+        if (!isset($alias_list[$alias->language()->getId()])) {
+          $alias_list[$alias->language()->getId()] = [
             '#theme' => 'item_list',
             '#list_type' => 'ul',
-            '#title' => ($alias['langcode'] == LanguageInterface::LANGCODE_NOT_SPECIFIED) ? t('Language neutral') : \Drupal::languageManager()->getLanguageName($alias['langcode']),
+            '#title' => ($alias->language()->getId() == LanguageInterface::LANGCODE_NOT_SPECIFIED) ? t('Language neutral') : \Drupal::languageManager()->getLanguageName($alias->language()->getId()),
             '#items' => [],
             '#wrapper_attributes' => ['class' => 'container'],
           ];
         }
-        $alias_list[$alias['langcode']]['#items'][] = $alias['alias'];
+        $alias_list[$alias->language()->getId()]['#items'][] = $alias->getAlias();
       }
       $form['tide_site_path_settings']['aliases'] = [
         '#theme' => 'item_list',
@@ -473,26 +474,29 @@ function tide_site_form_node_form_after_build(array $form, FormStateInterface $f
 function tide_site_form_alter(array &$form, FormStateInterface $form_state, $form_id) {
   // Add more information to path Edit/Delete form
   // when editing/deleting a site alias.
-  if (in_array($form_id, ['path_admin_edit', 'path_alias_delete'])) {
+  if (in_array($form_id, ['path_alias_form', 'path_alias_delete_form'])) {
     /** @var \Drupal\tide_site\AliasStorageHelper $alias_helper */
     $alias_helper = \Drupal::service('tide_site.alias_storage_helper');
-    /** @var \Drupal\tide_site\AliasStorage $alias_storage */
-    $alias_storage = \Drupal::service('tide_site.alias_storage');
-    $pid = $form_state->getBuildInfo()['args'][0];
-    if ($pid) {
-      $path = $alias_storage->load(['pid' => $pid]);
-      if ($path) {
-        $aliases = $alias_helper->getAllSiteAliases($path);
-        if ($aliases) {
-          $form['site_warning'] = [
-            '#theme' => 'item_list',
-            '#title' => t('The below site aliases will also be @action.', [
-              '@action' => ($form_id == 'path_admin_edit') ? 'updated' : 'deleted',
-            ]),
-            '#list_type' => 'ul',
-            '#items' => $aliases,
-            '#wrapper_attributes' => ['class' => 'container'],
-          ];
+    $path_alias = $form_state->getFormObject()->getEntity();
+    if ($path_alias) {
+      $aliases = $alias_helper->getAllSiteAliases($path_alias);
+      if ($aliases) {
+        $form['site_warning'] = [
+          '#theme' => 'item_list',
+          '#title' => t('The below site aliases will also be @action.', [
+            '@action' => ($form_id == 'path_alias_form') ? 'updated' : 'deleted',
+          ]),
+          '#list_type' => 'ul',
+          '#items' => $aliases,
+          '#wrapper_attributes' => ['class' => 'container'],
+        ];
+        if ($form_id == 'path_alias_delete_form') {
+          foreach (array_keys($form['actions']) as $action) {
+            if ($action != 'preview' && isset($form['actions'][$action]['#type']) && $form['actions'][$action]['#type'] === 'submit') {
+              $form_state->set('current_path_alias', $path_alias);
+              $form['actions'][$action]['#submit'][] = '_tide_site_delete_all_alias';
+            }
+          }
         }
       }
     }
@@ -500,62 +504,53 @@ function tide_site_form_alter(array &$form, FormStateInterface $form_state, $for
 }
 
 /**
- * Implements hook_path_insert().
- *
- * @see hook_path_insert()
+ * The submit handler for deleting all path alias.
  */
-function tide_site_path_insert($path) {
+function _tide_site_delete_all_alias(&$form, FormStateInterface $form_state) {
+  $path_alias = $form_state->get('current_path_alias');
+  if ($path_alias) {
+    $alias_helper = \Drupal::service('tide_site.alias_storage_helper');
+    $alias_helper->deleteSiteAliases($path_alias);
+  }
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_insert().
+ */
+function tide_site_path_alias_insert(PathAliasInterface $path) {
   /** @var \Drupal\tide_site\AliasStorageHelper $alias_helper */
   $alias_helper = \Drupal::service('tide_site.alias_storage_helper');
-  $node = $alias_helper->getNodeFromPath($path);
-  if ($node) {
-    $alias_helper->createSiteAliases($path);
+  $node = $alias_helper->getNodeFromPathEntity($path);
+  if ($node && !$alias_helper->isPathHasSitePrefix($path)) {
+    $alias_helper->createSiteAliases($path, $node);
     /** @var \Drupal\tide_site\TideSiteHelper $helper */
     $helper = \Drupal::service('tide_site.helper');
     if ($helper->getEntitySites($node)) {
-      // Delete the current alias which does not have site prefix.
       if (!$alias_helper->isPathHasSitePrefix($path)) {
-        /** @var \Drupal\tide_site\AliasStorage $alias_storage */
-        $alias_storage = \Drupal::service('tide_site.alias_storage');
-        $alias_storage->delete(['pid' => $path['pid']], FALSE);
+        $path->delete();
       }
     }
   }
 }
 
 /**
- * Implements hook_path_update().
- *
- * @see hook_path_update()
+ * Implements hook_ENTITY_TYPE_update().
  */
-function tide_site_path_update($path) {
+function tide_site_path_alias_update(PathAliasInterface $path) {
   /** @var \Drupal\tide_site\AliasStorageHelper $alias_helper */
   $alias_helper = \Drupal::service('tide_site.alias_storage_helper');
-  $node = $alias_helper->getNodeFromPath($path);
-  if ($node) {
-    $alias_helper->updateSiteAliases($path, $path['original']);
+  $node = $alias_helper->getNodeFromPathEntity($path);
+  if ($node && !$alias_helper->isPathHasSitePrefix($path)) {
+    $alias_helper->updateSiteAliases($path, $path->original);
     /** @var \Drupal\tide_site\TideSiteHelper $helper */
     $helper = \Drupal::service('tide_site.helper');
     if ($helper->getEntitySites($node)) {
       // Delete the current path if it does not have site prefix.
       if (!$alias_helper->isPathHasSitePrefix($path)) {
-        /** @var \Drupal\tide_site\AliasStorage $alias_storage */
-        $alias_storage = \Drupal::service('tide_site.alias_storage');
-        $alias_storage->delete(['pid' => $path['pid']], FALSE);
+        $path->delete();
       }
     }
   }
-}
-
-/**
- * Implements hook_path_delete().
- *
- * @see hook_path_delete()
- */
-function tide_site_path_delete($path) {
-  /** @var \Drupal\tide_site\AliasStorageHelper $alias_helper */
-  $alias_helper = \Drupal::service('tide_site.alias_storage_helper');
-  $alias_helper->deleteSiteAliases($path);
 }
 
 /**
@@ -565,12 +560,15 @@ function tide_site_taxonomy_term_delete($term) {
   // Delete all site aliases of content belong to this Site term.
   /** @var \Drupal\taxonomy\TermInterface $term */
   if ($term->bundle() == 'sites') {
-    /** @var \Drupal\tide_site\AliasStorage $alias_storage */
-    $alias_storage = \Drupal::service('tide_site.alias_storage');
     /** @var \Drupal\tide_site\TideSiteHelper $helper */
     $helper = \Drupal::service('tide_site.helper');
+    $path_storage = \Drupal::entityTypeManager()->getStorage('path_alias');
     $site_prefix = $helper->getSitePathPrefix($term);
-    $alias_storage->delete(['alias' => $site_prefix . '/%'], FALSE, FALSE);
+    $path_ids = \Drupal::entityQuery('path_alias')
+      ->condition('alias', $site_prefix . '/', 'CONTAINS')
+      ->condition('path', '/taxonomy/term/' . $term->id(), '=')
+      ->execute();
+    $path_storage->delete(PathAlias::loadMultiple($path_ids));
   }
 }
 
@@ -580,12 +578,15 @@ function tide_site_taxonomy_term_delete($term) {
 function tide_site_node_update($node) {
   // Regenerate site aliases of the updated node.
   /** @var \Drupal\tide_site\AliasStorage $alias_storage */
-  $alias_storage = \Drupal::service('tide_site.alias_storage');
+  $alias_storage_helper = \Drupal::service('tide_site.alias_storage_helper');
+
+  $path_storage = \Drupal::entityTypeManager()->getStorage('path_alias');
+
   /** @var \Drupal\node\NodeInterface $node */
-  if (!$alias_storage->load(['source' => '/node/' . $node->id()])) {
-    /** @var \Drupal\tide_site\AliasStorageHelper $alias_helper */
-    $alias_helper = \Drupal::service('tide_site.alias_storage_helper');
-    $alias_helper->regenerateNodeSiteAliases($node);
+  if (!$alias_storage_helper->loadAll(['path' => '/node/' . $node->id()])) {
+    /** @var \Drupal\pathauto\PathautoGenerator $path_auto_generator */
+    $path_auto_generator = \Drupal::service('pathauto.generator');
+    $path_auto_generator->createEntityAlias($node, 'update');
   }
   $old_node = $node->original;
   $helper = \Drupal::service('tide_site.helper');
@@ -595,10 +596,13 @@ function tide_site_node_update($node) {
   if ($unassigned_sites) {
     foreach ($unassigned_sites as $unassigned_site_id) {
       $site_prefix = $helper->getSitePathPrefix($unassigned_site_id);
-      $alias_storage->delete([
-        'alias' => $site_prefix . '/%',
-        'source' => '/node/' . $node->id(),
-      ], FALSE, FALSE);
+      $path_ids = \Drupal::entityQuery('path_alias')
+        ->condition('alias', $site_prefix . '/', 'CONTAINS')
+        ->condition('path', '/node/' . $node->id(), '=')
+        ->execute();
+      if ($path_ids) {
+        $path_storage->delete(PathAlias::loadMultiple($path_ids));
+      }
     }
   }
   $new_assigned_sites = array_diff($new_sites['ids'], $old_sites['ids']);
@@ -622,6 +626,7 @@ function tide_site_linkit_substitution_alter(&$data) {
  * Implements hook_search_api_index_items_alter().
  */
 function tide_site_search_api_index_items_alter(IndexInterface $index, array &$items) {
+  $path_storage = \Drupal::entityTypeManager()->getStorage('path_alias');
   foreach ($items as $item) {
 
     // Add all urls to the url field.
@@ -630,13 +635,11 @@ function tide_site_search_api_index_items_alter(IndexInterface $index, array &$i
     /** @var \Drupal\tide_site\AliasStorageHelper $alias_helper */
     $alias_helper = \Drupal::service('tide_site.alias_storage_helper');
 
-    /** @var \Drupal\tide_site\AliasStorage $alias_storage */
-    $alias_storage = \Drupal::service('tide_site.alias_storage');
-
     if (!is_null($item->getField('nid'))) {
       $nid = $item->getField('nid')->getValues()[0];
       $node = Node::load($nid);
-      $path = $alias_storage->load(['source' => '/node/' . $nid]);
+      $path = $path_storage->loadByProperties(['path' => '/node/' . $nid]);
+      $path = reset($path);
       if ($path) {
         $aliases = $alias_helper->getAllSiteAliases($path, $node);
       }

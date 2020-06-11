@@ -4,11 +4,11 @@
     "type": "drupal-module",
     "license": "GPL-2.0-or-later",
     "require": {
-        "dpc-sdp/tide_core": "^1.5.8",
-        "dpc-sdp/tide_media": "^1.5.2"
+        "dpc-sdp/tide_core": "^2.0.0",
+        "dpc-sdp/tide_media": "^2.0.0"
     },
     "suggest": {
-        "dpc-sdp/tide_api": "^1.2.11"
+        "dpc-sdp/tide_api": "^2.0.0"
     },
     "repositories": {
         "drupal": {

@@ -1,10 +1,7 @@
 services:
-  tide_site.alias_storage:
-    class: Drupal\tide_site\AliasStorage
-    arguments: ['@database', '@module_handler']
   tide_site.alias_storage_helper:
     class: Drupal\tide_site\AliasStorageHelper
-    arguments: ['@tide_site.helper', '@tide_site.alias_storage', '@entity_type.manager']
+    arguments: ['@tide_site.helper', '@entity_type.manager']
     calls:
       - [setContainer, ['@service_container']]
   tide_site.menu_autocreate:
