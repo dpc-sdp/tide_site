@@ -4,9 +4,9 @@ namespace Drupal\tide_site;
 
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
-use Drupal\Core\Path\AliasManager as CoreAliasManager;
-use Drupal\Core\Path\AliasStorageInterface;
-use Drupal\Core\Path\AliasWhitelistInterface;
+use Drupal\path_alias\AliasManager as CoreAliasManager;
+use Drupal\path_alias\AliasRepositoryInterface;
+use Drupal\path_alias\AliasWhitelistInterface;
 
 /**
  * Class AliasManager.
@@ -25,8 +25,8 @@ class AliasManager extends CoreAliasManager {
   /**
    * {@inheritdoc}
    */
-  public function __construct(AliasStorageInterface $storage, AliasWhitelistInterface $whitelist, LanguageManagerInterface $language_manager, CacheBackendInterface $cache, AliasStorageHelper $alias_helper) {
-    parent::__construct($storage, $whitelist, $language_manager, $cache);
+  public function __construct(AliasRepositoryInterface $repository, AliasWhitelistInterface $whitelist, LanguageManagerInterface $language_manager, CacheBackendInterface $cache, AliasStorageHelper $alias_helper) {
+    parent::__construct($repository, $whitelist, $language_manager, $cache);
     $this->aliasHelper = $alias_helper;
   }
 

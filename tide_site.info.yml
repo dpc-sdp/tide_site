@@ -11,6 +11,7 @@ dependencies:
   - drupal:taxonomy
   - drupal:text
   - drupal:user
+  - drupal:path_alias
   - pathauto:pathauto
   - dpc-sdp:tide_core
   - dpc-sdp:tide_media
