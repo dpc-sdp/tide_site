@@ -322,4 +322,3 @@ function tide_site_update_8016() {
   $config_storage = \Drupal::service('config.storage');
   $config_storage->write($view, $source->read($view));
 }
-
