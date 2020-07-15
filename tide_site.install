@@ -318,7 +318,7 @@ function tide_site_update_8015() {
  * Import summary content filters view.
  */
 function tide_site_update_8016() {
-    $view = 'views.view.summary_content_filters';
+    $view = 'views.view.summary_contents_filters';
     $config_path = drupal_get_path('module', 'tide_site') . '/config/install';
     $source = new FileStorage($config_path);
     $config_storage = \Drupal::service('config.storage');
