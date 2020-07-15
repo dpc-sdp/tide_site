@@ -307,9 +307,21 @@ function tide_site_update_8014() {
  * Import content moderation view.
  */
 function tide_site_update_8015() {
-    $view = 'views.view.views.view.tide_site_moderated_content_filters';
+    $view = 'views.view.tide_site_moderated_content_filters';
     $config_path = drupal_get_path('module', 'tide_site') . '/config/install';
     $source = new FileStorage($config_path);
     $config_storage = \Drupal::service('config.storage');
     $config_storage->write($view, $source->read($view));
 }
+
+/**
+ * Import summary content filters view.
+ */
+function tide_site_update_8016() {
+    $view = 'views.view.summary_content_filters';
+    $config_path = drupal_get_path('module', 'tide_site') . '/config/install';
+    $source = new FileStorage($config_path);
+    $config_storage = \Drupal::service('config.storage');
+    $config_storage->write($view, $source->read($view));
+}
+
