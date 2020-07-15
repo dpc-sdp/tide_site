@@ -286,3 +286,30 @@ function tide_site_update_8012() {
     $field->setSetting('alt_field', TRUE)->save();
   }
 }
+
+/**
+ * Disable content moderation view.
+ */
+function tide_site_update_8014() {
+    $view = 'tide_core_moderated_content_filters';
+    \Drupal::entityTypeManager()->getStorage('view')
+        ->load($view)
+        ->setStatus(FALSE)
+        ->save();
+
+    \Drupal::entityTypeManager()->getStorage('view')
+        ->load($view)->delete();
+    \Drupal::configFactory()->getEditable('views.view.tide_core_moderated_content_filters')->delete();
+
+}
+
+/**
+ * Import content moderation view.
+ */
+function tide_site_update_8015() {
+    $view = 'views.view.views.view.tide_site_moderated_content_filters';
+    $config_path = drupal_get_path('module', 'tide_site') . '/config/install';
+    $source = new FileStorage($config_path);
+    $config_storage = \Drupal::service('config.storage');
+    $config_storage->write($view, $source->read($view));
+}
