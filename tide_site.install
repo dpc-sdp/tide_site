@@ -322,3 +322,16 @@ function tide_site_update_8016() {
   $config_storage = \Drupal::service('config.storage');
   $config_storage->write($view, $source->read($view));
 }
+
+
+/**
+ * Enable SVG filetype for site logo.
+ */
+function tide_site_update_8017() {
+  $view = 'field.field.taxonomy_term.sites.field_site_logo';
+  $config_path = drupal_get_path('module', 'tide_site') . '/config/install';
+  $source = new FileStorage($config_path);
+  $config_storage = \Drupal::service('config.storage');
+  $config_storage->write($view, $source->read($view));
+}
+
