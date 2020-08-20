@@ -18,7 +18,7 @@ default_value: {  }
 default_value_callback: ''
 settings:
   file_directory: site_logo
-  file_extensions: 'png gif jpg jpeg svg'
+  file_extensions: 'png gif jpg jpeg'
   max_filesize: ''
   max_resolution: ''
   min_resolution: ''
