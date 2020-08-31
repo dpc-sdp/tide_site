@@ -1,0 +1,14 @@
+/**
+ * @file
+ * Theme styles for the tide site preview links.
+ */
+.block-tide-site-preview-links-block {
+  border: 1px dashed #bbb;
+  margin: 2em 0;
+  background: #fff;
+  padding-left: 1em;
+}
+
+.tide-site-preview-link .site-name::after {
+  content: ':';
+}

@@ -1,0 +1,12 @@
+name: 'Tide Site - Preview links'
+description: Provides frontend preview links for content managed with Tide Site.
+type: module
+package: Tide
+core: 8.x
+dependencies:
+  - dpc-sdp:tide_site
+  - dpc-sdp:tide_api
+config_devel:
+  install: {  }
+  optional:
+    - block.block.seven_tide_site_preview_links
