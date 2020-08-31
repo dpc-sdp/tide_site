@@ -334,3 +334,16 @@ function tide_site_update_8017() {
   $display['default']['display_options']['fields']['changed_1']['settings']['custom_date_format'] = 'd/m/Y - H:i';
   $summary_contents_view->set('display', $display)->save();
 }
+
+/**
+ * Enable SVG filetype for site logo.
+ */
+function tide_site_update_8018() {
+  $entity_type = 'taxonomy_term';
+  $bundle = 'sites';
+  $field_name = 'field_site_logo';
+  $field = FieldConfig::loadByName($entity_type, $bundle, $field_name);
+  if ($field) {
+    $field->setSetting('file_extensions', 'png gif jpg jpeg svg')->save();
+  }
+}
