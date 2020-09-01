@@ -347,3 +347,74 @@ function tide_site_update_8018() {
     $field->setSetting('file_extensions', 'png gif jpg jpeg svg')->save();
   }
 }
+
+/**
+ * Add a new optional Twitter Image on the Site Taxonomy.
+ */
+function tide_site_update_8019() {
+
+  $config_location = [Settings::get('config_sync_directory', FALSE)];
+  module_load_include('inc', 'tide_core', 'includes/helpers');
+  try {
+    _tide_read_config('field.storage.taxonomy_term.field_site_twitter_image', $config_location, TRUE);
+  }
+  catch (Exception $ex) {
+    
+    $configs = [
+      'field.storage.taxonomy_term.field_site_twitter_image' => 'field_storage_config',
+      'field.field.taxonomy_term.sites.field_site_twitter_image' => 'field_config',
+    ];
+    $config_location = [drupal_get_path('module', 'tide_site') . '/config/install'];
+    // Check if field already exported to config/sync.
+    foreach ($configs as $config => $type) {
+      $config_read = _tide_read_config($config, $config_location, TRUE);
+      $storage = \Drupal::entityTypeManager()->getStorage($type);
+      $config_entity = $storage->createFromStorageRecord($config_read);
+      $config_entity->save();
+    }
+
+    // Adding the field to display form.
+    $entity_form_display = Drupal::entityTypeManager()
+      ->getStorage('entity_form_display')
+      ->load('taxonomy_term.sites.default');
+    if ($entity_form_display) {
+      $entity_form_display->setComponent('field_site_twitter_image', [
+        'weight' => 13,
+        'settings' => [
+          'entity_browser' => 'tide_image_browser',
+          'field_widget_display' => 'rendered_entity',
+          'field_widget_display_settings' => [
+            'view_mode' => 'media_browser_preview',
+          ],
+          'field_widget_edit' => 'true',
+          'field_widget_remove' => 'true',
+          'selection_mode' => 'selection_append',
+          'field_widget_replace' => 'false',
+          'open' => 'false',
+        ],
+        'third_party_settings' => [],
+        'type' => 'entity_browser_entity_reference',
+        'region' => 'content',
+      ]);
+    }
+    $entity_form_display->save();
+
+    // Adding the field to display view.
+    $entity_view_display = Drupal::entityTypeManager()
+      ->getStorage('entity_view_display')
+      ->load('taxonomy_term.sites.default');
+    if ($entity_view_display) {
+      $entity_view_display->setComponent('field_site_twitter_image', [
+        'weight' => 11,
+        'label' => 'above',
+        'settings' => [
+          'view_mode' => 'default',
+          'link' => FALSE,
+        ],
+        'third_party_settings' => [],
+        'region' => 'content',
+      ]);
+    }
+    $entity_view_display->save();
+  }
+}
