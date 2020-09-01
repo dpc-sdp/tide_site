@@ -257,14 +257,13 @@ class AliasStorageHelper {
         /** @var \Drupal\Core\Entity\EntityStorageInterface $path_storage */
         $path_storage = $this->entityTypeManager->getStorage('path_alias');
         try {
-          if (!$this->isAliasExists($alias, $path->language()->getId())) {
-            if ($is_new) {
-              $path_storage->create([
-                'path' => $path->getPath(),
-                'alias' => $alias,
-                'langcode' => $path->language()->getId(),
-              ])->save();
-            }
+          if ($is_new) {
+            $this->uniquify($alias, $path->language()->getId());
+            $path_storage->create([
+              'path' => $path->getPath(),
+              'alias' => $alias,
+              'langcode' => $path->language()->getId(),
+            ])->save();
           }
         }
         catch (\Exception $exception) {
