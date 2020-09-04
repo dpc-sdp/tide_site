@@ -39,7 +39,7 @@ class AliasManager extends CoreAliasManager {
     // Remove the site prefix from path alias when responding from
     // JSONAPI entity resource with site parameter.
     $request = \Drupal::request();
-    $is_jsonapi = $request->attributes->get('_is_jsonapi', FALSE);
+    $is_jsonapi = !empty($request->attributes) ? $request->attributes->get('_is_jsonapi', FALSE) : FALSE;
     if ($is_jsonapi) {
       $site_id = $request->get('site');
       if ($site_id) {
