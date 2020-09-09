@@ -7,7 +7,6 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Url;
 use Drupal\node\NodeInterface;
 use Drupal\path_alias\PathAliasInterface;
-use Drupal\pathauto\AliasUniquifierInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
 /**
@@ -35,13 +34,6 @@ class AliasStorageHelper {
   protected $entityTypeManager;
 
   /**
-   * The Alias uniquifier service.
-   *
-   * @var \Drupal\pathauto\AliasUniquifierInterface
-   */
-  protected $aliasUniquifier;
-
-  /**
    * AliasStorageHelper constructor.
    *
    * @param \Drupal\tide_site\TideSiteHelper $helper
@@ -52,29 +44,6 @@ class AliasStorageHelper {
   public function __construct(TideSiteHelper $helper, EntityTypeManagerInterface $entity_type_manager) {
     $this->helper = $helper;
     $this->entityTypeManager = $entity_type_manager;
-  }
-
-  /**
-   * Set the Alias Uniquifier service.
-   *
-   * @param \Drupal\pathauto\AliasUniquifierInterface $alias_uniquifier
-   *   The service.
-   */
-  public function setAliasUniquifier(AliasUniquifierInterface $alias_uniquifier) {
-    $this->aliasUniquifier = $alias_uniquifier;
-  }
-
-  /**
-   * Get the Alias Uniquifier service.
-   *
-   * @return \Drupal\pathauto\AliasUniquifierInterface
-   *   The service.
-   */
-  public function getAliasUniquifier() {
-    if (empty($this->aliasUniquifier)) {
-      $this->setAliasUniquifier($this->container->get('pathauto.alias_uniquifier'));
-    }
-    return $this->aliasUniquifier;
   }
 
   /**
@@ -186,7 +155,6 @@ class AliasStorageHelper {
     /** @var \Drupal\Core\Entity\EntityStorageInterface $path_storage */
     $path_storage = $this->entityTypeManager->getStorage('path_alias');
     if ($node) {
-      $this->getAliasUniquifier();
       /** @var string[] $aliases */
       $aliases = $this->getAllSiteAliases($path, $node);
 
@@ -285,14 +253,20 @@ class AliasStorageHelper {
     // Collect all existing aliases of the node.
     $aliases = [];
     $path_aliases = $this->loadAll(['path' => '/node/' . $node->id()]);
-    foreach ($path_aliases as $path) {
-      // Group them by language and original alias without site prefix.
-      $alias = $this->getPathAliasWithoutSitePrefix(['alias' => $path->getAlias()]);
-      $aliases[$path->language()->getId() . ':' . $alias] = $path;
+    // If no path aliases exist, just generate them respectively.
+    if (empty($path_aliases)) {
+      $this->container->get('pathauto.generator')->createEntityAlias($node, 'insert');
     }
-    // Regenerate aliases.
-    foreach ($aliases as $path) {
-      $this->createSiteAliases($path, $node, $site_ids);
+    else {
+      foreach ($path_aliases as $path) {
+        // Group them by language and original alias without site prefix.
+        $alias = $this->getPathAliasWithoutSitePrefix(['alias' => $path->getAlias()]);
+        $aliases[$path->language()->getId() . ':' . $alias] = $path;
+      }
+      // Regenerate aliases.
+      foreach ($aliases as $path) {
+        $this->createSiteAliases($path, $node, $site_ids);
+      }
     }
   }
 
