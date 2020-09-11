@@ -46,7 +46,9 @@ class TideSitePathProcessor implements InboundPathProcessorInterface, OutboundPa
     if (empty($options['alias'])) {
       $langcode = isset($options['language']) ? $options['language']->getId() : NULL;
       $pattern = "\/node\/[0-9]*";
+      // We only care about /node/{id} path.
       if (preg_match('/^' . $pattern . '$/', $path)) {
+        // If it is an node canonical url, we load it.
         if (preg_match("/\/(\d+)$/", $path, $matches)) {
           $nid = $matches[1];
           $node = Node::load($nid);
@@ -54,12 +56,15 @@ class TideSitePathProcessor implements InboundPathProcessorInterface, OutboundPa
           $helper = \Drupal::service('tide_site.helper');
           /** @var \Drupal\tide_site\AliasStorageHelper $alias_helper */
           $alias_helper = \Drupal::service('tide_site.alias_storage_helper');
+          $aliases = $alias_helper->loadAll(['path' => $path]);
+          // Gets PrimarySite term entity.
           $site = $helper->getEntityPrimarySite($node);
           $path = $this->aliasManager->getAliasByPath($path, $langcode);
-          if (!preg_match('/^' . $pattern . '$/', $path)) {
-            if ($site) {
-              $path_without_site = $alias_helper->getPathAliasWithoutSitePrefix(['alias' => $path]);
-              $path = '/site-' . $site->id() . $path_without_site;
+          if ($site && $aliases) {
+            foreach ($aliases as $pathAlias) {
+              if (strpos($pathAlias->getAlias(), '/site-' . $site->id() . '/') !== FALSE) {
+                $path = $pathAlias->getAlias();
+              }
             }
           }
         }
