@@ -20,4 +20,6 @@ services:
     tags:
       - { name: path_processor_inbound, priority: 300 }
       - { name: path_processor_outbound, priority: 300 }
-    arguments: ['@path_alias.manager']
+    arguments: [ '@path_alias.manager', '@tide_site.helper', '@tide_site.alias_storage_helper' ]
+    calls:
+      - [ setContainer, [ '@service_container' ] ]

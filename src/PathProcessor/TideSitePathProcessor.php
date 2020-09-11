@@ -7,12 +7,16 @@ use Drupal\path_alias\AliasManagerInterface;
 use Drupal\Core\PathProcessor\InboundPathProcessorInterface;
 use Drupal\Core\PathProcessor\OutboundPathProcessorInterface;
 use Drupal\Core\Render\BubbleableMetadata;
+use Drupal\tide_site\AliasStorageHelper;
+use Drupal\tide_site\TideSiteHelper;
+use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Path processor for tide_site module.
  */
 class TideSitePathProcessor implements InboundPathProcessorInterface, OutboundPathProcessorInterface {
+  use ContainerAwareTrait;
 
   /**
    * An alias manager for looking up the system path.
@@ -22,13 +26,33 @@ class TideSitePathProcessor implements InboundPathProcessorInterface, OutboundPa
   protected $aliasManager;
 
   /**
+   * Tide site helper.
+   *
+   * @var \Drupal\tide_site\TideSiteHelper
+   */
+  protected $tideSiteHelper;
+
+  /**
+   * Tide path alias helper.
+   *
+   * @var \Drupal\tide_site\AliasStorageHelper
+   */
+  protected $tidAliasHelper;
+
+  /**
    * Constructs a PathProcessorAlias object.
    *
    * @param \Drupal\path_alias\AliasManagerInterface $alias_manager
    *   An alias manager for looking up the system path.
+   * @param \Drupal\tide_site\TideSiteHelper $siteHelper
+   *   Tide site helper.
+   * @param \Drupal\tide_site\AliasStorageHelper $aliasStorageHelper
+   *   Tide path alias helper.
    */
-  public function __construct(AliasManagerInterface $alias_manager) {
+  public function __construct(AliasManagerInterface $alias_manager, TideSiteHelper $siteHelper, AliasStorageHelper $aliasStorageHelper) {
     $this->aliasManager = $alias_manager;
+    $this->tideSiteHelper = $siteHelper;
+    $this->tidAliasHelper = $aliasStorageHelper;
   }
 
   /**
@@ -52,13 +76,9 @@ class TideSitePathProcessor implements InboundPathProcessorInterface, OutboundPa
         if (preg_match("/\/(\d+)$/", $path, $matches)) {
           $nid = $matches[1];
           $node = Node::load($nid);
-          /** @var \Drupal\tide_site\TideSiteHelper $helper */
-          $helper = \Drupal::service('tide_site.helper');
-          /** @var \Drupal\tide_site\AliasStorageHelper $alias_helper */
-          $alias_helper = \Drupal::service('tide_site.alias_storage_helper');
-          $aliases = $alias_helper->loadAll(['path' => $path]);
+          $aliases = $this->tidAliasHelper->loadAll(['path' => $path]);
           // Gets PrimarySite term entity.
-          $site = $helper->getEntityPrimarySite($node);
+          $site = $this->tideSiteHelper->getEntityPrimarySite($node);
           $path = $this->aliasManager->getAliasByPath($path, $langcode);
           if ($site && $aliases) {
             foreach ($aliases as $pathAlias) {
