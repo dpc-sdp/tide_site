@@ -24,6 +24,12 @@ class TideSiteServiceProvider extends ServiceProviderBase {
         ->addArgument(new Reference('tide_site.alias_storage_helper'));
     }
 
+    // Overrides path_alias.path_processor class.
+    if ($container->hasDefinition('path_alias.path_processor')) {
+      $alias_manager_definition = $container->getDefinition('path_alias.path_processor');
+      $alias_manager_definition->setClass('Drupal\tide_site\PathProcessor\TideSitePathProcessor');
+    }
+
     // Overrides linkit.suggestion_manager service (Linkit 5.x).
     if ($container->hasDefinition('linkit.suggestion_manager')) {
       $linkit_definition = $container->getDefinition('linkit.suggestion_manager');
