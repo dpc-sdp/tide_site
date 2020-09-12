@@ -691,3 +691,20 @@ function tide_site_entity_type_alter(array &$entity_types) {
     $entity_types['path_alias']->setListBuilderClass(TideSitePathAliasListBuilder::class);
   }
 }
+
+/**
+ * Implements hook_ENTITY_TYPE_presave().
+ */
+function tide_site_redirect_presave($redirect) {
+  if ($redirect->isNew()) {
+    // By default, redirect entity saved as internal:/node/{id}
+    // but, we want them saved as 'entity:node/{id}'(The entity itself).
+    $pattern = "\internal\:\/node\/[0-9]*";
+    $redirect_values = $redirect->get('redirect_redirect')->get(0)->getValue();
+    if (preg_match('/^' . $pattern . '$/', $redirect_values['uri'])) {
+      $nid = substr($redirect_values['uri'], strrpos($redirect_values['uri'], '/') + 1);
+      $redirect_values['uri'] = 'entity:node/' . $nid;
+      $redirect->redirect_redirect->set(0, $redirect_values);
+    }
+  }
+}
