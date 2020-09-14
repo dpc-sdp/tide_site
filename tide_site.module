@@ -18,6 +18,7 @@ use Drupal\views\ViewExecutable;
 use Drupal\path_alias\Entity\PathAlias;
 use Drupal\path_alias\PathAliasInterface;
 use Drupal\tide_site\TideSitePathAliasListBuilder;
+use Drupal\node\NodeInterface;
 
 /**
  * Implements hook_entity_bundle_create().
@@ -414,6 +415,9 @@ function tide_site_form_node_form_alter(&$form, FormStateInterface $form_state) 
     if ($aliases) {
       $alias_list = [];
       foreach ($aliases as $alias) {
+        if ($alias->isPublished() == FALSE) {
+          continue;
+        }
         if (!isset($alias_list[$alias->language()->getId()])) {
           $alias_list[$alias->language()->getId()] = [
             '#theme' => 'item_list',
@@ -576,27 +580,45 @@ function tide_site_taxonomy_term_delete($term) {
 /**
  * Implements hook_ENTITY_TYPE_update().
  */
-function tide_site_node_update($node) {
-  // Regenerate site aliases of the updated node.
-  /** @var \Drupal\tide_site\AliasStorage $alias_storage */
+function tide_site_node_update(NodeInterface $node) {
+  // Gets required services.
   $alias_storage_helper = \Drupal::service('tide_site.alias_storage_helper');
-
+  $tide_site_helper = \Drupal::service('tide_site.helper');
   $path_storage = \Drupal::entityTypeManager()->getStorage('path_alias');
 
-  /** @var \Drupal\node\NodeInterface $node */
+  // If the node has no aliases, we should creat them.
   if (!$alias_storage_helper->loadAll(['path' => '/node/' . $node->id()])) {
-    /** @var \Drupal\pathauto\PathautoGenerator $path_auto_generator */
     $path_auto_generator = \Drupal::service('pathauto.generator');
     $path_auto_generator->createEntityAlias($node, 'update');
   }
+
+  // Get last node revision for comparison purpose.
   $old_node = $node->original;
-  $helper = \Drupal::service('tide_site.helper');
-  $old_sites = $helper->getEntitySites($old_node, TRUE) ?: ['ids' => []];
-  $new_sites = $helper->getEntitySites($node, TRUE) ?: ['ids' => []];
+  // If node title changed, we should change the aliases accordingly.
+  if ($node->getTitle() !== $old_node->getTitle()) {
+    $new_uri_without_site_prefix = \Drupal::service('pathauto.alias_cleaner')->cleanString($node->getTitle());
+    $existing_path_aliases = $alias_storage_helper->loadAll(['path' => '/node/' . $node->id()]);
+    foreach ($existing_path_aliases as $existing_path_alias) {
+      $path = $existing_path_alias->getAlias();
+      $site_id = $tide_site_helper->getSiteIdFromSitePrefix($path);
+      // If site id cannot be found, just skip it.
+      if (!$site_id) {
+        continue;
+      }
+      $changed_alias = '/site-' . $site_id . '/' . $new_uri_without_site_prefix;
+      $alias_storage_helper->uniquify($changed_alias, $existing_path_alias->language()
+        ->getId());
+      $existing_path_alias->setAlias($changed_alias)->save();
+    }
+  }
+
+  // Compares sites changing.
+  $old_sites = $tide_site_helper->getEntitySites($old_node, TRUE) ?: ['ids' => []];
+  $new_sites = $tide_site_helper->getEntitySites($node, TRUE) ?: ['ids' => []];
   $unassigned_sites = array_diff($old_sites['ids'], $new_sites['ids']);
   if ($unassigned_sites) {
     foreach ($unassigned_sites as $unassigned_site_id) {
-      $site_prefix = $helper->getSitePathPrefix($unassigned_site_id);
+      $site_prefix = $tide_site_helper->getSitePathPrefix($unassigned_site_id);
       $path_ids = \Drupal::entityQuery('path_alias')
         ->condition('alias', $site_prefix . '/', 'CONTAINS')
         ->condition('path', '/node/' . $node->id(), '=')
