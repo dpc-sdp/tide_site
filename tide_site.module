@@ -586,7 +586,7 @@ function tide_site_node_update(NodeInterface $node) {
   $tide_site_helper = \Drupal::service('tide_site.helper');
   $path_storage = \Drupal::entityTypeManager()->getStorage('path_alias');
 
-  // If the node has no aliases, we should creat them.
+  // If the node has no aliases, we should create them.
   if (!$alias_storage_helper->loadAll(['path' => '/node/' . $node->id()])) {
     $path_auto_generator = \Drupal::service('pathauto.generator');
     $path_auto_generator->createEntityAlias($node, 'update');
