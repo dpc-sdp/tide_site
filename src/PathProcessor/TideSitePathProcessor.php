@@ -52,7 +52,7 @@ class TideSitePathProcessor implements InboundPathProcessorInterface, OutboundPa
   public function __construct(AliasManagerInterface $alias_manager, TideSiteHelper $siteHelper, AliasStorageHelper $aliasStorageHelper) {
     $this->aliasManager = $alias_manager;
     $this->tideSiteHelper = $siteHelper;
-    $this->tidAliasHelper = $aliasStorageHelper;
+    $this->tideAliasHelper = $aliasStorageHelper;
   }
 
   /**
@@ -76,7 +76,7 @@ class TideSitePathProcessor implements InboundPathProcessorInterface, OutboundPa
         if (preg_match("/\/(\d+)$/", $path, $matches)) {
           $nid = $matches[1];
           $node = Node::load($nid);
-          $aliases = $this->tidAliasHelper->loadAll(['path' => $path]);
+          $aliases = $this->tideAliasHelper->loadAll(['path' => $path]);
           // Gets PrimarySite term entity.
           $site = $this->tideSiteHelper->getEntityPrimarySite($node);
           $path = $this->aliasManager->getAliasByPath($path, $langcode);
