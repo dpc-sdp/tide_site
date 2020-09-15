@@ -19,6 +19,7 @@ use Drupal\path_alias\Entity\PathAlias;
 use Drupal\path_alias\PathAliasInterface;
 use Drupal\tide_site\TideSitePathAliasListBuilder;
 use Drupal\node\NodeInterface;
+use Drupal\tide_site\TideSiteEntityOperations;
 
 /**
  * Implements hook_entity_bundle_create().
@@ -414,6 +415,7 @@ function tide_site_form_node_form_alter(&$form, FormStateInterface $form_state) 
       ]);
     if ($aliases) {
       $alias_list = [];
+      /** @var \Drupal\path_alias\Entity\PathAliasInterface $alias */
       foreach ($aliases as $alias) {
         if ($alias->isPublished() == FALSE) {
           continue;
@@ -523,117 +525,36 @@ function _tide_site_delete_all_alias(&$form, FormStateInterface $form_state) {
  * Implements hook_ENTITY_TYPE_insert().
  */
 function tide_site_path_alias_insert(PathAliasInterface $path) {
-  /** @var \Drupal\tide_site\AliasStorageHelper $alias_helper */
-  $alias_helper = \Drupal::service('tide_site.alias_storage_helper');
-  $node = $alias_helper->getNodeFromPathEntity($path);
-  if ($node && !$alias_helper->isPathHasSitePrefix($path)) {
-    $alias_helper->createSiteAliases($path, $node);
-    /** @var \Drupal\tide_site\TideSiteHelper $helper */
-    $helper = \Drupal::service('tide_site.helper');
-    if ($helper->getEntitySites($node)) {
-      if (!$alias_helper->isPathHasSitePrefix($path)) {
-        $path->delete();
-      }
-    }
-  }
+  return \Drupal::service('class_resolver')
+    ->getInstanceFromDefinition(TideSiteEntityOperations::class)
+    ->pathAliasInsert($path);
 }
 
 /**
  * Implements hook_ENTITY_TYPE_update().
  */
 function tide_site_path_alias_update(PathAliasInterface $path) {
-  /** @var \Drupal\tide_site\AliasStorageHelper $alias_helper */
-  $alias_helper = \Drupal::service('tide_site.alias_storage_helper');
-  $node = $alias_helper->getNodeFromPathEntity($path);
-  if ($node && !$alias_helper->isPathHasSitePrefix($path)) {
-    $alias_helper->updateSiteAliases($path, $path->original);
-    /** @var \Drupal\tide_site\TideSiteHelper $helper */
-    $helper = \Drupal::service('tide_site.helper');
-    if ($helper->getEntitySites($node)) {
-      // Delete the current path if it does not have site prefix.
-      if (!$alias_helper->isPathHasSitePrefix($path)) {
-        $path->delete();
-      }
-    }
-  }
+  return \Drupal::service('class_resolver')
+    ->getInstanceFromDefinition(TideSiteEntityOperations::class)
+    ->pathAliasUpdate($path);
 }
 
 /**
  * Implements hook_ENTITY_TYPE_delete().
  */
 function tide_site_taxonomy_term_delete($term) {
-  // Delete all site aliases of content belong to this Site term.
-  /** @var \Drupal\taxonomy\TermInterface $term */
-  if ($term->bundle() == 'sites') {
-    /** @var \Drupal\tide_site\TideSiteHelper $helper */
-    $helper = \Drupal::service('tide_site.helper');
-    $path_storage = \Drupal::entityTypeManager()->getStorage('path_alias');
-    $site_prefix = $helper->getSitePathPrefix($term);
-    $path_ids = \Drupal::entityQuery('path_alias')
-      ->condition('alias', $site_prefix . '/', 'CONTAINS')
-      ->condition('path', '/taxonomy/term/' . $term->id(), '=')
-      ->execute();
-    $path_storage->delete(PathAlias::loadMultiple($path_ids));
-  }
+  return \Drupal::service('class_resolver')
+    ->getInstanceFromDefinition(TideSiteEntityOperations::class)
+    ->termDelete($term);
 }
 
 /**
  * Implements hook_ENTITY_TYPE_update().
  */
 function tide_site_node_update(NodeInterface $node) {
-  // Gets required services.
-  $alias_storage_helper = \Drupal::service('tide_site.alias_storage_helper');
-  $tide_site_helper = \Drupal::service('tide_site.helper');
-  $path_storage = \Drupal::entityTypeManager()->getStorage('path_alias');
-
-  // If the node has no aliases, we should create them.
-  if (!$alias_storage_helper->loadAll(['path' => '/node/' . $node->id()])) {
-    $path_auto_generator = \Drupal::service('pathauto.generator');
-    $path_auto_generator->createEntityAlias($node, 'update');
-  }
-
-  // Get last node revision for comparison purpose.
-  $old_node = $node->original;
-  // If node title changed, we should change the aliases accordingly.
-  if ($node->getTitle() !== $old_node->getTitle()) {
-    $new_uri_without_site_prefix = \Drupal::service('pathauto.alias_cleaner')->cleanString($node->getTitle());
-    $existing_path_aliases = $alias_storage_helper->loadAll(['path' => '/node/' . $node->id()]);
-    foreach ($existing_path_aliases as $existing_path_alias) {
-      $path = $existing_path_alias->getAlias();
-      $site_id = $tide_site_helper->getSiteIdFromSitePrefix($path);
-      // If site id cannot be found, just skip it.
-      if (!$site_id) {
-        continue;
-      }
-      $changed_alias = '/site-' . $site_id . '/' . $new_uri_without_site_prefix;
-      $alias_storage_helper->uniquify($changed_alias, $existing_path_alias->language()
-        ->getId());
-      $existing_path_alias->setAlias($changed_alias)->save();
-    }
-  }
-
-  // Compares sites changing.
-  $old_sites = $tide_site_helper->getEntitySites($old_node, TRUE) ?: ['ids' => []];
-  $new_sites = $tide_site_helper->getEntitySites($node, TRUE) ?: ['ids' => []];
-  $unassigned_sites = array_diff($old_sites['ids'], $new_sites['ids']);
-  if ($unassigned_sites) {
-    foreach ($unassigned_sites as $unassigned_site_id) {
-      $site_prefix = $tide_site_helper->getSitePathPrefix($unassigned_site_id);
-      $path_ids = \Drupal::entityQuery('path_alias')
-        ->condition('alias', $site_prefix . '/', 'CONTAINS')
-        ->condition('path', '/node/' . $node->id(), '=')
-        ->execute();
-      if ($path_ids) {
-        $path_storage->delete(PathAlias::loadMultiple($path_ids));
-      }
-    }
-  }
-  $new_assigned_sites = array_diff($new_sites['ids'], $old_sites['ids']);
-  if ($new_assigned_sites) {
-    /** @var \Drupal\tide_site\AliasStorageHelper $alias_helper */
-    $alias_helper = \Drupal::service('tide_site.alias_storage_helper');
-    $alias_helper->regenerateNodeSiteAliases($node, $new_assigned_sites);
-  }
+  return \Drupal::service('class_resolver')
+    ->getInstanceFromDefinition(TideSiteEntityOperations::class)
+    ->nodeUpdate($node);
 }
 
 /**

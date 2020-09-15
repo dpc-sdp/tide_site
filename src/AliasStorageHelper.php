@@ -6,6 +6,7 @@ use Drupal\Component\Utility\Unicode;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Url;
 use Drupal\node\NodeInterface;
+use Drupal\path_alias\Entity\PathAlias;
 use Drupal\path_alias\PathAliasInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
@@ -329,11 +330,7 @@ class AliasStorageHelper {
    *
    * @return \Drupal\path_alias\PathAliasInterface[]|false
    *   FALSE if no alias was found or an associative array containing the
-   *   following keys:
-   *   - path (string): The internal system path with a starting slash.
-   *   - alias (string): The URL alias with a starting slash.
-   *   - id (int): Unique path alias identifier.
-   *   - langcode (string): The language code of the alias.
+   *   path_alias entities keyed by entity id.
    */
   public function loadAll(array $conditions) {
     $path_storage = $this->entityTypeManager->getStorage('path_alias');
@@ -354,6 +351,32 @@ class AliasStorageHelper {
     $path_alias_storage = $this->entityTypeManager->getStorage('path_alias');
     $path_entities = $path_alias_storage->loadByProperties(['path' => $path->getPath()]);
     $path_alias_storage->delete($path_entities);
+  }
+
+  /**
+   * Delete or create path_alias entities based on the changing of node sites.
+   */
+  public function deleteOrCreateFromSites(NodeInterface $original_node, NodeInterface $node) {
+    // Compares sites changing.
+    $old_sites = $this->helper->getEntitySites($original_node, TRUE) ?: ['ids' => []];
+    $new_sites = $this->helper->getEntitySites($node, TRUE) ?: ['ids' => []];
+    $unassigned_sites = array_diff($old_sites['ids'], $new_sites['ids']);
+    if ($unassigned_sites) {
+      foreach ($unassigned_sites as $unassigned_site_id) {
+        $site_prefix = $this->helper->getSitePathPrefix($unassigned_site_id);
+        $path_ids = \Drupal::entityQuery('path_alias')
+          ->condition('alias', $site_prefix . '/', 'CONTAINS')
+          ->condition('path', '/node/' . $node->id(), '=')
+          ->execute();
+        if ($path_ids) {
+          $this->entityTypeManager->getStorage('path_alias')->delete(PathAlias::loadMultiple($path_ids));
+        }
+      }
+    }
+    $new_assigned_sites = array_diff($new_sites['ids'], $old_sites['ids']);
+    if ($new_assigned_sites) {
+      $this->regenerateNodeSiteAliases($node, $new_assigned_sites);
+    }
   }
 
 }
