@@ -4,7 +4,6 @@ namespace Drupal\tide_site\PathProcessor;
 
 use Drupal\node\Entity\Node;
 use Drupal\path_alias\AliasManagerInterface;
-use Drupal\Core\PathProcessor\InboundPathProcessorInterface;
 use Drupal\Core\PathProcessor\OutboundPathProcessorInterface;
 use Drupal\Core\Render\BubbleableMetadata;
 use Drupal\tide_site\AliasStorageHelper;
@@ -15,7 +14,7 @@ use Symfony\Component\HttpFoundation\Request;
 /**
  * Path processor for tide_site module.
  */
-class TideSitePathProcessor implements InboundPathProcessorInterface, OutboundPathProcessorInterface {
+class TideSitePathProcessor implements OutboundPathProcessorInterface {
   use ContainerAwareTrait;
 
   /**
@@ -37,7 +36,7 @@ class TideSitePathProcessor implements InboundPathProcessorInterface, OutboundPa
    *
    * @var \Drupal\tide_site\AliasStorageHelper
    */
-  protected $tidAliasHelper;
+  protected $tideAliasHelper;
 
   /**
    * Constructs a PathProcessorAlias object.
@@ -53,14 +52,6 @@ class TideSitePathProcessor implements InboundPathProcessorInterface, OutboundPa
     $this->aliasManager = $alias_manager;
     $this->tideSiteHelper = $siteHelper;
     $this->tideAliasHelper = $aliasStorageHelper;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function processInbound($path, Request $request) {
-    $path = $this->aliasManager->getPathByAlias($path);
-    return $path;
   }
 
   /**

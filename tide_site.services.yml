@@ -18,7 +18,6 @@ services:
   tide_site.path_processor:
     class: Drupal\tide_site\PathProcessor\TideSitePathProcessor
     tags:
-      - { name: path_processor_inbound, priority: 300 }
       - { name: path_processor_outbound, priority: 300 }
     arguments: [ '@path_alias.manager', '@tide_site.helper', '@tide_site.alias_storage_helper' ]
     calls:
