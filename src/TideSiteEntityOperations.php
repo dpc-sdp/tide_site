@@ -113,7 +113,7 @@ class TideSiteEntityOperations implements ContainerInjectionInterface {
         $path = $existing_path_alias->getAlias();
         $site_id = $this->tideSiteHelper->getSiteIdFromSitePrefix($path);
         // If site id cannot be found, just skip it.
-        if (!$site_id) {
+        if (!$site_id || !$this->tideSiteAliasStorageHelper->eligibleToUpdate($node, $existing_path_alias)) {
           continue;
         }
         $changed_alias = '/site-' . $site_id . '/' . $new_uri_without_site_prefix;

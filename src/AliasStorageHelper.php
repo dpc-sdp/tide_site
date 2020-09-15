@@ -379,4 +379,18 @@ class AliasStorageHelper {
     }
   }
 
+  /**
+   * Check if the alias eligible to update.
+   */
+  public function eligibleToUpdate(NodeInterface $node, PathAliasInterface $pathAlias) {
+    $path_alias_without_prefix = $this->getPathAliasWithoutSitePrefix(['alias' => $pathAlias->getAlias()]);
+    $original_title = $node->original->getTitle();
+    $cleaned_uri = '/' . \Drupal::service('pathauto.alias_cleaner')
+      ->cleanString($original_title);
+    if ($cleaned_uri == $path_alias_without_prefix) {
+      return TRUE;
+    }
+    return FALSE;
+  }
+
 }
