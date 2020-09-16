@@ -18,6 +18,8 @@ use Drupal\views\ViewExecutable;
 use Drupal\path_alias\Entity\PathAlias;
 use Drupal\path_alias\PathAliasInterface;
 use Drupal\tide_site\TideSitePathAliasListBuilder;
+use Drupal\node\NodeInterface;
+use Drupal\tide_site\TideSiteEntityOperations;
 
 /**
  * Implements hook_entity_bundle_create().
@@ -413,7 +415,11 @@ function tide_site_form_node_form_alter(&$form, FormStateInterface $form_state) 
       ]);
     if ($aliases) {
       $alias_list = [];
+      /** @var \Drupal\path_alias\Entity\PathAliasInterface $alias */
       foreach ($aliases as $alias) {
+        if ($alias->isPublished() == FALSE) {
+          continue;
+        }
         if (!isset($alias_list[$alias->language()->getId()])) {
           $alias_list[$alias->language()->getId()] = [
             '#theme' => 'item_list',
@@ -519,99 +525,36 @@ function _tide_site_delete_all_alias(&$form, FormStateInterface $form_state) {
  * Implements hook_ENTITY_TYPE_insert().
  */
 function tide_site_path_alias_insert(PathAliasInterface $path) {
-  /** @var \Drupal\tide_site\AliasStorageHelper $alias_helper */
-  $alias_helper = \Drupal::service('tide_site.alias_storage_helper');
-  $node = $alias_helper->getNodeFromPathEntity($path);
-  if ($node && !$alias_helper->isPathHasSitePrefix($path)) {
-    $alias_helper->createSiteAliases($path, $node);
-    /** @var \Drupal\tide_site\TideSiteHelper $helper */
-    $helper = \Drupal::service('tide_site.helper');
-    if ($helper->getEntitySites($node)) {
-      if (!$alias_helper->isPathHasSitePrefix($path)) {
-        $path->delete();
-      }
-    }
-  }
+  return \Drupal::service('class_resolver')
+    ->getInstanceFromDefinition(TideSiteEntityOperations::class)
+    ->pathAliasInsert($path);
 }
 
 /**
  * Implements hook_ENTITY_TYPE_update().
  */
 function tide_site_path_alias_update(PathAliasInterface $path) {
-  /** @var \Drupal\tide_site\AliasStorageHelper $alias_helper */
-  $alias_helper = \Drupal::service('tide_site.alias_storage_helper');
-  $node = $alias_helper->getNodeFromPathEntity($path);
-  if ($node && !$alias_helper->isPathHasSitePrefix($path)) {
-    $alias_helper->updateSiteAliases($path, $path->original);
-    /** @var \Drupal\tide_site\TideSiteHelper $helper */
-    $helper = \Drupal::service('tide_site.helper');
-    if ($helper->getEntitySites($node)) {
-      // Delete the current path if it does not have site prefix.
-      if (!$alias_helper->isPathHasSitePrefix($path)) {
-        $path->delete();
-      }
-    }
-  }
+  return \Drupal::service('class_resolver')
+    ->getInstanceFromDefinition(TideSiteEntityOperations::class)
+    ->pathAliasUpdate($path);
 }
 
 /**
  * Implements hook_ENTITY_TYPE_delete().
  */
 function tide_site_taxonomy_term_delete($term) {
-  // Delete all site aliases of content belong to this Site term.
-  /** @var \Drupal\taxonomy\TermInterface $term */
-  if ($term->bundle() == 'sites') {
-    /** @var \Drupal\tide_site\TideSiteHelper $helper */
-    $helper = \Drupal::service('tide_site.helper');
-    $path_storage = \Drupal::entityTypeManager()->getStorage('path_alias');
-    $site_prefix = $helper->getSitePathPrefix($term);
-    $path_ids = \Drupal::entityQuery('path_alias')
-      ->condition('alias', $site_prefix . '/', 'CONTAINS')
-      ->condition('path', '/taxonomy/term/' . $term->id(), '=')
-      ->execute();
-    $path_storage->delete(PathAlias::loadMultiple($path_ids));
-  }
+  return \Drupal::service('class_resolver')
+    ->getInstanceFromDefinition(TideSiteEntityOperations::class)
+    ->termDelete($term);
 }
 
 /**
  * Implements hook_ENTITY_TYPE_update().
  */
-function tide_site_node_update($node) {
-  // Regenerate site aliases of the updated node.
-  /** @var \Drupal\tide_site\AliasStorage $alias_storage */
-  $alias_storage_helper = \Drupal::service('tide_site.alias_storage_helper');
-
-  $path_storage = \Drupal::entityTypeManager()->getStorage('path_alias');
-
-  /** @var \Drupal\node\NodeInterface $node */
-  if (!$alias_storage_helper->loadAll(['path' => '/node/' . $node->id()])) {
-    /** @var \Drupal\pathauto\PathautoGenerator $path_auto_generator */
-    $path_auto_generator = \Drupal::service('pathauto.generator');
-    $path_auto_generator->createEntityAlias($node, 'update');
-  }
-  $old_node = $node->original;
-  $helper = \Drupal::service('tide_site.helper');
-  $old_sites = $helper->getEntitySites($old_node, TRUE) ?: ['ids' => []];
-  $new_sites = $helper->getEntitySites($node, TRUE) ?: ['ids' => []];
-  $unassigned_sites = array_diff($old_sites['ids'], $new_sites['ids']);
-  if ($unassigned_sites) {
-    foreach ($unassigned_sites as $unassigned_site_id) {
-      $site_prefix = $helper->getSitePathPrefix($unassigned_site_id);
-      $path_ids = \Drupal::entityQuery('path_alias')
-        ->condition('alias', $site_prefix . '/', 'CONTAINS')
-        ->condition('path', '/node/' . $node->id(), '=')
-        ->execute();
-      if ($path_ids) {
-        $path_storage->delete(PathAlias::loadMultiple($path_ids));
-      }
-    }
-  }
-  $new_assigned_sites = array_diff($new_sites['ids'], $old_sites['ids']);
-  if ($new_assigned_sites) {
-    /** @var \Drupal\tide_site\AliasStorageHelper $alias_helper */
-    $alias_helper = \Drupal::service('tide_site.alias_storage_helper');
-    $alias_helper->regenerateNodeSiteAliases($node, $new_assigned_sites);
-  }
+function tide_site_node_update(NodeInterface $node) {
+  return \Drupal::service('class_resolver')
+    ->getInstanceFromDefinition(TideSiteEntityOperations::class)
+    ->nodeUpdate($node);
 }
 
 /**
@@ -689,5 +632,22 @@ function tide_site_form_views_exposed_form_alter(&$form, FormStateInterface $for
 function tide_site_entity_type_alter(array &$entity_types) {
   if (isset($entity_types['path_alias'])) {
     $entity_types['path_alias']->setListBuilderClass(TideSitePathAliasListBuilder::class);
+  }
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_presave().
+ */
+function tide_site_redirect_presave($redirect) {
+  if ($redirect->isNew()) {
+    // By default, redirect entity saved as internal:/node/{id}
+    // but, we want them saved as 'entity:node/{id}'(The entity itself).
+    $pattern = "\internal\:\/node\/[0-9]*";
+    $redirect_values = $redirect->get('redirect_redirect')->get(0)->getValue();
+    if (preg_match('/^' . $pattern . '$/', $redirect_values['uri'])) {
+      $nid = substr($redirect_values['uri'], strrpos($redirect_values['uri'], '/') + 1);
+      $redirect_values['uri'] = 'entity:node/' . $nid;
+      $redirect->redirect_redirect->set(0, $redirect_values);
+    }
   }
 }

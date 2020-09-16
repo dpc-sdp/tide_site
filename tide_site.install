@@ -9,6 +9,7 @@ use Drupal\Core\Config\FileStorage;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\taxonomy\TaxonomyPermissions;
+use Drupal\redirect\Entity\Redirect;
 
 /**
  * Implements hook_install().
@@ -346,4 +347,45 @@ function tide_site_update_8018() {
   if ($field) {
     $field->setSetting('file_extensions', 'png gif jpg jpeg svg')->save();
   }
+}
+
+/**
+ * Changes internal:/node/{id} to entity:node/{id}.
+ */
+function tide_site_update_8019(&$sandbox) {
+  if (!isset($sandbox['total'])) {
+    $count = \Drupal::entityTypeManager()
+      ->getStorage('redirect')
+      ->getQuery()
+      ->condition('redirect_redirect__uri', '%internal:/node/%', 'LIKE')
+      ->count()
+      ->execute();
+    $sandbox['total'] = $count;
+    $sandbox['current'] = 0;
+    $sandbox['processed'] = 0;
+    $sandbox['#finished'] = $count ? 0 : 1;
+  }
+  $batch_size = 10;
+  $redirect_ids = \Drupal::entityTypeManager()
+    ->getStorage('redirect')
+    ->getQuery()
+    ->condition('redirect_redirect__uri', '%internal:/node/%', 'LIKE')
+    ->condition('id', $sandbox['current'], '>')
+    ->sort('id', 'ASC')
+    ->range(0, $batch_size)
+    ->execute();
+  foreach ($redirect_ids as $redirect_id) {
+    $sandbox['current'] = $redirect_id;
+    $redirect = Redirect::load($redirect_id);
+    if ($redirect) {
+      $redirect_values = $redirect->get('redirect_redirect')->get(0)->getValue();
+      $nid = substr($redirect_values['uri'], strrpos($redirect_values['uri'], '/') + 1);
+      $redirect_values['uri'] = 'entity:node/' . $nid;
+      $redirect->redirect_redirect->set(0, $redirect_values);
+      $redirect->save();
+    }
+    $sandbox['processed']++;
+  }
+  $sandbox['#finished'] = $sandbox['total'] ? $sandbox['processed'] / $sandbox['total'] : 1;
+  $sandbox['#finished'] = $sandbox['#finished'] > 1 ? 1 : $sandbox['#finished'];
 }
