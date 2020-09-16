@@ -370,8 +370,8 @@ function tide_site_update_8019(&$sandbox) {
     ->getStorage('redirect')
     ->getQuery()
     ->condition('redirect_redirect__uri', '%internal:/node/%', 'LIKE')
-    ->condition('id', $sandbox['current'], '>')
-    ->sort('id', 'ASC')
+    ->condition('rid', $sandbox['current'], '>')
+    ->sort('rid', 'ASC')
     ->range(0, $batch_size)
     ->execute();
   foreach ($redirect_ids as $redirect_id) {
