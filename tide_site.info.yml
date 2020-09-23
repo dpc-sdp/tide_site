@@ -33,6 +33,7 @@ config_devel:
     - field.field.taxonomy_term.sites.field_site_og_image
     - field.field.taxonomy_term.sites.field_site_show_exit_site
     - field.field.taxonomy_term.sites.field_site_slogan
+    - field.field.taxonomy_term.sites.field_site_twitter_image
     - field.storage.media.field_media_site
     - field.storage.node.field_node_primary_site
     - field.storage.node.field_node_site
@@ -48,6 +49,7 @@ config_devel:
     - field.storage.taxonomy_term.field_site_og_image
     - field.storage.taxonomy_term.field_site_show_exit_site
     - field.storage.taxonomy_term.field_site_slogan
+    - field.storage.taxonomy_term.field_site_twitter_image
     - taxonomy.vocabulary.sites
   optional:
     - jsonapi_extras.jsonapi_resource_config.taxonomy_term--sites
