@@ -67,14 +67,16 @@ class TideSitePathProcessor implements OutboundPathProcessorInterface {
         if (preg_match("/\/(\d+)$/", $path, $matches)) {
           $nid = $matches[1];
           $node = Node::load($nid);
-          $aliases = $this->tideAliasHelper->loadAll(['path' => $path]);
-          // Gets PrimarySite term entity.
-          $site = $this->tideSiteHelper->getEntityPrimarySite($node);
-          $path = $this->aliasManager->getAliasByPath($path, $langcode);
-          if ($site && $aliases) {
-            foreach ($aliases as $pathAlias) {
-              if (strpos($pathAlias->getAlias(), '/site-' . $site->id() . '/') !== FALSE) {
-                $path = $pathAlias->getAlias();
+          if ($node !== NULL){
+            $aliases = $this->tideAliasHelper->loadAll(['path' => $path]);
+            // Gets PrimarySite term entity.
+            $site = $this->tideSiteHelper->getEntityPrimarySite($node);
+            $path = $this->aliasManager->getAliasByPath($path, $langcode);
+            if ($site && $aliases) {
+              foreach ($aliases as $pathAlias) {
+                if (strpos($pathAlias->getAlias(), '/site-' . $site->id() . '/') !== FALSE) {
+                  $path = $pathAlias->getAlias();
+                }
               }
             }
           }
