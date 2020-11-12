@@ -768,15 +768,27 @@ function tide_site_share_link_token_view_alter(array &$build, EntityInterface $t
   // Add the Site Links to token view.
   if (count($preview_urls)) {
     $build['frontend_links'] = [
-      '#theme' => 'item_list',
-      '#list_type' => 'ul',
-      '#title' => t('Click the links below to view the shared page on frontend sites'),
-      '#items' => [],
-      '#wrapper_attributes' => ['class' => 'share-link-token-frontend-links'],
+      '#theme' => 'details',
+      '#title' => t('Click the link/s below to view the shared page on frontend sites'),
+      '#attributes' => [
+        'open' => TRUE,
+      ],
+      '#summary_attributes' => [],
+      '#children' => [
+        '#theme' => 'container',
+        '#children' => [
+          '#theme' => 'item_list',
+          '#list_type' => 'ul',
+          '#items' => [],
+          '#wrapper_attributes' => ['class' => 'share-link-token-frontend-links'],
+        ],
+        '#has_parent' => TRUE,
+      ],
+      '#weight' => -100,
     ];
     foreach ($preview_urls as $url_data) {
       if (!empty($url_data['url'])) {
-        $build['frontend_links']['#items'][] = [
+        $build['frontend_links']['#children']['#children']['#items'][] = [
           '#markup' => $url_data['name'] . ': ' . Link::fromTextAndUrl($url_data['url']->toString(), $url_data['url'])->toString(),
         ];
       }
