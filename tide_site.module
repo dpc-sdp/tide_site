@@ -769,7 +769,7 @@ function tide_site_share_link_token_view_alter(array &$build, EntityInterface $t
   if (count($preview_urls)) {
     $build['frontend_links'] = [
       '#theme' => 'details',
-      '#title' => t('Click the link/s below to view the shared page on frontend sites'),
+      '#title' => t('Click the link/s below to preview this page'),
       '#attributes' => [
         'open' => TRUE,
       ],
