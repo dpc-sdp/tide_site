@@ -5,10 +5,13 @@
  * Tide Site module functionality.
  */
 
+use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
+use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Link;
+use Drupal\Core\Url;
 use Drupal\node\Entity\Node;
 use Drupal\search_api\IndexInterface;
 use Drupal\taxonomy\Entity\Term;
@@ -689,5 +692,106 @@ function tide_site_form_views_exposed_form_alter(&$form, FormStateInterface $for
 function tide_site_entity_type_alter(array &$entity_types) {
   if (isset($entity_types['path_alias'])) {
     $entity_types['path_alias']->setListBuilderClass(TideSitePathAliasListBuilder::class);
+  }
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_view_alter().
+ */
+function tide_site_share_link_token_view_alter(array &$build, EntityInterface $token, EntityViewDisplayInterface $display) {
+  /** @var \Drupal\tide_share_link\Entity\ShareLinkTokenInterface $token */
+  if (!$token->isActive()) {
+    return;
+  }
+
+  if (!$display->getComponent('api_info')) {
+    return;
+  }
+
+  /** @var \Drupal\node\NodeInterface $node */
+  $node = $token->getSharedNode();
+  if (!$node) {
+    return;
+  }
+
+  $preview_urls = [];
+
+  /** @var \Drupal\tide_site\TideSiteHelper $site_helper */
+  $site_helper = \Drupal::service('tide_site.helper');
+  // Generate the preview URLs on all sites.
+  $sites = $site_helper->getEntitySites($node, TRUE);
+  if (!empty($sites['ids'])) {
+    // Prepend the preview URL of the primary site to the Preview Links.
+    $primary_site = $site_helper->getEntityPrimarySite($node);
+    if ($primary_site) {
+      if (isset($sites['ids'][$primary_site->id()])) {
+        $element = [$primary_site->id() => $sites['ids'][$primary_site->id()]];
+        unset($sites['ids'][$primary_site->id()]);
+        $sites['ids'] = $element + $sites['ids'];
+      }
+      if (isset($sites['sections'][$primary_site->id()])) {
+        $element = [$primary_site->id() => $sites['sections'][$primary_site->id()]];
+        unset($sites['sections'][$primary_site->id()]);
+        $sites['sections'] = $element + $sites['sections'];
+      }
+    }
+
+    foreach ($sites['ids'] as $site_id) {
+      $site = $site_helper->getSiteById($site_id);
+      if ($site) {
+        $url_options = [
+          'attributes' => ['target' => '_blank'],
+        ];
+
+        $section = NULL;
+        if (!empty($sites['sections'][$site_id])) {
+          $section = $site_helper->getSiteById($sites['sections'][$site_id]);
+          if ($section && $section->id() !== $site_id) {
+            $url_options['query']['section'] = $sites['sections'][$site_id];
+          }
+        }
+
+        $site_url = $site_helper->getSiteBaseUrl($site);
+        $url = !empty($site_url) ? ($site_url . '/share_link/' . $token->getToken() . '/' . $node->id()) : '';
+        $preview_urls[$site_id] = [
+          'name' => !empty($site->getName()) ? $site->getName() : '',
+          'url' => (!empty($url) && !empty($url_options)) ? Url::fromUri($url, $url_options) : '',
+        ];
+
+        if ($section && $section->id() !== $site_id) {
+          $preview_urls[$site_id]['name'] .= ' - ' . $section->getName();
+        }
+      }
+    }
+  }
+
+  // Add the Site Links to token view.
+  if (count($preview_urls)) {
+    $build['frontend_links'] = [
+      '#theme' => 'details',
+      '#title' => t('Click the link/s below to preview this page'),
+      '#attributes' => [
+        'open' => TRUE,
+      ],
+      '#summary_attributes' => [],
+      '#children' => [
+        '#theme' => 'container',
+        '#children' => [
+          '#theme' => 'item_list',
+          '#list_type' => 'ul',
+          '#items' => [],
+          '#wrapper_attributes' => ['class' => 'share-link-token-frontend-links'],
+        ],
+        '#has_parent' => TRUE,
+      ],
+      '#weight' => -100,
+    ];
+    foreach ($preview_urls as $url_data) {
+      if (!empty($url_data['url'])) {
+        $build['frontend_links']['#children']['#children']['#items'][] = [
+          '#markup' => $url_data['name'] . ': ' . Link::fromTextAndUrl($url_data['url']->toString(), $url_data['url'])->toString(),
+        ];
+      }
+    }
   }
 }
