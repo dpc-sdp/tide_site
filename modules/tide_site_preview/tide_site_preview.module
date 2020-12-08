@@ -1,0 +1,31 @@
+<?php
+
+/**
+ * @file
+ * Tide Site Preview module.
+ */
+
+use Drupal\Core\Link;
+
+/**
+ * Implements hook_theme().
+ */
+function tide_site_preview_theme($existing, $type, $theme, $path) {
+  return [
+    'tide_site_preview_links' => [
+      'variables' => [
+        'node' => NULL,
+        'preview_links' => [],
+      ],
+    ],
+  ];
+}
+
+/**
+ * Implements template_preprocess_HOOK().
+ */
+function template_preprocess_tide_site_preview_links(&$variables) {
+  foreach ($variables['preview_links'] as &$preview_link) {
+    $preview_link['link'] = !empty($preview_link['url']) ? Link::fromTextAndUrl($preview_link['url']->toString(), $preview_link['url']) : '';
+  }
+}

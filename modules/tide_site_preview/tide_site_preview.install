@@ -1,0 +1,23 @@
+<?php
+
+/**
+ * @file
+ * Tide Site install file.
+ */
+
+use Drupal\user\Entity\Role;
+
+/**
+ * Implements hook_install().
+ */
+function tide_site_preview_install() {
+  // Grant view preview links block to default roles from tide_core.
+  $roles = ['editor', 'approver', 'site_admin'];
+  foreach ($roles as $role_id) {
+    /** @var \Drupal\user\RoleInterface $role */
+    $role = Role::load($role_id);
+    if ($role) {
+      $role->grantPermission('view tide_site preview links')->save();
+    }
+  }
+}
