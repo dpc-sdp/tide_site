@@ -1,0 +1,23 @@
+{#
+/**
+ * @file
+ * Default theme implementation for the preview links.
+ *
+ * Available variables:
+ * - node: The node of the preview links.
+ * - open_in_new_window: whether to open all links in a new window.
+ * - preview_links: The preview links array, each item has:
+ *   - name: The site/section name of the link.
+ *   - url: The absolute URL of the preview link.
+ *   - link: The pregenerated anchor link.
+ *
+ * @ingroup themeable
+ */
+#}
+<ul class="tide-site-preview-links">
+{% for link in preview_links %}
+    <li class="tide-site-preview-link">
+        <span class="site-name">{{ link.name }}</span> <span class="preview-link">{{ link.link }}</span>
+    </li>
+{% endfor %}
+</ul>
