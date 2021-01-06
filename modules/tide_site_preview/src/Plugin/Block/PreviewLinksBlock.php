@@ -235,6 +235,11 @@ class PreviewLinksBlock extends BlockBase implements ContainerFactoryPluginInter
         $node = NULL;
       }
     }
+
+    if (!($node instanceof NodeInterface)) {
+      $node = NULL;
+    }
+
     $this->currentNode = $node;
 
     return $this->currentNode;
