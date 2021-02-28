@@ -26,6 +26,11 @@ use Drupal\tide_site\TideSitePathAliasListBuilder;
  * Implements hook_entity_bundle_create().
  */
 function tide_site_entity_bundle_create($entity_type_id, $bundle) {
+  // Don't do anything else during config sync.
+  if (\Drupal::isConfigSyncing()) {
+    return;
+  }
+
   /** @var \Drupal\tide_site\TideSiteFields $fields_helper */
   $fields_helper = \Drupal::service('tide_site.fields');
 
