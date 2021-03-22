@@ -715,10 +715,10 @@ class TideSiteHelper {
   public function handleApiUrl($data, Context $context) {
     /** @var \Drupal\tide_site\AliasStorageHelper $alias_helper */
     $alias_helper = \Drupal::service('tide_site.alias_storage_helper');
-  
+
     $data['origin_alias'] = $data['alias'];
     $data['alias'] = $alias_helper->getPathAliasWithoutSitePrefix($data);
-  
+
     /** @var \Drupal\path_alias\Entity\PathAlias $path_entity */
     $path_entity = PathAlias::load($data['pid']);
     if ($path_entity) {
@@ -730,7 +730,7 @@ class TideSiteHelper {
         if (!$site_id) {
           return;
         }
-  
+
         // The URL from Tide API is already relative.
         $data['origin_url'] = $data['url'];
         // Check if the link belongs to the current site.
