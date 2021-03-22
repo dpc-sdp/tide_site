@@ -813,36 +813,5 @@ function tide_site_tide_card_link_enhancer_undo_transform_alter(&$data, &$contex
 
   /** @var \Drupal\tide_site\TideSiteHelper $helper */
   $helper = \Drupal::service('tide_site.helper');
-  /** @var \Drupal\tide_site\AliasStorageHelper $alias_helper */
-  $alias_helper = \Drupal::service('tide_site.alias_storage_helper');
-
-  $data['origin_alias'] = $data['alias'];
-  $data['alias'] = $alias_helper->getPathAliasWithoutSitePrefix($data);
-
-  /** @var \Drupal\path_alias\Entity\PathAlias $path_entity */
-  $path_entity = PathAlias::load($data['pid']);
-  if ($path_entity) {
-    $node = $alias_helper->getNodeFromPathEntity($path_entity);
-    if ($node) {
-      // Get the Site ID parameter.
-      $request = \Drupal::request();
-      $site_id = $request->get('site');
-      if (!$site_id) {
-        return;
-      }
-
-      // The URL from Tide API is already relative.
-      $data['origin_url'] = $data['url'];
-      // Check if the link belongs to the current site.
-      if ($helper->isEntityBelongToSite($node, $site_id)) {
-        $site_url = '';
-      }
-      else {
-        $site_url = $helper->getEntityPrimarySiteBaseUrl($node);
-        $data['url'] = $helper->getNodeUrlFromPrimarySite($node);
-      }
-      // Remove site prefix from the  URL.
-      $data['url'] = $alias_helper->getPathAliasWithoutSitePrefix(['alias' => $data['url']], $site_url);
-    }
-  }
+  $helper->handleApiUrl($data, $context);
 }
