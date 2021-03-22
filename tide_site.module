@@ -800,3 +800,18 @@ function tide_site_share_link_token_view_alter(array &$build, EntityInterface $t
     }
   }
 }
+
+/**
+ * Implements hook_tide_card_link_enhancer_undo_transform_alter().
+ *
+ * @see Drupal\tide_landing_page\Plugin\jsonapi\FieldEnhancer\CardLinkEnhancer::doUndoTransform()
+ */
+function tide_site_tide_card_link_enhancer_undo_transform_alter(&$data, &$context) {
+  if (empty($data['pid']) || empty($data['url'])) {
+    return;
+  }
+
+  /** @var \Drupal\tide_site\TideSiteHelper $helper */
+  $helper = \Drupal::service('tide_site.helper');
+  $helper->handleApiUrl($data, $context);
+}
