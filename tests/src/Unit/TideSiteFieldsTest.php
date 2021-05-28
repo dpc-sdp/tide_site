@@ -17,8 +17,7 @@ class TideSiteFieldsTest extends TideSiteTest {
    * @dataProvider providerNormaliseFieldName
    */
   public function testToMachineName($field_name, $entity_type_id, $bundle, $expected) {
-    $mock = self::createMock('Drupal\tide_site\TideSiteFields');
-    $actual = $this->callProtectedMethod($mock, 'normaliseFieldName', [$field_name, $entity_type_id, $bundle]);
+    $actual = TideSiteFields::normaliseFieldName($field_name, $entity_type_id, $bundle);
     $this->assertEquals($expected, $actual);
   }
 
