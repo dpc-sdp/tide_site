@@ -394,7 +394,7 @@ function tide_site_tide_path_enhancer_transform_alter(&$value, &$context) {
  * Implements hook_form_BASE_FORM_ID_alter() for \Drupal\node\NodeForm.
  */
 function tide_site_form_node_form_alter(&$form, FormStateInterface $form_state) {
-  /** @var \Drupal\node\Entity\Node $node */
+  /** @var \Drupal\node\NodeInterface $node */
   $node = $form_state->getFormObject()->getEntity();
   $form['tide_site_path_settings'] = [
     '#type' => 'details',
@@ -440,6 +440,33 @@ function tide_site_form_node_form_alter(&$form, FormStateInterface $form_state) 
         '#items' => $alias_list,
         '#wrapper_attributes' => ['class' => 'container'],
       ];
+    }
+  }
+
+  // Move site fields to a Sidebar tab.
+  $form['tide_site_metadata'] = [
+    '#type' => 'details',
+    '#title' => t('Sites'),
+    '#open' => $node->isNew(),
+    '#optional' => TRUE,
+    '#access' => TRUE,
+    '#group' => 'advanced',
+    '#attributes' => [
+      'class' => ['tide-site-metadata'],
+    ],
+    '#weight' => 100,
+  ];
+
+  $site_fields = [
+    0 => TideSiteFields::normaliseFieldName(TideSiteFields::FIELD_PRIMARY_SITE, 'node'),
+    10 => TideSiteFields::normaliseFieldName(TideSiteFields::FIELD_SITE, 'node'),
+  ];
+  foreach ($site_fields as $weight => $site_field) {
+    if ($node->hasField($site_field)) {
+      if (isset($form[$site_field])) {
+        $form[$site_field]['#group'] = 'tide_site_metadata';
+        $form[$site_field]['#weight'] = $weight;
+      }
     }
   }
 

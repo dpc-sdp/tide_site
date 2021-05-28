@@ -2,7 +2,6 @@
 
 namespace Drupal\tide_site;
 
-use Drupal\Component\Utility\Unicode;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\StringTranslation\TranslationInterface;
@@ -228,7 +227,7 @@ class TideSiteMenuAutocreate {
    */
   protected static function filterAutocreateFieldNames($values) {
     return array_filter($values, function ($k) {
-      return Unicode::strpos($k, self::AUTOCREATE_FIELD_PREFIX) === 0 && Unicode::strpos($k, 'menu') !== FALSE;
+      return mb_strpos($k, self::AUTOCREATE_FIELD_PREFIX) === 0 && mb_strpos($k, 'menu') !== FALSE;
     }, ARRAY_FILTER_USE_KEY);
   }
 
@@ -252,11 +251,11 @@ class TideSiteMenuAutocreate {
    *   If provided string does not contain expected field prefix.
    */
   protected static function extractMenuName($string) {
-    if (Unicode::strpos($string, self::AUTOCREATE_FIELD_PREFIX) === FALSE) {
+    if (mb_strpos($string, self::AUTOCREATE_FIELD_PREFIX) === FALSE) {
       throw new \Exception('Unable to extract menu name from provided value');
     }
 
-    return Unicode::substr($string, Unicode::strlen(self::AUTOCREATE_FIELD_PREFIX));
+    return mb_substr($string, mb_strlen(self::AUTOCREATE_FIELD_PREFIX));
   }
 
   /**
@@ -350,7 +349,7 @@ class TideSiteMenuAutocreate {
    */
   protected static function toMachineName($string, $delimiter = '_') {
     $string = trim($string);
-    $string = Unicode::strtolower($string);
+    $string = mb_strtolower($string);
     // Replace spaces and hyphens, preserving existing delimiters.
     $string = str_replace([$delimiter, ' ', '-', '_'], $delimiter, $string);
     // Remove all other non-alphanumeric characters.
