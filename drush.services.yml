@@ -1,0 +1,5 @@
+services:
+  tide_site.commands:
+    class: \Drupal\tide_site\Commands\TideSiteCommands
+    tags:
+      - { name: drush.command }
