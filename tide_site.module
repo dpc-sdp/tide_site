@@ -5,6 +5,7 @@
  * Tide Site module functionality.
  */
 
+use Drupal\Core\Entity\Display\EntityFormDisplayInterface;
 use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\FieldableEntityInterface;
@@ -12,6 +13,7 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Link;
 use Drupal\Core\Url;
+use Drupal\field\Entity\FieldConfig;
 use Drupal\node\Entity\Node;
 use Drupal\search_api\IndexInterface;
 use Drupal\taxonomy\Entity\Term;
@@ -35,7 +37,7 @@ function tide_site_entity_bundle_create($entity_type_id, $bundle) {
   $fields_helper = \Drupal::service('tide_site.fields');
 
   // Add the new bundle to file_site_homepage entity reference of Sites.
-  if ($entity_type_id == 'node') {
+  if ($entity_type_id === 'node') {
     $fields_helper->addContentTypesToSiteHomepageField([$bundle]);
   }
 
@@ -75,6 +77,54 @@ function tide_site_entity_bundle_create($entity_type_id, $bundle) {
 }
 
 /**
+ * Implements hook_entity_presave().
+ */
+function tide_site_entity_presave(EntityInterface $entity) {
+  // Attempt to add Site fields into entity form if missing.
+  if ($entity instanceof EntityFormDisplayInterface) {
+    /** @var \Drupal\tide_site\TideSiteHelper $site_helper */
+    $site_helper = \Drupal::service('tide_site.helper');
+    /** @var \Drupal\tide_site\TideSiteFields $fields_helper */
+    $fields_helper = \Drupal::service('tide_site.fields');
+
+    $entity_type = $entity->getTargetEntityTypeId();
+    $bundle = $entity->getTargetBundle();
+    // Only add site fields to supported entity types.
+    if ($site_helper->isSupportedEntityType($entity_type)) {
+      $components = $entity->getComponents();
+
+      $map = [
+        'node' => [
+          $fields_helper::FIELD_SITE,
+          $fields_helper::FIELD_PRIMARY_SITE,
+        ],
+        'media' => [$fields_helper::FIELD_SITE],
+      ];
+      foreach ($map[$entity_type] as $field_name) {
+        $field_name = $fields_helper::normaliseFieldName($field_name, $entity_type);
+
+        // Only action if this entity type/bundle to have the site field.
+        $field_config = FieldConfig::loadByName($entity_type, $bundle, $field_name);
+        if (!$field_config) {
+          continue;
+        }
+
+        // Add the site field if missing.
+        if (!isset($components[$field_name])) {
+          $entity->setComponent($field_name, [
+            'type' => 'options_buttons',
+            'region' => 'content',
+            'field_name' => $field_name,
+            'settings' => [],
+            'third_party_settings' => [],
+          ]);
+        }
+      }
+    }
+  }
+}
+
+/**
  * Implements hook_field_widget_form_alter().
  *
  * @todo: Extract into a service.
@@ -84,7 +134,7 @@ function tide_site_field_widget_form_alter(&$element, FormStateInterface $form_s
 
   // Restrict options to 2 levels of depth for Site field.
   if (TideSiteFields::isSiteField($field_definition->getName(), TideSiteFields::FIELD_SITE)) {
-    $tree = \Drupal::entityManager()->getStorage('taxonomy_term')->loadTree('sites', 0, 2);
+    $tree = \Drupal::entityTypeManager()->getStorage('taxonomy_term')->loadTree('sites', 0, 2);
     if (isset($element['#options'])) {
       $element['#options'] = array_intersect_key($element['#options'], array_flip(array_column($tree, 'tid')));
     }
@@ -95,7 +145,7 @@ function tide_site_field_widget_form_alter(&$element, FormStateInterface $form_s
 
   // Restrict options to 1 level of depth for Primary Site field.
   if (TideSiteFields::isSiteField($field_definition->getName(), TideSiteFields::FIELD_PRIMARY_SITE)) {
-    $tree = \Drupal::entityManager()->getStorage('taxonomy_term')->loadTree('sites', 0, 1);
+    $tree = \Drupal::entityTypeManager()->getStorage('taxonomy_term')->loadTree('sites', 0, 1);
     if (isset($element['#options'])) {
       $element['#options'] = array_intersect_key($element['#options'], array_flip(array_column($tree, 'tid')));
     }
@@ -121,7 +171,7 @@ function _tide_site_form_taxonomy_overview_terms_validate(&$form, FormStateInter
   $max_depth = 1;
 
   $vocabulary = $form_state->get(['taxonomy', 'vocabulary']);
-  if ($vocabulary->id() == 'sites') {
+  if ($vocabulary->id() === 'sites') {
     $invalid_tids = [];
     $terms = $form_state->getValue('terms');
     foreach ($terms as $term) {
@@ -154,7 +204,7 @@ function _tide_site_form_taxonomy_overview_terms_validate(&$form, FormStateInter
  * Implements hook_form_taxonomy_term_form_alter().
  */
 function tide_site_form_taxonomy_term_form_alter(&$form, FormStateInterface $form_state, $form_id) {
-  if ($form_id == 'taxonomy_term_sites_form') {
+  if ($form_id === 'taxonomy_term_sites_form') {
     /** @var \Drupal\tide_site\TideSiteMenuAutocreate $menu_helper */
     $menu_helper = \Drupal::service('tide_site.menu_autocreate');
     $altered = $menu_helper->alterFormFields($form, [
@@ -520,15 +570,15 @@ function tide_site_form_alter(array &$form, FormStateInterface $form_state, $for
         $form['site_warning'] = [
           '#theme' => 'item_list',
           '#title' => t('The below site aliases will also be @action.', [
-            '@action' => ($form_id == 'path_alias_form') ? 'updated' : 'deleted',
+            '@action' => ($form_id === 'path_alias_form') ? 'updated' : 'deleted',
           ]),
           '#list_type' => 'ul',
           '#items' => $aliases,
           '#wrapper_attributes' => ['class' => 'container'],
         ];
-        if ($form_id == 'path_alias_delete_form') {
+        if ($form_id === 'path_alias_delete_form') {
           foreach (array_keys($form['actions']) as $action) {
-            if ($action != 'preview' && isset($form['actions'][$action]['#type']) && $form['actions'][$action]['#type'] === 'submit') {
+            if ($action !== 'preview' && isset($form['actions'][$action]['#type']) && $form['actions'][$action]['#type'] === 'submit') {
               $form_state->set('current_path_alias', $path_alias);
               $form['actions'][$action]['#submit'][] = '_tide_site_delete_all_alias';
             }
@@ -595,7 +645,7 @@ function tide_site_path_alias_update(PathAliasInterface $path) {
 function tide_site_taxonomy_term_delete($term) {
   // Delete all site aliases of content belong to this Site term.
   /** @var \Drupal\taxonomy\TermInterface $term */
-  if ($term->bundle() == 'sites') {
+  if ($term->bundle() === 'sites') {
     /** @var \Drupal\tide_site\TideSiteHelper $helper */
     $helper = \Drupal::service('tide_site.helper');
     $path_storage = \Drupal::entityTypeManager()->getStorage('path_alias');
@@ -700,7 +750,7 @@ function tide_site_tide_api_jsonapi_custom_query_parameters_alter(&$custom_param
 function tide_site_form_views_exposed_form_alter(&$form, FormStateInterface $form_state, $form_id) {
   $view = $form_state->get('view');
   if ($view && $view instanceof ViewExecutable) {
-    if ($view->id() == 'summary_contents' && $view->current_display == 'page') {
+    if ($view->id() === 'summary_contents' && $view->current_display === 'page') {
       $form['#attached']['library'][] = 'tide_site/tide_site_layout';
       /** @var \Drupal\tide_site\TideSiteHelper $helper */
       $helper = \Drupal::service('tide_site.helper');
