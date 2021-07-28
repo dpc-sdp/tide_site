@@ -2,7 +2,7 @@ name: 'Tide site'
 description: 'Functionality to allow post content to multiple sites and sections.'
 type: module
 package: Tide
-core: 8.x
+core_version_requirement: ^8.9 || ^9
 dependencies:
   - drupal:field
   - drupal:field_ui
