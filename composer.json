@@ -8,7 +8,7 @@
         "dpc-sdp/tide_media": "dev-compatible-with-drupal-9 as 1.7.10"
     },
     "suggest": {
-        "dpc-sdp/tide_api:dev-compatible-with-drupal-9 as 1.5.4": "Allows to use Drupal in headless mode"
+        "dpc-sdp/tide_api:dev-compatible-with-drupal-9": "Allows to use Drupal in headless mode"
     },
     "repositories": {
         "drupal": {

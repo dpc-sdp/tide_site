@@ -39,7 +39,7 @@ Feature: Link Enhancer with Site
     # Page 1 (site 1) with a reference to Page 2 (site 1).
     # Current site is site 1. Link field should have relative URL.
     When I send a GET request to "api/v1/node/test/99999999-aaaa-bbbb-ccc-000000000001?site=10001"
-    Then the rest response status code should be 200
+    Then the response code should be 200
     And the response should be in JSON
     And the JSON node "links.self" should exist
     And the JSON node "links.self.href" should contain "api/v1/node/test"
@@ -58,7 +58,7 @@ Feature: Link Enhancer with Site
     # Page 2 (site 1) with a reference to Page 3 (site 1, site 2).
     # Current site is site 1. Link field should have relative URL.
     When I send a GET request to "api/v1/node/test/99999999-aaaa-bbbb-ccc-000000000002?site=10001"
-    Then the rest response status code should be 200
+    Then the response code should be 200
     And the response should be in JSON
     And the JSON node "links.self" should exist
     And the JSON node "links.self.href" should contain "api/v1/node/test"
@@ -77,7 +77,7 @@ Feature: Link Enhancer with Site
     # Page 3 (site 1, site 2) with a reference to Page 4 (site 2).
     # Current site is site 1. Link field should have full URL of site 2.
     When I send a GET request to "api/v1/node/test/99999999-aaaa-bbbb-ccc-000000000003?site=10001"
-    Then the rest response status code should be 200
+    Then the response code should be 200
     And the response should be in JSON
     And the JSON node "links.self" should exist
     And the JSON node "links.self.href" should contain "api/v1/node/test"
@@ -95,7 +95,7 @@ Feature: Link Enhancer with Site
     # Page 3 (site 1, site 2) with a reference to Page 4 (site 2).
     # Current site is site 2. Link field should have relative URL.
     When I send a GET request to "api/v1/node/test/99999999-aaaa-bbbb-ccc-000000000003?site=10002"
-    Then the rest response status code should be 200
+    Then the response code should be 200
     And the response should be in JSON
     And the JSON node "links.self" should exist
     And the JSON node "links.self.href" should contain "api/v1/node/test"
@@ -114,7 +114,7 @@ Feature: Link Enhancer with Site
     # Page 4 (site 2) with a reference to Page 1 (site 1).
     # Current site is site 2. Link field should have full URL of site 1.
     When I send a GET request to "api/v1/node/test/99999999-aaaa-bbbb-ccc-000000000004?site=10002"
-    Then the rest response status code should be 200
+    Then the response code should be 200
     And the response should be in JSON
     And the JSON node "links.self" should exist
     And the JSON node "links.self.href" should contain "api/v1/node/test"
@@ -132,7 +132,7 @@ Feature: Link Enhancer with Site
     # Page 5 (site 2, site 1) with a reference to Page 3 (site 1, site 2).
     # Current site is site 1. Link field should have relative URL.
     When I send a GET request to "api/v1/node/test/99999999-aaaa-bbbb-ccc-000000000005?site=10001"
-    Then the rest response status code should be 200
+    Then the response code should be 200
     And the response should be in JSON
     And the JSON node "links.self" should exist
     And the JSON node "links.self.href" should contain "api/v1/node/test"
@@ -151,7 +151,7 @@ Feature: Link Enhancer with Site
     # Page 5 (site 2, site 1) with a reference to Page 3 (site 1, site 2).
     # Current site is site 2. Link field should have relative URL.
     When I send a GET request to "api/v1/node/test/99999999-aaaa-bbbb-ccc-000000000005?site=10002"
-    Then the rest response status code should be 200
+    Then the response code should be 200
     And the response should be in JSON
     And the JSON node "links.self" should exist
     And the JSON node "links.self.href" should contain "api/v1/node/test"

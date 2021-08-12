@@ -20,7 +20,7 @@ Feature: Node path alias with site prefix in JSONAPI.
 
     # Query Page 1 (Site 1). Current site is Site 1.
     When I send a GET request to "api/v1/route?site=100001&path=/test-page-1"
-    Then the rest response status code should be 200
+    Then the response code should be 200
     And the response should be in JSON
     And the JSON node "data.attributes.bundle" should contain "test"
     And the JSON node "data.attributes.endpoint" should contain "api/v1/node/test"
@@ -29,13 +29,13 @@ Feature: Node path alias with site prefix in JSONAPI.
 
     # Query Page 1 (Site 1). Current site is Site 2.
     When I send a GET request to "api/v1/route?site=100002&path=/test-page-1"
-    Then the rest response status code should be 404
+    Then the response code should be 404
     And the response should be in JSON
     And the JSON node "errors" should exist
 
     # Query Page 2 (Site 1, Site 2). Current site is Site 1.
     When I send a GET request to "api/v1/route?site=100001&path=/test-page-2"
-    Then the rest response status code should be 200
+    Then the response code should be 200
     And the response should be in JSON
     And the JSON node "data.attributes.bundle" should contain "test"
     And the JSON node "data.attributes.endpoint" should contain "api/v1/node/test"
@@ -44,7 +44,7 @@ Feature: Node path alias with site prefix in JSONAPI.
 
     # Query Page 2 (Site 1, Site 2). Current site is Site 2.
     When I send a GET request to "api/v1/route?site=100002&path=/test-page-2"
-    Then the rest response status code should be 200
+    Then the response code should be 200
     And the response should be in JSON
     And the JSON node "data.attributes.bundle" should contain "test"
     And the JSON node "data.attributes.endpoint" should contain "api/v1/node/test"
@@ -57,7 +57,7 @@ Feature: Node path alias with site prefix in JSONAPI.
     # Link field should have relative URL of Page 2.
     # Body should have relative URL of Page 2.
     When I send a GET request to "api/v1/node/test/99999999-aaaa-bbbb-ccc-000000000001?site=100001&include=field_test_reference"
-    Then the rest response status code should be 200
+    Then the response code should be 200
     And the response should be in JSON
     And the JSON node "links.self" should exist
     And the JSON node "links.self.href" should contain "api/v1/node/test"
@@ -78,7 +78,7 @@ Feature: Node path alias with site prefix in JSONAPI.
     # Body should have absolute URL of Page 3 on Site 2.
     # Referenced node should have relative URL of Page 1.
     When I send a GET request to "api/v1/node/test/99999999-aaaa-bbbb-ccc-000000000002?site=100001&include=field_test_reference"
-    Then the rest response status code should be 200
+    Then the response code should be 200
     And the response should be in JSON
     And the JSON node "links.self" should exist
     And the JSON node "links.self.href" should contain "api/v1/node/test"
@@ -102,7 +102,7 @@ Feature: Node path alias with site prefix in JSONAPI.
     # Body should have relative URL of Page 3.
     # Referenced node should have absolute URL of Page 1 on Site 1.
     When I send a GET request to "api/v1/node/test/99999999-aaaa-bbbb-ccc-000000000002?site=100002&include=field_test_reference"
-    Then the rest response status code should be 200
+    Then the response code should be 200
     And the response should be in JSON
     And the JSON node "links.self" should exist
     And the JSON node "links.self.href" should contain "api/v1/node/test"
@@ -126,7 +126,7 @@ Feature: Node path alias with site prefix in JSONAPI.
     # Body should have absolute URL of Page 1 on Site 1.
     # Referenced node should have absolute URL of Page 1 on Site 1.
     When I send a GET request to "api/v1/node/test/99999999-aaaa-bbbb-ccc-000000000003?site=100002&include=field_test_reference"
-    Then the rest response status code should be 200
+    Then the response code should be 200
     And the response should be in JSON
     And the JSON node "links.self" should exist
     And the JSON node "links.self.href" should contain "api/v1/node/test"
