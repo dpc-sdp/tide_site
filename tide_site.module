@@ -84,7 +84,7 @@ function tide_site_field_widget_form_alter(&$element, FormStateInterface $form_s
 
   // Restrict options to 2 levels of depth for Site field.
   if (TideSiteFields::isSiteField($field_definition->getName(), TideSiteFields::FIELD_SITE)) {
-    $tree = \Drupal::entityManager()->getStorage('taxonomy_term')->loadTree('sites', 0, 2);
+    $tree = \Drupal::entityTypeManager()->getStorage('taxonomy_term')->loadTree('sites', 0, 2);
     if (isset($element['#options'])) {
       $element['#options'] = array_intersect_key($element['#options'], array_flip(array_column($tree, 'tid')));
     }
@@ -95,7 +95,7 @@ function tide_site_field_widget_form_alter(&$element, FormStateInterface $form_s
 
   // Restrict options to 1 level of depth for Primary Site field.
   if (TideSiteFields::isSiteField($field_definition->getName(), TideSiteFields::FIELD_PRIMARY_SITE)) {
-    $tree = \Drupal::entityManager()->getStorage('taxonomy_term')->loadTree('sites', 0, 1);
+    $tree = \Drupal::entityTypeManager()->getStorage('taxonomy_term')->loadTree('sites', 0, 1);
     if (isset($element['#options'])) {
       $element['#options'] = array_intersect_key($element['#options'], array_flip(array_column($tree, 'tid')));
     }
@@ -408,7 +408,7 @@ function tide_site_form_node_form_alter(&$form, FormStateInterface $form_state) 
     '#weight' => 30,
   ];
 
-  $form['tide_site_path_settings']['manage'] = Link::createFromRoute('Manage URL aliases.', 'path.admin_overview', [], [
+  $form['tide_site_path_settings']['manage'] = Link::createFromRoute('Manage URL aliases.', 'entity.path_alias.collection', [], [
     'attributes' => ['target' => '_blank'],
   ])->toRenderable();
 
