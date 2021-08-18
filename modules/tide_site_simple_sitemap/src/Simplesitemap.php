@@ -29,33 +29,13 @@ class Simplesitemap extends DefaultSimplesitemap {
     $this->request = $request_stack->getCurrentRequest();
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  protected function fetchSitemapChunkInfo() {
-    $site_id = $this->request->get('site');
-    if (empty($site_id)) {
-      return parent::fetchSitemapChunkInfo();
-    }
-
-    return $this->db
-      ->query('SELECT id, sitemap_created FROM {simple_sitemap_site} WHERE site_id = :site_id', [':site_id' => $site_id])
-      ->fetchAllAssoc('id');
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   protected function fetchSitemapChunk($id) {
     $site_id = $this->request->get('site');
     if (empty($site_id)) {
       return parent::fetchSitemapChunk($id);
     }
-
-    return $this->db->query(
-      'SELECT * FROM {simple_sitemap_site} WHERE id = :id AND site_id = :site_id',
-      [':id' => $id, ':site_id' => $site_id]
-    )->fetchObject();
+    return $this->db->query('SELECT * FROM {simple_sitemap_site} WHERE site_id = :site_id',
+      [':site_id' => $site_id])->fetchObject();
   }
 
 }
