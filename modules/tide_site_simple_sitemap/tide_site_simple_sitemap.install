@@ -94,6 +94,20 @@ function tide_site_simple_sitemap_requirements($phase) {
 }
 
 /**
+ * Implements hook_install().
+ */
+function tide_site_simple_sitemap_install($is_syncing) {
+  $config_factory = \Drupal::service('config.factory');
+  $default_variant = $config_factory->get('simple_sitemap.settings')->get('default_variant');
+  if ($default_variant) {
+    $default_variant = 'tide_default';
+    $config_factory->getEditable('simple_sitemap.settings')
+      ->set('default_variant', $default_variant)
+      ->save();
+  }
+}
+
+/**
  * Adding 'type' and 'delta' fields to simple_sitemap_site table.
  */
 function tide_site_simple_sitemap_update_8001() {

@@ -143,4 +143,52 @@ class TideDefaultSitemapGenerator extends DefaultSitemapGenerator {
     return $this;
   }
 
+  protected function getChunkInfo() {
+    return $this->db->select('simple_sitemap_site', 's')
+      ->fields('s', ['delta', 'sitemap_created', 'type'])
+      ->condition('s.type', $this->sitemapVariant)
+      ->condition('s.delta', self::INDEX_DELTA, '<>')
+      ->condition('s.status', 0)
+      ->execute()
+      ->fetchAllAssoc('delta');
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function remove($mode = 'all') {
+    parent::purgeSitemapVariants($this->sitemapVariant, $mode);
+    self::purgeSitemapVariants($this->sitemapVariant, $mode);
+
+    return $this;
+  }
+
+  public static function purgeSitemapVariants($variants = NULL, $mode = 'all') {
+    if (NULL === $variants || !empty((array) $variants)) {
+      $delete_query = \Drupal::database()->delete('simple_sitemap_site');
+
+      switch ($mode) {
+        case 'published':
+          $delete_query->condition('status', 1);
+          break;
+
+        case 'unpublished':
+          $delete_query->condition('status', 0);
+          break;
+
+        case 'all':
+          break;
+
+        default:
+          //todo: throw error
+      }
+
+      if (NULL !== $variants) {
+        $delete_query->condition('type', (array) $variants, 'IN');
+      }
+
+      $delete_query->execute();
+    }
+  }
+
 }
