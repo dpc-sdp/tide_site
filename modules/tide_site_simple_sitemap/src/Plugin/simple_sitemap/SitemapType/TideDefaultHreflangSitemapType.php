@@ -13,6 +13,7 @@ use Drupal\simple_sitemap\Plugin\simple_sitemap\SitemapType\DefaultHreflangSitem
  *   description = @Translation("The default hreflang sitemap type."),
  *   sitemapGenerator = "tide_default",
  *   urlGenerators = {
+ *     "tide_custom",
  *     "tide_entity",
  *   },
  * )
