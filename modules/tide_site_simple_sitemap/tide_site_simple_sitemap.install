@@ -97,13 +97,34 @@ function tide_site_simple_sitemap_requirements($phase) {
  * Implements hook_install().
  */
 function tide_site_simple_sitemap_install($is_syncing) {
-  $config_factory = \Drupal::service('config.factory');
-  $default_variant = $config_factory->get('simple_sitemap.settings')->get('default_variant');
-  if ($default_variant) {
-    $default_variant = 'tide_default';
-    $config_factory->getEditable('simple_sitemap.settings')
-      ->set('default_variant', $default_variant)
-      ->save();
+  /** @var \Drupal\simple_sitemap\EntityHelper $sitemapHelper */
+  $sitemapHelper = Drupal::service('simple_sitemap.entity_helper');
+  /** @var \Drupal\simple_sitemap\Simplesitemap $generator */
+  $generator = \Drupal::service('simple_sitemap.generator');
+  /** @var \Drupal\simple_sitemap\SimplesitemapManager $manager */
+  $manager = \Drupal::service('simple_sitemap.manager');
+  $manager->addSitemapVariant('default', [
+    'type' => 'tide_default_hreflang',
+    'label' => 'Default',
+    'weight' => 0,
+  ]);
+  $generator->saveSetting('default_variant', 'default');
+  $generator->setVariants('default')->addCustomLink('/', [
+    'priority' => '1.0',
+    'changefreq' => 'daily',
+  ]);
+  $settings = [
+    "index" => TRUE,
+    "priority" => "0.5",
+    "changefreq" => "",
+    "include_images" => FALSE,
+  ];
+  $generator->setVariants('default');
+  $bundles = $sitemapHelper->getBundleInfo('node');
+  if ($bundles) {
+    foreach ($bundles as $bundle => $details) {
+      $generator->setBundleSettings('node', $bundle, $settings);
+    }
   }
 }
 
@@ -239,4 +260,39 @@ function tide_site_simple_sitemap_update_8005() {
     ],
   ];
   $schema->addIndex('simple_sitemap_site', 'type_status_delta', ['type', 'status', 'delta'], $spec);
+}
+
+/**
+ * Install bundle settings and homepage.
+ */
+function tide_site_simple_sitemap_update_8006() {
+  /** @var \Drupal\simple_sitemap\EntityHelper $sitemapHelper */
+  $sitemapHelper = Drupal::service('simple_sitemap.entity_helper');
+  /** @var \Drupal\simple_sitemap\Simplesitemap $generator */
+  $generator = \Drupal::service('simple_sitemap.generator');
+  /** @var \Drupal\simple_sitemap\SimplesitemapManager $manager */
+  $manager = \Drupal::service('simple_sitemap.manager');
+  $manager->addSitemapVariant('default', [
+    'type' => 'tide_default_hreflang',
+    'label' => 'Default',
+    'weight' => 0,
+  ]);
+  $generator->saveSetting('default_variant', 'default');
+  $generator->setVariants('default')->addCustomLink('/', [
+    'priority' => '1.0',
+    'changefreq' => 'daily',
+  ]);
+  $settings = [
+    "index" => TRUE,
+    "priority" => "0.5",
+    "changefreq" => "",
+    "include_images" => FALSE,
+  ];
+  $generator->setVariants('default');
+  $bundles = $sitemapHelper->getBundleInfo('node');
+  if ($bundles) {
+    foreach ($bundles as $bundle => $details) {
+      $generator->setBundleSettings('node', $bundle, $settings);
+    }
+  }
 }
