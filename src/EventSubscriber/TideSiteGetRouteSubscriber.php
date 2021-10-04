@@ -13,7 +13,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * Class TideSiteGetRouteSubscriber.
+ * Class get route subscriber for tide_site.
  *
  * @package Drupal\tide_site\EventSubscriber
  */
@@ -52,6 +52,7 @@ class TideSiteGetRouteSubscriber implements EventSubscriberInterface {
    * {@inheritdoc}
    */
   public static function getSubscribedEvents() {
+    $events = [];
     $events[TideApiEvents::GET_ROUTE][] = ['onApiGetRouteAddSiteFilter', -10];
 
     return $events;

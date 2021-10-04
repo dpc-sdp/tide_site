@@ -6,7 +6,7 @@ use Drupal\simple_sitemap\Simplesitemap as DefaultSimplesitemap;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
- * Class Simplesitemap.
+ * Class simple sitemap.
  *
  * @package Drupal\tide_site_simple_sitemap
  */
@@ -29,6 +29,15 @@ class Simplesitemap extends DefaultSimplesitemap {
     $this->request = $request_stack->getCurrentRequest();
   }
 
+  /**
+   * Fetches a single sitemap chunk by ID.
+   *
+   * @param int $id
+   *   The chunk ID.
+   *
+   * @return object
+   *   A sitemap chunk object.
+   */
   protected function fetchSitemapChunk($id) {
     $site_id = $this->request->get('site');
     if (empty($site_id)) {

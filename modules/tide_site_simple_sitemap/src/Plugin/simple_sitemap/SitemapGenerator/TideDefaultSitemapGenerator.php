@@ -5,7 +5,7 @@ namespace Drupal\tide_site_simple_sitemap\Plugin\simple_sitemap\SitemapGenerator
 use Drupal\simple_sitemap\Plugin\simple_sitemap\SitemapGenerator\DefaultSitemapGenerator;
 
 /**
- * Class DefaultSitemapGenerator
+ * Class default sitemap generator.
  *
  * @SitemapGenerator(
  *   id = "tide_default",
@@ -112,7 +112,11 @@ class TideDefaultSitemapGenerator extends DefaultSitemapGenerator {
   }
 
   /**
-   * {@inheritdoc}
+   * Generate Index.
+   *
+   * @return $this
+   *
+   * @throws \Exception
    */
   public function generateIndex() {
     if (!empty($chunk_info = $this->getChunkInfo()) && count($chunk_info) > 1) {
@@ -143,6 +147,9 @@ class TideDefaultSitemapGenerator extends DefaultSitemapGenerator {
     return $this;
   }
 
+  /**
+   * Get chunk info.
+   */
   protected function getChunkInfo() {
     return $this->db->select('simple_sitemap_site', 's')
       ->fields('s', ['delta', 'sitemap_created', 'type'])
@@ -154,7 +161,7 @@ class TideDefaultSitemapGenerator extends DefaultSitemapGenerator {
   }
 
   /**
-   * {@inheritdoc}
+   * Remove function for sitemap generator.
    */
   public function remove($mode = 'all') {
     parent::purgeSitemapVariants($this->sitemapVariant, $mode);
@@ -163,6 +170,9 @@ class TideDefaultSitemapGenerator extends DefaultSitemapGenerator {
     return $this;
   }
 
+  /**
+   * Purge sitemap variants.
+   */
   public static function purgeSitemapVariants($variants = NULL, $mode = 'all') {
     if (NULL === $variants || !empty((array) $variants)) {
       $delete_query = \Drupal::database()->delete('simple_sitemap_site');
@@ -180,7 +190,8 @@ class TideDefaultSitemapGenerator extends DefaultSitemapGenerator {
           break;
 
         default:
-          //todo: throw error
+
+          // @todo throw error.
       }
 
       if (NULL !== $variants) {

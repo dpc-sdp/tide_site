@@ -14,11 +14,10 @@ use Drupal\Core\Url;
 use Drupal\node\NodeInterface;
 use Drupal\taxonomy\TermInterface;
 use Drupal\tide_site\TideSiteHelper;
-use Exception;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Class PreviewLinksBlock.
+ * Class preview links block.
  *
  *  @Block(
  *   id = "tide_site_preview_links_block",

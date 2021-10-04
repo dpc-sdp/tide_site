@@ -9,6 +9,7 @@
  * Implements hook_schema().
  */
 function tide_site_simple_sitemap_schema() {
+  $schema = [];
   $schema['simple_sitemap_site'] = [
     'description' => 'Holds XML sitemaps as strings for quick retrieval.',
     'fields' => [
@@ -185,7 +186,7 @@ function tide_site_simple_sitemap_update_8002() {
 }
 
 /**
- * Changing id and delta fields of simple_sitemap_site table from smallint to int.
+ * Changing id and delta fields of simple_sitemap_site table.
  */
 function tide_site_simple_sitemap_update_8003() {
   $schema = \Drupal::database()->schema();
@@ -259,7 +260,16 @@ function tide_site_simple_sitemap_update_8005() {
       ],
     ],
   ];
-  $schema->addIndex('simple_sitemap_site', 'type_status_delta', ['type', 'status', 'delta'], $spec);
+  $schema->addIndex(
+    'simple_sitemap_site',
+    'type_status_delta',
+    [
+      'type',
+      'status',
+      'delta',
+    ],
+    $spec
+  );
 }
 
 /**

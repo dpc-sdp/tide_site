@@ -8,7 +8,7 @@ use Drupal\Core\StringTranslation\TranslationInterface;
 use Drupal\system\Entity\Menu;
 
 /**
- * Class TideSiteMenuAutocreate.
+ * Provides the auto creation of the menus for tide_site.
  *
  * @package Drupal\tide_site.
  */

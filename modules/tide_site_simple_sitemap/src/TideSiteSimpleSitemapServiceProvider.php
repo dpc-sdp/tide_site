@@ -7,7 +7,7 @@ use Drupal\Core\DependencyInjection\ServiceProviderBase;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
- * Class TideSiteSimpleSitemapServiceProvider.
+ * Class simple sitemap service provider for tide_site.
  *
  * @package Drupal\tide_site
  */

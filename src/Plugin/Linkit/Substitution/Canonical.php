@@ -13,7 +13,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * Class Canonical.
+ * Defines the canonical links.
  *
  * @package Drupal\tide_site\Plugin\Linkit\Substitution
  */

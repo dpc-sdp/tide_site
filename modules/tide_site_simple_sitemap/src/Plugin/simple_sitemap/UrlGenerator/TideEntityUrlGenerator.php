@@ -5,7 +5,7 @@ namespace Drupal\tide_site_simple_sitemap\Plugin\simple_sitemap\UrlGenerator;
 use Drupal\simple_sitemap\Plugin\simple_sitemap\UrlGenerator\EntityUrlGenerator;
 
 /**
- * Class EntityUrlGenerator
+ * Class entity url generator.
  *
  * @UrlGenerator(
  *   id = "tide_entity",

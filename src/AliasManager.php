@@ -9,7 +9,7 @@ use Drupal\path_alias\AliasRepositoryInterface;
 use Drupal\path_alias\AliasWhitelistInterface;
 
 /**
- * Class AliasManager.
+ * Class alias manager.
  *
  * @package Drupal\tide_site
  */

@@ -5,7 +5,7 @@ namespace Drupal\tide_site_simple_sitemap\Plugin\simple_sitemap\SitemapType;
 use Drupal\simple_sitemap\Plugin\simple_sitemap\SitemapType\DefaultHreflangSitemapType;
 
 /**
- * Class DefaultHreflangSitemapType
+ * Class default href lang sitemap type.
  *
  * @SitemapType(
  *   id = "tide_default_hreflang",

@@ -2,11 +2,11 @@
 
 namespace Drupal\tide_site_simple_sitemap\Plugin\simple_sitemap\UrlGenerator;
 
-use Drupal\simple_sitemap\Annotation\UrlGenerator;
 use Drupal\simple_sitemap\Plugin\simple_sitemap\UrlGenerator\CustomUrlGenerator;
 
 /**
- * Class TideCustomUrlGenerator
+ * Class Tide custom url generator.
+ *
  * @package Drupal\tide_site_simple_sitemap\Plugin\simple_sitemap\UrlGenerator
  *
  * @UrlGenerator(
@@ -14,7 +14,6 @@ use Drupal\simple_sitemap\Plugin\simple_sitemap\UrlGenerator\CustomUrlGenerator;
  *   label = @Translation("Tide Custom URL generator"),
  *   description = @Translation("Generates URLs set in admin/config/search/simplesitemap/custom."),
  * )
- *
  */
 class TideCustomUrlGenerator extends CustomUrlGenerator {
 

@@ -12,7 +12,7 @@ use Drupal\taxonomy\TermInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
 /**
- * Class TideSiteHelper.
+ * Provides helper functions for tide_site.
  *
  * @package Drupal\tide_site
  */
