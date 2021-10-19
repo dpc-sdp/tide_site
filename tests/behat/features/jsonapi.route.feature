@@ -19,19 +19,19 @@ Feature: Route lookup
     And I am an anonymous user
 
     When I send a GET request to "api/v1/route?path=/test-article-no-site"
-    Then the rest response status code should be 200
+    Then the response code should be 200
     And the JSON node "data" should exist
     And the JSON node "errors" should not exist
     And the response should be in JSON
 
     When I send a GET request to "api/v1/route?path=/test-article-one-site"
-    Then the rest response status code should be 404
+    Then the response code should be 404
     And the response should be in JSON
     And the JSON node "data" should not exist
     And the JSON node "errors" should exist
 
     When I send a GET request to "api/v1/route?path=/test-article-one-site&site=10001"
-    Then the rest response status code should be 200
+    Then the response code should be 200
     And the response should be in JSON
     And the JSON node "data" should exist
     And the JSON node "data.attributes.section" should not contain "10001"
@@ -39,21 +39,21 @@ Feature: Route lookup
     And the JSON node "errors" should not exist
 
     When I send a GET request to "api/v1/route?path=/test-article-one-site&site=10011"
-    Then the rest response status code should be 404
+    Then the response code should be 404
     And the response should be in JSON
     And the JSON node "data" should not exist
     And the JSON node "errors" should exist
     And the JSON node "errors[0].title" should contain "Path not found."
 
     When I send a GET request to "api/v1/route?path=/test-article-two-sites&site=10001"
-    Then the rest response status code should be 200
+    Then the response code should be 200
     And the response should be in JSON
     And the JSON node "data" should exist
     And the JSON node "data.attributes.section" should contain "10001"
     And the JSON node "errors" should not exist
 
     When I send a GET request to "api/v1/route?path=/test-article-two-sites&site=10002"
-    Then the rest response status code should be 200
+    Then the response code should be 200
     And the response should be in JSON
     And the JSON node "data" should exist
     And the JSON node "data.attributes.section" should contain "10002"
@@ -76,7 +76,7 @@ Feature: Route lookup
 
     Given I am an anonymous user
     When I send a GET request to "api/v1/route?path=/&site=10003"
-    Then the rest response status code should be 200
+    Then the response code should be 200
     And the response should be in JSON
     And the JSON node "data" should exist
     And the JSON node "data.attributes.entity_type" should be equal to "node"

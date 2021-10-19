@@ -9,7 +9,7 @@ use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
 /**
- * Class Response.
+ * Class tide_site response.
  *
  * @package Drupal\tide_site_simple_sitemap\EventSubscriber
  */
@@ -20,7 +20,11 @@ class Response implements EventSubscriberInterface {
    */
   public static function getSubscribedEvents() {
     // Run before DynamicPageCacheSubscriber (priority 100).
-    $events[KernelEvents::RESPONSE][] = ['onSimpleSitemapResponseAddCacheContext', 101];
+    $events = [];
+    $events[KernelEvents::RESPONSE][] = [
+      'onSimpleSitemapResponseAddCacheContext',
+      101,
+    ];
 
     return $events;
   }

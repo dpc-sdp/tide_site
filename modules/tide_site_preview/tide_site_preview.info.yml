@@ -2,7 +2,7 @@ name: 'Tide Site - Preview links'
 description: Provides frontend preview links for content managed with Tide Site.
 type: module
 package: Tide
-core: 8.x
+core_version_requirement: ^8.9 || ^9
 dependencies:
   - dpc-sdp:tide_site
   - dpc-sdp:tide_api

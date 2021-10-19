@@ -7,7 +7,7 @@ use Drupal\linkit\ProfileInterface;
 use Drupal\linkit\SuggestionManager;
 
 /**
- * Class LinkitResultManager.
+ * Class linkit result manager.
  *
  * @package Drupal\tide_site
  */

@@ -13,7 +13,7 @@ Feature: JSONAPI exposure
   Scenario: Request to Sites endpoint to get all information about sites
     Given I am an anonymous user
     When I send a GET request to "api/v1/taxonomy_term/sites?sort=-tid"
-    Then the rest response status code should be 200
+    Then the response code should be 200
     And the response should be in JSON
     And the JSON node "jsonapi.version" should be equal to "1.0"
     And the JSON node "links.self.href" should contain "api/v1/taxonomy_term/sites"

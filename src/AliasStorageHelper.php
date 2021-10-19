@@ -10,7 +10,7 @@ use Drupal\path_alias\PathAliasInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
 /**
- * Class AliasStorageHelper.
+ * Class alias storage helper.
  *
  * @package Drupal\tide_site
  */

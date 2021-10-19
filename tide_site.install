@@ -28,6 +28,7 @@ function tide_site_install() {
  * Implements hook_update_dependencies().
  */
 function tide_site_update_dependencies() {
+  $dependencies = [];
   $dependencies['tide_site'][8002] = ['tide_core' => 8003];
   $dependencies['tide_site'][8004] = ['system' => 8805];
 
