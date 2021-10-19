@@ -69,12 +69,16 @@ class TideSiteRequestEventSubscriber implements EventSubscriberInterface {
    * {@inheritdoc}
    */
   public static function getSubscribedEvents() {
+    $events = [];
     // Our subscriber must have very low priority,
     // as it relies on route resolver to parse all params.
     $events[KernelEvents::REQUEST][] = ['onRequestAddSiteFilter', -10000];
     // Run after JSON API ResourceResponseSubscriber (priority 128) and
     // before DynamicPageCacheSubscriber (priority 100).
-    $events[KernelEvents::RESPONSE][] = ['onResponseAddSiteFilterCacheContext', 127];
+    $events[KernelEvents::RESPONSE][] = [
+      'onResponseAddSiteFilterCacheContext',
+      127,
+    ];
 
     return $events;
   }
@@ -196,7 +200,10 @@ class TideSiteRequestEventSubscriber implements EventSubscriberInterface {
       // No Site ID, JSON API should only return entities without a Site.
       else {
         $site_filter = [
-          'condition' => ['path' => $field_site_name . '.tid', 'operator' => 'IS NULL'],
+          'condition' => [
+            'path' => $field_site_name . '.tid',
+            'operator' => 'IS NULL',
+          ],
         ];
       }
 

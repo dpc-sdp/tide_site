@@ -127,7 +127,7 @@ function tide_site_entity_presave(EntityInterface $entity) {
 /**
  * Implements hook_field_widget_form_alter().
  *
- * @todo: Extract into a service.
+ * @todo Extract into a service.
  */
 function tide_site_field_widget_form_alter(&$element, FormStateInterface $form_state, $context) {
   $field_definition = $context['items']->getFieldDefinition();
@@ -165,7 +165,7 @@ function tide_site_form_taxonomy_overview_terms_alter(&$form, FormStateInterface
 /**
  * Validation handler for taxonomy term overview form.
  *
- * @todo: Extract into a service.
+ * @todo Extract into a service.
  */
 function _tide_site_form_taxonomy_overview_terms_validate(&$form, FormStateInterface $form_state) {
   $max_depth = 1;
@@ -458,7 +458,7 @@ function tide_site_form_node_form_alter(&$form, FormStateInterface $form_state) 
     '#weight' => 30,
   ];
 
-  $form['tide_site_path_settings']['manage'] = Link::createFromRoute('Manage URL aliases.', 'path.admin_overview', [], [
+  $form['tide_site_path_settings']['manage'] = Link::createFromRoute('Manage URL aliases.', 'entity.path_alias.collection', [], [
     'attributes' => ['target' => '_blank'],
   ])->toRenderable();
 

@@ -7,7 +7,7 @@ use Drupal\tide_api\TideApiEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
- * Class TideSiteGetCacheIdSubscriber.
+ * Class get cache id subscriber for tide_site.
  *
  * @package Drupal\tide_site\EventSubscriber
  */
@@ -17,6 +17,7 @@ class TideSiteGetCacheIdSubscriber implements EventSubscriberInterface {
    * {@inheritdoc}
    */
   public static function getSubscribedEvents() {
+    $events = [];
     $events[TideApiEvents::GET_CACHE_ID][] = ['onApiGetCacheId'];
     return $events;
   }

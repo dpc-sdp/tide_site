@@ -25,6 +25,7 @@ class TideSiteCommands extends DrushCommands {
    *
    * @command tide:site-env-domain-update
    * @aliases tide-si-domup,tide-site-env-domain-update
+   *
    * @throws \Exception
    */
   public function siteEnvDomainUpdate() {

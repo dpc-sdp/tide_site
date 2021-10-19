@@ -7,7 +7,7 @@ use Drupal\Core\DependencyInjection\ServiceProviderBase;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
- * Class TideSiteServiceProvider.
+ * Defines service provider for tide_site.
  *
  * @package Drupal\tide_site
  */

@@ -46,7 +46,7 @@ function tide_site_tokens($type, $tokens, array $data, array $options, Bubbleabl
     foreach ($tokens as $name => $original) {
       switch ($name) {
         case 'path-no-site-prefix':
-          $value = !($url->getOption('alias')) ? \Drupal::service('path.alias_manager')->getAliasByPath($path, $langcode) : $path;
+          $value = !($url->getOption('alias')) ? \Drupal::service('path_alias.manager')->getAliasByPath($path, $langcode) : $path;
           $value = preg_replace("/^\/site\-(\d+)\//", '/', $value, 1);
           $replacements[$original] = $value;
           break;

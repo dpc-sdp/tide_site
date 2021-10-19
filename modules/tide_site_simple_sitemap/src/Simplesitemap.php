@@ -6,7 +6,7 @@ use Drupal\simple_sitemap\Simplesitemap as DefaultSimplesitemap;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
- * Class Simplesitemap.
+ * Class simple sitemap.
  *
  * @package Drupal\tide_site_simple_sitemap
  */
@@ -30,32 +30,21 @@ class Simplesitemap extends DefaultSimplesitemap {
   }
 
   /**
-   * {@inheritdoc}
-   */
-  protected function fetchSitemapChunkInfo() {
-    $site_id = $this->request->get('site');
-    if (empty($site_id)) {
-      return parent::fetchSitemapChunkInfo();
-    }
-
-    return $this->db
-      ->query('SELECT id, sitemap_created FROM {simple_sitemap_site} WHERE site_id = :site_id', [':site_id' => $site_id])
-      ->fetchAllAssoc('id');
-  }
-
-  /**
-   * {@inheritdoc}
+   * Fetches a single sitemap chunk by ID.
+   *
+   * @param int $id
+   *   The chunk ID.
+   *
+   * @return object
+   *   A sitemap chunk object.
    */
   protected function fetchSitemapChunk($id) {
     $site_id = $this->request->get('site');
     if (empty($site_id)) {
       return parent::fetchSitemapChunk($id);
     }
-
-    return $this->db->query(
-      'SELECT * FROM {simple_sitemap_site} WHERE id = :id AND site_id = :site_id',
-      [':id' => $id, ':site_id' => $site_id]
-    )->fetchObject();
+    return $this->db->query('SELECT * FROM {simple_sitemap_site} WHERE site_id = :site_id',
+      [':site_id' => $site_id])->fetchObject();
   }
 
 }

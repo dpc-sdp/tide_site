@@ -6,7 +6,7 @@ use Drupal\field\Entity\FieldConfig;
 use Drupal\tide_core\TideCoreFields;
 
 /**
- * Class TideSiteFields.
+ * Defines the site fields and functionalities for tide_site.
  *
  * @package Drupal\tide_site.
  */
