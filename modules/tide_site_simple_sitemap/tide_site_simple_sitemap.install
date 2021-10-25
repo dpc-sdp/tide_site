@@ -110,6 +110,7 @@ function tide_site_simple_sitemap_install($is_syncing) {
     'weight' => 0,
   ]);
   $generator->saveSetting('default_variant', 'default');
+  $generator->saveSetting('xsl', FALSE);
   $generator->setVariants('default')->addCustomLink('/', [
     'priority' => '1.0',
     'changefreq' => 'daily',
@@ -288,6 +289,7 @@ function tide_site_simple_sitemap_update_8006() {
     'weight' => 0,
   ]);
   $generator->saveSetting('default_variant', 'default');
+  $generator->saveSetting('xsl', FALSE);
   $generator->setVariants('default')->addCustomLink('/', [
     'priority' => '1.0',
     'changefreq' => 'daily',
