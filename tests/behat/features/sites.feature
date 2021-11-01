@@ -13,6 +13,7 @@ Feature: Sites taxonomy vocabulary
     And I see field "Footer text"
     And I see field "Domains"
     And I see field "Main menu"
+    And I see field "Footer Main menu"
     And I see field "Footer menu"
     And I see field "Homepage"
     And I don't see field "Description"

@@ -210,6 +210,7 @@ function tide_site_form_taxonomy_term_form_alter(&$form, FormStateInterface $for
     $altered = $menu_helper->alterFormFields($form, [
       'field_site_main_menu',
       'field_site_footer_menu',
+      'field_site_footer_main_menu',
     ]);
 
     if (!empty($altered)) {

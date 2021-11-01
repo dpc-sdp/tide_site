@@ -6,6 +6,7 @@ dependencies:
     - field.field.taxonomy_term.sites.field_prominence_ack_to_country
     - field.field.taxonomy_term.sites.field_site_domains
     - field.field.taxonomy_term.sites.field_site_footer_logos
+    - field.field.taxonomy_term.sites.field_site_footer_main_menu
     - field.field.taxonomy_term.sites.field_site_footer_menu
     - field.field.taxonomy_term.sites.field_site_footer_text
     - field.field.taxonomy_term.sites.field_site_homepage
@@ -105,6 +106,15 @@ content:
     region: content
   field_site_main_menu:
     weight: 4
+    settings:
+      match_operator: CONTAINS
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+    type: entity_reference_autocomplete
+    region: content
+  field_site_footer_main_menu:
+    weight: 5
     settings:
       match_operator: CONTAINS
       size: 60

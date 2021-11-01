@@ -25,6 +25,7 @@ config_devel:
     - field.field.taxonomy_term.sites.field_prominence_ack_to_country
     - field.field.taxonomy_term.sites.field_site_domains
     - field.field.taxonomy_term.sites.field_site_footer_logos
+    - field.field.taxonomy_term.sites.field_site_footer_main_menu
     - field.field.taxonomy_term.sites.field_site_footer_menu
     - field.field.taxonomy_term.sites.field_site_footer_text
     - field.field.taxonomy_term.sites.field_site_homepage
@@ -41,6 +42,7 @@ config_devel:
     - field.storage.taxonomy_term.field_prominence_ack_to_country
     - field.storage.taxonomy_term.field_site_domains
     - field.storage.taxonomy_term.field_site_footer_logos
+    - field.storage.taxonomy_term.field_site_footer_main_menu
     - field.storage.taxonomy_term.field_site_footer_menu
     - field.storage.taxonomy_term.field_site_footer_text
     - field.storage.taxonomy_term.field_site_homepage

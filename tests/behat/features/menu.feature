@@ -16,6 +16,8 @@ Feature: Sites menu autocreate
       | site-main-menu-test-1-test-11   |
       | site-footer-menu-test-1         |
       | site-footer-menu-test-1-test-11 |
+      | site-footer-main-menu-test-1    |
+      | site-footer-main-menu-test-1-11 |
 
   @api
   Scenario: Menu autocreate - new and existing sites
@@ -29,14 +31,18 @@ Feature: Sites menu autocreate
     And I see field "Footer menu"
     And I see field "autocreate_footer_menu"
     And the "autocreate_footer_menu" checkbox should be checked
+    And I see field "Footer Main menu"
+    And I see field "autocreate_footer_main_menu"
+    And the "autocreate_footer_main_menu" checkbox should be checked
 
     # Assert auto-creation and association.
     When I press "Save"
     Then I should see the following success messages:
-      | success messages                                                                   |
-      | Created new term Test 1.                                                           |
-      | Automatically created Main menu - Test 1 menu and assigned to Main menu field.     |
-      | Automatically created Footer menu - Test 1 menu and assigned to Footer menu field. |
+      | success messages                                                                             |
+      | Created new term Test 1.                                                                     |
+      | Automatically created Main menu - Test 1 menu and assigned to Main menu field.               |
+      | Automatically created Footer menu - Test 1 menu and assigned to Footer menu field.           |
+      | Automatically created Footer Main menu - Test 1 menu and assigned to Footer Main menu field. |
     When I click "Test 1"
     And I click "Edit"
     Then the "Name" field should contain "Test 1"
@@ -45,6 +51,8 @@ Feature: Sites menu autocreate
     And I don't see field "autocreate_main_menu"
     And the "Footer menu" field should contain "Footer menu - Test 1 (site-footer-menu-test-1)"
     And I don't see field "autocreate_footer_menu"
+    And the "Footer Main menu" field should contain "Footer Main menu - Test 1 (site-footer-main-menu-test-1)"
+    And I don't see field "autocreate_footer_main_menu"
 
     # Assert that menus are not auto-created again.
     When I fill in "Domains" with "test2.example.com"
@@ -54,9 +62,10 @@ Feature: Sites menu autocreate
       | success messages     |
       | Updated term Test 1. |
     And I should not see the following success messages:
-      | success messages                                                                   |
-      | Automatically created Main menu - Test 1 menu and assigned to Main menu field.     |
-      | Automatically created Footer menu - Test 1 menu and assigned to Footer menu field. |
+      | success messages                                                                             |
+      | Automatically created Main menu - Test 1 menu and assigned to Main menu field.               |
+      | Automatically created Footer menu - Test 1 menu and assigned to Footer menu field.           |
+      | Automatically created Footer Main menu - Test 1 menu and assigned to Footer Main menu field. |
 
     # Assert that menu association was not lost after editing term.
     And I click "Edit"
@@ -66,6 +75,8 @@ Feature: Sites menu autocreate
     And I don't see field "autocreate_main_menu"
     And the "Footer menu" field should contain "Footer menu - Test 1 (site-footer-menu-test-1)"
     And I don't see field "autocreate_footer_menu"
+    And the "Footer Main menu" field should contain "Footer Main menu - Test 1 (site-footer-main-menu-test-1)"
+    And I don't see field "autocreate_footer_main_menu"
 
     # Cleanup. Doing this manually since entities were created through UI.
     And no "sites" terms:
@@ -75,6 +86,8 @@ Feature: Sites menu autocreate
       | site-main-menu-test-1-test-11   |
       | site-footer-menu-test-1         |
       | site-footer-menu-test-1-test-11 |
+      | site-footer-main-menu-test-1    |
+      | site-footer-main-menu-test-1-11 |
 
   @api
   Scenario: Menu autocreate - new and existing sections
@@ -93,18 +106,23 @@ Feature: Sites menu autocreate
     And I see field "Footer menu"
     And I see field "autocreate_footer_menu"
     And the "autocreate_footer_menu" checkbox should be checked
+    And I see field "Footer Main menu"
+    And I see field "autocreate_footer_main_menu"
+    And the "autocreate_footer_main_menu" checkbox should be checked
 
     # Assert auto-creation and association. Footer menu will not be created just
     # yet - it will be created after the term is edited.
     When I uncheck "autocreate_footer_menu"
+    When I uncheck "autocreate_footer_main_menu"
     And I press "Save"
     Then I should see the following success messages:
       | success messages                                                                          |
       | Created new term Test 1.1                                                                 |
       | Automatically created Main menu - Test 1 - Test 1.1 menu and assigned to Main menu field. |
     Then I should not see the following success messages:
-      | success messages                                                                              |
-      | Automatically created Footer menu - Test 1 - Test 1.1 menu and assigned to Footer menu field. |
+      | success messages                                                                                        |
+      | Automatically created Footer menu - Test 1 - Test 1.1 menu and assigned to Footer menu field.           |
+      | Automatically created Footer Main menu - Test 1 - Test 1.1 menu and assigned to Footer Main menu field. |
     When I click "Test 1.1"
     And I click "Edit"
     Then the "Name" field should contain "Test 1.1"
@@ -113,17 +131,22 @@ Feature: Sites menu autocreate
     And I don't see field "autocreate_main_menu"
     And the "Footer menu" field should not contain "Footer menu - Test 1 - Test 1.1 (site-footer-menu-test-1-test-11)"
     And I see field "autocreate_footer_menu"
+    And the "Footer Main menu" field should not contain "Footer Main menu - Test 1 - Test 1.1 (site-footer-main-menu-test-1-11)"
+    And I see field "autocreate_footer_main_menu"
     # Assert that for sections menus are not set to be created by default.
     And the "autocreate_footer_menu" checkbox should not be checked
+    And the "autocreate_footer_main_menu" checkbox should not be checked
 
     # Assert that follow-up menu creation works.
     When I check "autocreate_footer_menu"
+    When I check "autocreate_footer_main_menu"
     And I press "Save"
 
     Then I should see the following success messages:
-      | success messages                                                                              |
-      | Updated term Test 1.1.                                                                        |
-      | Automatically created Footer menu - Test 1 - Test 1.1 menu and assigned to Footer menu field. |
+      | success messages                                                                                        |
+      | Updated term Test 1.1.                                                                                  |
+      | Automatically created Footer menu - Test 1 - Test 1.1 menu and assigned to Footer menu field.           |
+      | Automatically created Footer Main menu - Test 1 - Test 1.1 menu and assigned to Footer Main menu field. |
     And I should not see the following success messages:
       | success messages                                                                          |
       | Automatically created Main menu - Test 1 - Test 1.1 menu and assigned to Main menu field. |
@@ -136,6 +159,7 @@ Feature: Sites menu autocreate
     And I don't see field "autocreate_main_menu"
     And the "Footer menu" field should contain "Footer menu - Test 1 - Test 1.1 (site-footer-menu-test-1-test-11)"
     And I don't see field "autocreate_footer_menu"
+    And I don't see field "autocreate_footer_main_menu"
 
     # Cleanup. Doing this manually since entities were created through UI.
     And no "sites" terms:
@@ -146,3 +170,5 @@ Feature: Sites menu autocreate
       | site-main-menu-test-1-test-11   |
       | site-footer-menu-test-1         |
       | site-footer-menu-test-1-test-11 |
+      | site-footer-main-menu-test-1    |
+      | site-footer-main-menu-test-1-11 |
