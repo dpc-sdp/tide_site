@@ -104,3 +104,9 @@ resourceFields:
     enhancer:
       id: ''
     disabled: false
+  field_site_footer_main_menu:
+    fieldName: field_site_footer_main_menu
+    publicName: field_site_footer_main_menu
+    enhancer:
+      id: ''
+    disabled: false
