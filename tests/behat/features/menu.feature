@@ -12,12 +12,12 @@ Feature: Sites menu autocreate
     And no "sites" terms:
       | Test 1 |
     And no menus:
-      | site-main-menu-test-1                |
-      | site-main-menu-test-1-test-11        |
-      | site-footer-menu-test-1              |
-      | site-footer-menu-test-1-test-11      |
-      | site-footer-main-menu-test-1         |
-      | site-footer-main-menu-test-1-test-11 |
+      | site-main-menu-test-1           |
+      | site-main-menu-test-1-test-11   |
+      | site-footer-menu-test-1         |
+      | site-footer-menu-test-1-test-11 |
+      | site-footer-main-menu-test-1    |
+      | site-footer-main-menu-test-1-11 |
 
   @api
   Scenario: Menu autocreate - new and existing sites
@@ -82,12 +82,12 @@ Feature: Sites menu autocreate
     And no "sites" terms:
       | Test 1 |
     And no menus:
-      | site-main-menu-test-1                |
-      | site-main-menu-test-1-test-11        |
-      | site-footer-menu-test-1              |
-      | site-footer-menu-test-1-test-11      |
-      | site-footer-main-menu-test-1         |
-      | site-footer-main-menu-test-1-test-11 |
+      | site-main-menu-test-1           |
+      | site-main-menu-test-1-test-11   |
+      | site-footer-menu-test-1         |
+      | site-footer-menu-test-1-test-11 |
+      | site-footer-main-menu-test-1    |
+      | site-footer-main-menu-test-1-11 |
 
   @api
   Scenario: Menu autocreate - new and existing sections
@@ -131,7 +131,7 @@ Feature: Sites menu autocreate
     And I don't see field "autocreate_main_menu"
     And the "Footer menu" field should not contain "Footer menu - Test 1 - Test 1.1 (site-footer-menu-test-1-test-11)"
     And I see field "autocreate_footer_menu"
-    And the "Footer Main menu" field should not contain "Footer Main menu - Test 1 - Test 1.1 (site-footer-menu-main-test-1-test-11)"
+    And the "Footer Main menu" field should not contain "Footer Main menu - Test 1 - Test 1.1 (site-footer-main-menu-test-1-11)"
     And I see field "autocreate_footer_menu"
     # Assert that for sections menus are not set to be created by default.
     And the "autocreate_footer_menu" checkbox should not be checked
@@ -159,7 +159,7 @@ Feature: Sites menu autocreate
     And I don't see field "autocreate_main_menu"
     And the "Footer menu" field should contain "Footer menu - Test 1 - Test 1.1 (site-footer-menu-test-1-test-11)"
     And I don't see field "autocreate_footer_menu"
-    And the "Footer Main menu" field should contain "Footer Main menu - Test 1 - Test 1.1 (site-footer-main-menu-test-1-test-11)"
+    And the "Footer Main menu" field should contain "Footer Main menu - Test 1 - Test 1.1 (site-footer-main-menu-test-1-11)"
     And I don't see field "autocreate_footer_main_menu"
 
     # Cleanup. Doing this manually since entities were created through UI.
@@ -167,9 +167,9 @@ Feature: Sites menu autocreate
       | Test 1   |
       | Test 1.1 |
     And no menus:
-      | site-main-menu-test-1                |
-      | site-main-menu-test-1-test-11        |
-      | site-footer-menu-test-1              |
-      | site-footer-menu-test-1-test-11      |
-      | site-footer-main-menu-test-1         |
-      | site-footer-main-menu-test-1-test-11 |
+      | site-main-menu-test-1           |
+      | site-main-menu-test-1-test-11   |
+      | site-footer-menu-test-1         |
+      | site-footer-menu-test-1-test-11 |
+      | site-footer-main-menu-test-1    |
+      | site-footer-main-menu-test-1-11 |
