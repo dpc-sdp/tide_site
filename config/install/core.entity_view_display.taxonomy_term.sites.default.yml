@@ -4,6 +4,7 @@ dependencies:
   config:
     - field.field.taxonomy_term.sites.field_acknowledgement_to_country
     - field.field.taxonomy_term.sites.field_prominence_ack_to_country
+    - field.field.taxonomy_term.sites.field_show_table_of_contents
     - field.field.taxonomy_term.sites.field_site_domains
     - field.field.taxonomy_term.sites.field_site_footer_logos
     - field.field.taxonomy_term.sites.field_site_footer_menu
@@ -15,6 +16,7 @@ dependencies:
     - field.field.taxonomy_term.sites.field_site_show_exit_site
     - field.field.taxonomy_term.sites.field_site_slogan
     - field.field.taxonomy_term.sites.field_site_twitter_image
+    - field.field.taxonomy_term.sites.field_title_of_table_of_contents
     - taxonomy.vocabulary.sites
   module:
     - image
@@ -38,6 +40,16 @@ content:
     settings: {  }
     third_party_settings: {  }
     type: basic_string
+    region: content
+  field_show_table_of_contents:
+    weight: 14
+    label: above
+    settings:
+      format: default
+      format_custom_false: ''
+      format_custom_true: ''
+    third_party_settings: {  }
+    type: boolean
     region: content
   field_site_domains:
     weight: 2
@@ -133,6 +145,14 @@ content:
       view_mode: default
       link: false
     third_party_settings: {  }
+    region: content
+  field_title_of_table_of_contents:
+    weight: 15
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    type: string
     region: content
 hidden:
   description: true
