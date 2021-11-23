@@ -261,7 +261,7 @@ class PreviewLinksBlock extends BlockBase implements ContainerFactoryPluginInter
    *   * name: The site/section name.
    *   * url: The absolute URL of the preview link.
    */
-  protected function buildFrontendPreviewLink(NodeInterface $node, TermInterface $site, TermInterface $section = NULL) : array {
+  public function buildFrontendPreviewLink(NodeInterface $node, TermInterface $site, TermInterface $section = NULL) : array {
     $config = $this->getConfiguration();
     $url_options = [
       'attributes' => !(empty($config['open_new_window'])) ? ['target' => '_blank'] : [],
