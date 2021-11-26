@@ -10,11 +10,10 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Session\AccountInterface;
-use Drupal\Core\Url;
 use Drupal\node\NodeInterface;
-use Drupal\taxonomy\TermInterface;
 use Drupal\tide_site\TideSiteHelper;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Drupal\tide_site_preview\TideSitePreviewHelper;
 
 /**
  * Class preview links block.
@@ -35,6 +34,13 @@ class PreviewLinksBlock extends BlockBase implements ContainerFactoryPluginInter
    * @var \Drupal\tide_site\TideSiteHelper
    */
   protected $siteHelper;
+
+  /**
+   * Tide Site Preview Helper service.
+   *
+   * @var \Drupal\tide_site_preview\TideSitePreviewHelper
+   */
+  protected $sitePreviewHelper;
 
   /**
    * Route Match service.
@@ -60,11 +66,12 @@ class PreviewLinksBlock extends BlockBase implements ContainerFactoryPluginInter
   /**
    * {@inheritdoc}
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, TideSiteHelper $site_helper, RouteMatchInterface $route_match, EntityTypeManagerInterface $entity_type_manager) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, TideSiteHelper $site_helper, RouteMatchInterface $route_match, EntityTypeManagerInterface $entity_type_manager, TideSitePreviewHelper $site_preview_helper) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->siteHelper = $site_helper;
     $this->routeMatch = $route_match;
     $this->entityTypeManager = $entity_type_manager;
+    $this->sitePreviewHelper = $site_preview_helper;
     $this->getCurrentNode();
   }
 
@@ -78,7 +85,8 @@ class PreviewLinksBlock extends BlockBase implements ContainerFactoryPluginInter
       $plugin_definition,
       $container->get('tide_site.helper'),
       $container->get('current_route_match'),
-      $container->get('entity_type.manager')
+      $container->get('entity_type.manager'),
+      $container->get('tide_site_preview.helper')
     );
   }
 
@@ -134,7 +142,7 @@ class PreviewLinksBlock extends BlockBase implements ContainerFactoryPluginInter
           if (!empty($sites['sections'][$site_id])) {
             $section = $this->siteHelper->getSiteById($sites['sections'][$site_id]);
           }
-          $preview_urls[$site_id] = $this->buildFrontendPreviewLink($this->currentNode, $site, $section);
+          $preview_urls[$site_id] = $this->sitePreviewHelper->buildFrontendPreviewLink($this->currentNode, $site, $section, $this->getConfiguration());
         }
       }
     }
@@ -146,7 +154,7 @@ class PreviewLinksBlock extends BlockBase implements ContainerFactoryPluginInter
       if (!empty($sites['sections'][$primary_site->id()])) {
         $primary_site_section = $this->siteHelper->getSiteById($sites['sections'][$primary_site->id()]);
       }
-      $primary_preview_url = $this->buildFrontendPreviewLink($this->currentNode, $primary_site, $primary_site_section);
+      $primary_preview_url = $this->sitePreviewHelper->buildFrontendPreviewLink($this->currentNode, $primary_site, $primary_site_section, $this->getConfiguration());
       unset($preview_urls[$primary_site->id()]);
       array_unshift($preview_urls, $primary_preview_url);
     }
@@ -242,89 +250,6 @@ class PreviewLinksBlock extends BlockBase implements ContainerFactoryPluginInter
     $this->currentNode = $node;
 
     return $this->currentNode;
-  }
-
-  /**
-   * Build the frontend preview link array of a node.
-   *
-   * @param \Drupal\node\NodeInterface $node
-   *   The node.
-   * @param \Drupal\taxonomy\TermInterface $site
-   *   The site of the preview link.
-   * @param \Drupal\taxonomy\TermInterface|null $section
-   *   The section of the preview link.
-   *
-   * @return array
-   *   The preview link array with following keys:
-   *   * #site: The site object.
-   *   * #section: The section object.
-   *   * name: The site/section name.
-   *   * url: The absolute URL of the preview link.
-   */
-  protected function buildFrontendPreviewLink(NodeInterface $node, TermInterface $site, TermInterface $section = NULL) : array {
-    $config = $this->getConfiguration();
-    $url_options = [
-      'attributes' => !(empty($config['open_new_window'])) ? ['target' => '_blank'] : [],
-    ];
-    if ($section) {
-      $url_options['query']['section'] = $section->id();
-    }
-
-    $preview_link = [
-      '#site' => $site,
-      '#section' => $section,
-      'name' => $site->getName(),
-    ];
-    if ($section && $section->id() !== $site->id()) {
-      $preview_link['name'] = $site->getName() . ' - ' . $section->getName();
-    }
-    $site_base_url = $this->siteHelper->getSiteBaseUrl($site);
-    if ($node->isPublished() && $node->isDefaultRevision()) {
-      unset($url_options['query']['section']);
-      $preview_link['url'] = $this->getNodeFrontendUrl($node, $site_base_url, $url_options);
-    }
-    else {
-      $revision_id = $node->getLoadedRevisionId();
-      $is_latest_revision = $node->isLatestRevision();
-      $content_type = $node->bundle();
-      $url = !empty($site_base_url) ? ($site_base_url . '/preview/' . $content_type . '/' . $node->uuid() . '/' . ($is_latest_revision ? 'latest' : $revision_id)) : '';
-      $preview_link['url'] = (!empty($url) && !empty($url_options)) ? Url::fromUri($url, $url_options) : '';
-    }
-
-    return $preview_link;
-  }
-
-  /**
-   * Get the frontend URL of a node.
-   *
-   * @param \Drupal\node\NodeInterface $node
-   *   The node.
-   * @param string $site_base_url
-   *   The base URL of the frontend.
-   * @param array $url_options
-   *   The extra options.
-   *
-   * @return \Drupal\Core\Url|string
-   *   The Url.
-   */
-  protected function getNodeFrontendUrl(NodeInterface $node, $site_base_url = '', array $url_options = []) {
-    try {
-      $url = $node->toUrl('canonical', [
-        'absolute' => TRUE,
-        'base_url' => $site_base_url,
-      ] + $url_options);
-
-      $pattern = '/^\/site\-(\d+)\//';
-      if ($site_base_url) {
-        $pattern = '/' . preg_quote($site_base_url, '/') . '\/site\-(\d+)\//';
-      }
-      $clean_url = preg_replace($pattern, $site_base_url . '/', $url->toString());
-      return $clean_url ? Url::fromUri($clean_url, $url_options) : $url;
-    }
-    catch (Exception $exception) {
-      watchdog_exception('tide_site_preview', $exception);
-    }
-    return '';
   }
 
 }
