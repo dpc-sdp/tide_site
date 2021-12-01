@@ -1,0 +1,4 @@
+services:
+  tide_site_preview.helper:
+    class: Drupal\tide_site_preview\TideSitePreviewHelper
+    arguments: ['@tide_site.helper']
