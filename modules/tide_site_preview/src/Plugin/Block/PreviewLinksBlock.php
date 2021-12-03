@@ -142,7 +142,12 @@ class PreviewLinksBlock extends BlockBase implements ContainerFactoryPluginInter
           if (!empty($sites['sections'][$site_id])) {
             $section = $this->siteHelper->getSiteById($sites['sections'][$site_id]);
           }
-          $preview_urls[$site_id] = $this->sitePreviewHelper->buildFrontendPreviewLink($this->currentNode, $site, $section, $this->getConfiguration());
+          $site_base_url = $this->siteHelper->getSiteBaseUrl($site);
+          $url = $this->currentNode->toUrl('canonical', [
+            'absolute' => TRUE,
+            'base_url' => $site_base_url,
+          ]);
+          $preview_urls[$site_id] = $this->sitePreviewHelper->buildFrontendPreviewLink($this->currentNode, $url, $site, $section, $this->getConfiguration());
         }
       }
     }

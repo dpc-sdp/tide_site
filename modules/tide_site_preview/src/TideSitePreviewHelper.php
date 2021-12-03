@@ -49,7 +49,7 @@ class TideSitePreviewHelper {
    *   * name: The site/section name.
    *   * url: The absolute URL of the preview link.
    */
-  public function buildFrontendPreviewLink(NodeInterface $node, TermInterface $site, TermInterface $section = NULL, array $configuration = []) : array {
+  public function buildFrontendPreviewLink(NodeInterface $node, Url $url, TermInterface $site, TermInterface $section = NULL, array $configuration = []) : array {
     $url_options = [
       'attributes' => !(empty($configuration['open_new_window'])) ? ['target' => '_blank'] : [],
     ];
@@ -68,7 +68,7 @@ class TideSitePreviewHelper {
     $site_base_url = $this->siteHelper->getSiteBaseUrl($site);
     if ($node->isPublished() && $node->isDefaultRevision()) {
       unset($url_options['query']['section']);
-      $preview_link['url'] = $this->getNodeFrontendUrl($node, $site_base_url, $url_options);
+      $preview_link['url'] = $this->getNodeFrontendUrl($url, $url_options);
     }
     else {
       $revision_id = $node->getLoadedRevisionId();
@@ -84,31 +84,19 @@ class TideSitePreviewHelper {
   /**
    * Get the frontend URL of a node.
    *
-   * @param \Drupal\node\NodeInterface $node
+   * @param \Drupal\Core\Url $url
    *   The node.
-   * @param string $site_base_url
-   *   The base URL of the frontend.
-   * @param array $url_options
-   *   The extra options.
    *
    * @return \Drupal\Core\Url|string
    *   The Url.
    */
-  public function getNodeFrontendUrl(NodeInterface $node, $site_base_url = '', array $url_options = []) {
+  public function getNodeFrontendUrl(Url $url, array $url_options = []) {
     try {
-      $url = $node->toUrl('canonical', [
-        'absolute' => TRUE,
-        'base_url' => $site_base_url,
-      ] + $url_options);
-
-      $pattern = '/^\/site\-(\d+)\//';
-      if ($site_base_url) {
-        $pattern = '/' . preg_quote($site_base_url, '/') . '\/site\-(\d+)\//';
-      }
-      $clean_url = preg_replace($pattern, $site_base_url . '/', $url->toString());
+      $path = $url->toString();
+      $path = rtrim($path, '/');
+      $clean_url = preg_replace('/\/site\-(\d+)\//', '/', $path);
       return $clean_url ? Url::fromUri($clean_url, $url_options) : $url;
-    }
-    catch (Exception $exception) {
+    } catch (Exception $exception) {
       watchdog_exception('tide_site_preview', $exception);
     }
     return '';
