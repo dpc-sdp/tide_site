@@ -68,7 +68,7 @@ class TideSitePreviewHelper {
     $site_base_url = $this->siteHelper->getSiteBaseUrl($site);
     if ($node->isPublished() && $node->isDefaultRevision()) {
       unset($url_options['query']['section']);
-      $preview_link['url'] = $this->getNodeFrontendUrl($url, $url_options);
+      $preview_link['url'] = $this->getNodeFrontendUrl($url, $site_base_url, $url_options);
     }
     else {
       $revision_id = $node->getLoadedRevisionId();
@@ -86,16 +86,26 @@ class TideSitePreviewHelper {
    *
    * @param \Drupal\Core\Url $url
    *   The node.
-   *
+   * @param string $site_base_url
+   *   The base URL of the frontend.
+   * @param array $url_options
+   *   The extra options.
    * @return \Drupal\Core\Url|string
    *   The Url.
    */
-  public function getNodeFrontendUrl(Url $url, array $url_options = []) {
+  public function getNodeFrontendUrl(Url $url, string $site_base_url = '', array $url_options = []) {
     try {
       $path = $url->toString();
       $path = rtrim($path, '/');
-      $clean_url = preg_replace('/\/site\-(\d+)\//', '/', $path);
-      return $clean_url ? Url::fromUri($clean_url, $url_options) : $url;
+      $clean_url = preg_replace('/\/site\-(\d+)\//', '/', $path,1);
+      if ((strpos($clean_url, '/') !== 0) && (strpos($clean_url, '#') !== 0) && (strpos($clean_url, '?') !== 0)) {
+        return $clean_url ? Url::fromUri($clean_url, $url_options) : $url;
+      }
+      if ($site_base_url) {
+        $clean_url = $site_base_url . $clean_url;
+        return $clean_url ? Url::fromUri($clean_url, $url_options) : $url;
+      }
+      return $clean_url ? Url::fromUserInput($clean_url, $url_options) : $url;
     } catch (Exception $exception) {
       watchdog_exception('tide_site_preview', $exception);
     }
