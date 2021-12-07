@@ -10,6 +10,7 @@ use Drupal\taxonomy\Entity\Term;
 /**
  * Tests the TideSitePreviewHelper.
  *
+ * @coversDefaultClass \Drupal\tide_site_preview\TideSitePreviewHelper
  * @group tide_site_preview
  */
 class TideSitePreviewHelperTest extends EntityKernelTestBase {
