@@ -8,7 +8,7 @@ use Drupal\node\Entity\Node;
 use Drupal\taxonomy\Entity\Term;
 
 /**
- * Tests the TideSitePreviewHelper
+ * Tests the TideSitePreviewHelper.
  *
  * @group tide_site_preview
  */
@@ -99,6 +99,12 @@ class TideSitePreviewHelperTest extends EntityKernelTestBase {
     $this->assertEquals($expected, $url);
   }
 
+  /**
+   * Data provider of test dates.
+   *
+   * @return array
+   *   Array of values.
+   */
   public function buildFrontendPreviewLinkDataProvider() {
     return [
       [

@@ -35,6 +35,8 @@ class TideSitePreviewHelper {
    *
    * @param \Drupal\node\NodeInterface $node
    *   The node.
+   * @param \Drupal\Core\Url $url
+   *   The url.
    * @param \Drupal\taxonomy\TermInterface $site
    *   The site of the preview link.
    * @param \Drupal\taxonomy\TermInterface|null $section
@@ -85,11 +87,12 @@ class TideSitePreviewHelper {
    * Get the frontend URL of a node.
    *
    * @param \Drupal\Core\Url $url
-   *   The node.
+   *   The url.
    * @param string $site_base_url
    *   The base URL of the frontend.
    * @param array $url_options
    *   The extra options.
+   *
    * @return \Drupal\Core\Url|string
    *   The Url.
    */
@@ -97,7 +100,7 @@ class TideSitePreviewHelper {
     try {
       $path = $url->toString();
       $path = rtrim($path, '/');
-      $clean_url = preg_replace('/\/site\-(\d+)\//', '/', $path,1);
+      $clean_url = preg_replace('/\/site\-(\d+)\//', '/', $path, 1);
       if ((strpos($clean_url, '/') !== 0) && (strpos($clean_url, '#') !== 0) && (strpos($clean_url, '?') !== 0)) {
         return $clean_url ? Url::fromUri($clean_url, $url_options) : $url;
       }
@@ -106,7 +109,8 @@ class TideSitePreviewHelper {
         return $clean_url ? Url::fromUri($clean_url, $url_options) : $url;
       }
       return $clean_url ? Url::fromUserInput($clean_url, $url_options) : $url;
-    } catch (Exception $exception) {
+    }
+    catch (Exception $exception) {
       watchdog_exception('tide_site_preview', $exception);
     }
     return '';
