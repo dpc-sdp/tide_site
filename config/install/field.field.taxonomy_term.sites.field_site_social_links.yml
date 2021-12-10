@@ -1,0 +1,23 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.taxonomy_term.field_site_social_links
+    - taxonomy.vocabulary.sites
+  module:
+    - link
+third_party_settings: {  }
+id: taxonomy_term.sites.field_site_social_links
+field_name: field_site_social_links
+entity_type: taxonomy_term
+bundle: sites
+label: 'Social media channels'
+description: 'Add links to your <em>Social media channels</em> for display on this site.'
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  link_type: 16
+  title: 2
+field_type: link
