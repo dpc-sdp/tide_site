@@ -456,8 +456,8 @@ function tide_site_update_8020(&$sandbox) {
     $entity_form_display->setComponent('field_site_social_links', [
       'weight' => 14,
       'settings' => [
-        'placeholder_url' => '',
-        'placeholder_title' => '',
+        'placeholder_url' => 'https://twitter.com/VicGovAu',
+        'placeholder_title' => 'VicGovAu on Twitter',
       ],
       'third_party_settings' => [
         'maxlength' => [

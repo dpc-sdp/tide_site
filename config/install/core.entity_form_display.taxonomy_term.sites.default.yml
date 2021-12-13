@@ -151,7 +151,7 @@ content:
     weight: 14
     settings:
       placeholder_url: 'https://twitter.com/VicGovAu'
-      placeholder_title: '@VicGovAu'
+      placeholder_title: 'VicGovAu on Twitter'
     third_party_settings:
       maxlength:
         maxlength_js: 30
