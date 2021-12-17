@@ -150,11 +150,11 @@ content:
   field_site_social_links:
     weight: 14
     settings:
-      placeholder_url: 'https://twitter.com/VicGovAu'
-      placeholder_title: 'VicGovAu on Twitter'
+      placeholder_url: 'https://example.com/Social'
+      placeholder_title: 'Example Social'
     third_party_settings:
       maxlength:
-        maxlength_js: 30
+        maxlength_js: 35
         maxlength_js_label: 'Link text limited to @limit characters, remaining: <strong>@remaining</strong>'
     type: link_default
     region: content

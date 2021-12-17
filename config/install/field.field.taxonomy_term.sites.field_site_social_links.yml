@@ -12,7 +12,7 @@ field_name: field_site_social_links
 entity_type: taxonomy_term
 bundle: sites
 label: 'Social media channels'
-description: 'Add links to your <em>Social media channels</em> for display on this site.'
+description: 'Add canonical links to <em>Social media channels</em> for display on the site. Links URLs cannot be shortened links or redirects.'
 required: false
 translatable: false
 default_value: {  }
