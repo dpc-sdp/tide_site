@@ -6,6 +6,8 @@
  */
 
 use Drupal\Core\Config\FileStorage;
+use Drupal\Core\Entity\Display\EntityFormDisplayInterface;
+use Drupal\Core\Utility\UpdateException;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\taxonomy\TaxonomyPermissions;
@@ -421,4 +423,53 @@ function tide_site_update_8019() {
       $entity_view_display->save();
     }
   }
+}
+
+/**
+ * Create sites social media link field.
+ */
+function tide_site_update_8020(&$sandbox) {
+  module_load_include('inc', 'tide_core', 'includes/helpers');
+
+  $module_path = drupal_get_path('module', 'tide_site');
+  $config_location = $module_path . '/config/install';
+  $config_items = [
+    'field.storage.taxonomy_term.field_site_social_links',
+    'field.field.taxonomy_term.sites.field_site_social_links',
+  ];
+  foreach ($config_items as $item_name) {
+    try {
+      _tide_import_single_config($item_name, [$config_location]);
+    }
+    catch (Exception $e) {
+      throw new UpdateException(
+        sprintf("Failed to import config item '%s' from '%s'", $item_name, $config_location), $e->getCode(), $e
+      );
+    }
+  }
+
+  $entity_form_display = \Drupal::entityTypeManager()
+    ->getStorage('entity_form_display')
+    ->load('taxonomy_term.sites.default');
+
+  if ($entity_form_display instanceof EntityFormDisplayInterface) {
+    $entity_form_display->setComponent('field_site_social_links', [
+      'weight' => 14,
+      'settings' => [
+        'placeholder_url' => 'https://example.com/Social',
+        'placeholder_title' => 'Example Social',
+      ],
+      'third_party_settings' => [
+        'maxlength' => [
+          'maxlength_js' => 35,
+          'maxlength_js_label' => 'Link text limited to @limit characters, remaining: <strong>@remaining</strong>',
+        ],
+      ],
+      'type' => 'link_default',
+      'region' => 'content',
+    ]);
+
+    $entity_form_display->save();
+  }
+
 }
