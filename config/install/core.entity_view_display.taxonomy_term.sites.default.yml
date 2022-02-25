@@ -15,12 +15,13 @@ dependencies:
     - field.field.taxonomy_term.sites.field_site_og_image
     - field.field.taxonomy_term.sites.field_site_show_exit_site
     - field.field.taxonomy_term.sites.field_site_slogan
+    - field.field.taxonomy_term.sites.field_site_social_links
     - field.field.taxonomy_term.sites.field_site_twitter_image
     - field.field.taxonomy_term.sites.field_title_of_table_of_contents
     - taxonomy.vocabulary.sites
   module:
-    - image
     - entity_reference_revisions
+    - link
     - text
 id: taxonomy_term.sites.default
 targetEntityType: taxonomy_term
@@ -35,7 +36,7 @@ content:
     type: basic_string
     region: content
   field_prominence_ack_to_country:
-    weight: 12
+    weight: 11
     label: above
     settings: {  }
     third_party_settings: {  }
@@ -97,8 +98,8 @@ content:
       image_style: ''
       image_link: ''
       svg_attributes:
-        width: ''
-        height: ''
+        width: null
+        height: null
       svg_render_as_image: true
     third_party_settings: {  }
     type: image
@@ -137,15 +138,26 @@ content:
     third_party_settings: {  }
     type: text_default
     region: content
+  field_site_social_links:
+    weight: 13
+    label: above
+    settings:
+      trim_length: 80
+      url_only: false
+      url_plain: false
+      rel: ''
+      target: ''
+    third_party_settings: {  }
+    type: link
+    region: content
   field_site_twitter_image:
-    type: entity_reference_entity_view
     weight: 11
     label: above
     settings:
-      view_mode: default
       link: false
     third_party_settings: {  }
     region: content
+    type: entity_reference_label
   field_title_of_table_of_contents:
     weight: 15
     label: above
@@ -156,3 +168,4 @@ content:
     region: content
 hidden:
   description: true
+  search_api_excerpt: true

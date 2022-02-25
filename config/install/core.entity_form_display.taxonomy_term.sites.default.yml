@@ -2,6 +2,7 @@ langcode: en
 status: true
 dependencies:
   config:
+    - entity_browser.browser.tide_image_browser
     - field.field.taxonomy_term.sites.field_acknowledgement_to_country
     - field.field.taxonomy_term.sites.field_prominence_ack_to_country
     - field.field.taxonomy_term.sites.field_show_table_of_contents
@@ -15,13 +16,14 @@ dependencies:
     - field.field.taxonomy_term.sites.field_site_og_image
     - field.field.taxonomy_term.sites.field_site_show_exit_site
     - field.field.taxonomy_term.sites.field_site_slogan
+    - field.field.taxonomy_term.sites.field_site_social_links
     - field.field.taxonomy_term.sites.field_site_twitter_image
     - field.field.taxonomy_term.sites.field_title_of_table_of_contents
     - image.style.thumbnail
     - taxonomy.vocabulary.sites
   module:
-    - tide_core
-    - image
+    - entity_browser
+    - link
     - maxlength
     - paragraphs
     - text
@@ -101,6 +103,7 @@ content:
       match_operator: CONTAINS
       size: 60
       placeholder: ''
+      match_limit: 10
     third_party_settings: {  }
     type: entity_reference_autocomplete
     region: content
@@ -118,6 +121,7 @@ content:
       match_operator: CONTAINS
       size: 60
       placeholder: ''
+      match_limit: 10
     third_party_settings: {  }
     type: entity_reference_autocomplete
     region: content
@@ -135,6 +139,7 @@ content:
       match_operator: CONTAINS
       size: 60
       placeholder: ''
+      match_limit: 10
     third_party_settings: {  }
     type: entity_reference_autocomplete
     region: content
@@ -168,14 +173,17 @@ content:
     third_party_settings: {  }
     type: text_textarea
     region: content
-  name:
-    type: string_textfield
-    weight: 0
-    region: content
+  field_site_social_links:
+    weight: 14
     settings:
-      size: 60
-      placeholder: ''
-    third_party_settings: {  }
+      placeholder_url: 'https://example.com/Social'
+      placeholder_title: 'Example Social'
+    third_party_settings:
+      maxlength:
+        maxlength_js: 35
+        maxlength_js_label: 'Link text limited to @limit characters, remaining: <strong>@remaining</strong>'
+    type: link_default
+    region: content
   field_site_twitter_image:
     weight: 13
     settings:
@@ -191,6 +199,21 @@ content:
     third_party_settings: {  }
     type: entity_browser_entity_reference
     region: content
+  name:
+    type: string_textfield
+    weight: 0
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  status:
+    type: boolean_checkbox
+    settings:
+      display_label: true
+    weight: 15
+    region: content
+    third_party_settings: {  }
   field_title_of_table_of_contents:
     weight: 18
     settings:

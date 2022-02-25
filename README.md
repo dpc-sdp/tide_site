@@ -10,10 +10,10 @@ Tide is a Drupal 8 distribution focused on delivering an API first, headless Dru
 [![Pull Requests](https://img.shields.io/github/issues-pr/dpc-sdp/tide_page.svg)](https://github.com/dpc-sdp/tide_site/pulls)
 
 ## What is in this package
-- Fields for `Site` taxonomy vocabulary
-- JSONAPI and Tide API module integration
-- Preview Links support (with Tide API)
-- Simple Sitemap integration configuration
+- Fields for `Site` taxonomy vocabulary.
+- JSONAPI and Tide API module integration.
+- Preview Links support (with Tide API).
+- Simple Sitemap integration configuration.
 
 ## Installation
 To install this package, add this custom repository to `repositories` section of

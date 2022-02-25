@@ -8,7 +8,7 @@ id: taxonomy_term.sites.field_show_table_of_contents
 field_name: field_show_table_of_contents
 entity_type: taxonomy_term
 bundle: sites
-label: 'Show Table of contents'
+label: 'Show Table of contents on sitemap'
 description: ''
 required: false
 translatable: false
