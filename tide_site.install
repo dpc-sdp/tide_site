@@ -7,7 +7,6 @@
 
 use Drupal\Core\Config\FileStorage;
 use Drupal\Core\Entity\Display\EntityFormDisplayInterface;
-use Drupal\Core\Utility\UpdateException;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\taxonomy\TaxonomyPermissions;
@@ -429,22 +428,19 @@ function tide_site_update_8019() {
  * Create sites social media link field.
  */
 function tide_site_update_8020(&$sandbox) {
-  module_load_include('inc', 'tide_core', 'includes/helpers');
-
-  $module_path = drupal_get_path('module', 'tide_site');
-  $config_location = $module_path . '/config/install';
-  $config_items = [
-    'field.storage.taxonomy_term.field_site_social_links',
-    'field.field.taxonomy_term.sites.field_site_social_links',
+  $configs = [
+    'field.storage.taxonomy_term.field_site_social_links' => 'field_storage_config',
+    'field.field.taxonomy_term.sites.field_site_social_links' => 'field_config',
   ];
-  foreach ($config_items as $item_name) {
-    try {
-      _tide_import_single_config($item_name, [$config_location]);
-    }
-    catch (Exception $e) {
-      throw new UpdateException(
-        sprintf("Failed to import config item '%s' from '%s'", $item_name, $config_location), $e->getCode(), $e
-      );
+  $config_location = [drupal_get_path('module', 'tide_site') . '/config/install'];
+  // Check if field already exported to config/sync.
+  foreach ($configs as $config => $type) {
+    $config_read = _tide_read_config($config, $config_location, TRUE);
+    $storage = \Drupal::entityTypeManager()->getStorage($type);
+    $id = substr($config, strrpos($config, '.') + 1);
+    if ($storage->load($id) == NULL) {
+      $config_entity = $storage->createFromStorageRecord($config_read);
+      $config_entity->save();
     }
   }
 
