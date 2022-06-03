@@ -479,3 +479,14 @@ function tide_site_update_8021() {
     \Drupal::service('module_installer')->install([$module]);
   }
 }
+
+/**
+ * Create new Linkit profile to view content information
+ */
+function tide_site_update_8022() {
+  $config = 'linkit.linkit_profile.site_content.yml';
+  $config_location = [drupal_get_path('module', 'tide_site') . '/config/install'];
+  $source = new FileStorage($config_location);
+  $config_storage = \Drupal::service('config.storage');
+  $config_storage->write($config, $source->read($config));
+}

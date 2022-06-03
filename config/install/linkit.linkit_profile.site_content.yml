@@ -1,0 +1,20 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - node
+id: site_content
+label: 'Site Content'
+description: ''
+matchers:
+  e94b5256-49c7-4b3c-bd2f-67e6a5a86929:
+    uuid: e94b5256-49c7-4b3c-bd2f-67e6a5a86929
+    id: 'entity:node'
+    weight: 0
+    settings:
+      include_unpublished: true
+      metadata: 'Sites: [node:field_node_site] | Node: [node:nid] | [node:field_publication:entity:title] | <strong>[node:published_status]</strong>'
+      bundles: {  }
+      group_by_bundle: true
+      substitution_type: canonical
+      limit: 100
