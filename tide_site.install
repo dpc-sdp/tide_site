@@ -481,7 +481,7 @@ function tide_site_update_8021() {
 }
 
 /**
- * Create new Linkit profile to view content information
+ * Create new Linkit profile to view content information.
  */
 function tide_site_update_8022() {
   $configs = [
