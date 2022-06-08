@@ -488,7 +488,7 @@ function tide_site_update_8022() {
     'linkit.linkit_profile.site_content' => 'linkit_profile',
   ];
   module_load_include('inc', 'tide_core', 'includes/helpers');
-  $config_location = [drupal_get_path('module', 'tide_site') . '/config/install'];
+  $config_location = [__DIR__ . '/config/install'];
   foreach ($configs as $config => $type) {
     $config_read = _tide_read_config($config, $config_location, TRUE);
     $storage = \Drupal::entityTypeManager()->getStorage($type);
