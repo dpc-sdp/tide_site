@@ -89,6 +89,7 @@ class TideDefaultSitemapGenerator extends DefaultSitemapGenerator {
             $links_per_site[$site_id][] = $site_link;
           }
         }
+        \Drupal::service('entity.memory_cache')->deleteAll();
       }
 
       // Now we have the sitemap of all sites.
