@@ -94,7 +94,7 @@ class EntityReferenceSiteEnhancer extends ResourceFieldEnhancerBase implements C
     $data['meta']['type'] = $data['type'];
     $data['meta']['id'] = $data['id'];
 
-    list($entity_type, $bundle) = explode('--', $data['type']);
+    [$entity_type, $bundle] = explode('--', $data['type']);
     $entities = $this->entityTypeManager->getStorage($entity_type)->loadByProperties([
       'type' => $bundle,
       'uuid' => $data['id'],

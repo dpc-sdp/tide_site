@@ -469,3 +469,13 @@ function tide_site_update_8020(&$sandbox) {
   }
 
 }
+
+/**
+ * Install "Create Menus Permission" module.
+ */
+function tide_site_update_8021() {
+  $module = 'create_menus_permission';
+  if (!\Drupal::moduleHandler()->moduleExists($module)) {
+    \Drupal::service('module_installer')->install([$module]);
+  }
+}

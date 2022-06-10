@@ -17,6 +17,7 @@ dependencies:
   - dpc-sdp:tide_media
   - entity_browser:entity_browser
   - entity_browser:entity_browser_entity_form
+  - create_menus_permission:create_menus_permission
 config_devel:
   install:
     - core.entity_form_display.taxonomy_term.sites.default
