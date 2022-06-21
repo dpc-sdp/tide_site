@@ -1,4 +1,3 @@
-uuid: d5183f04-bf54-4e88-ad4f-d3a9ef4a1dd7
 langcode: en
 status: true
 dependencies:
@@ -33,6 +32,12 @@ display:
         type: tag
       query:
         type: views_query
+        options:
+          disable_sql_rewrite: false
+          distinct: true
+          replica: false
+          query_comment: ''
+          query_tags: {  }
       exposed_form:
         type: basic
         options:
