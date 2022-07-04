@@ -4,6 +4,7 @@ dependencies:
   config:
     - field.storage.node.field_node_primary_site
     - field.storage.node.field_node_site
+    - taxonomy.vocabulary.department
     - taxonomy.vocabulary.sites
   module:
     - content_moderation
@@ -11,8 +12,6 @@ dependencies:
     - taxonomy
     - tide_core
     - user
-_core:
-  default_config_hash: tS8PbpJX90aRFC3-UTgXzdqkq7_2frk2pz4TMijEebM
 id: summary_contents_filters
 label: 'Filtered Content'
 module: node
@@ -20,7 +19,6 @@ description: 'Find and manage content.'
 tag: default
 base_table: node_field_data
 base_field: nid
-core: 8.x
 display:
   default:
     display_options:
@@ -593,6 +591,8 @@ display:
               authenticated: authenticated
               anonymous: '0'
               administrator: '0'
+            operator_limit_selection: false
+            operator_list: {  }
           is_grouped: false
           group_info:
             label: ''
@@ -640,6 +640,8 @@ display:
               event_author: '0'
               grant_author: '0'
             reduce: false
+            operator_limit_selection: false
+            operator_list: {  }
           is_grouped: false
           group_info:
             label: ''
@@ -659,10 +661,10 @@ display:
           hierarchy: true
           error_message: true
           plugin_id: taxonomy_index_tid
-        field_node_site_target_id:
-          id: field_node_site_target_id
-          table: node__field_node_site
-          field: field_node_site_target_id
+        sub_sites_filter:
+          id: sub_sites_filter
+          table: node_field_data
+          field: sub_sites_filter
           relationship: none
           group_type: group
           admin_label: ''
@@ -671,15 +673,17 @@ display:
           group: 1
           exposed: true
           expose:
-            operator_id: field_node_site_target_id_op
-            label: Sub-Site
+            operator_id: sub_sites_filter_op
+            label: Sub-Sites
             description: ''
             use_operator: false
-            operator: field_node_site_target_id_op
-            identifier: field_node_site_target_id
+            operator: sub_sites_filter_op
+            operator_limit_selection: false
+            operator_list: {  }
+            identifier: sub_sites_filter
             required: false
             remember: false
-            multiple: false
+            multiple: true
             remember_roles:
               authenticated: authenticated
               anonymous: '0'
@@ -688,9 +692,7 @@ display:
               site_admin: '0'
               editor: '0'
               previewer: '0'
-              event_author: '0'
-              grant_author: '0'
-            reduce: false
+            reduce: 0
           is_grouped: false
           group_info:
             label: ''
@@ -703,13 +705,9 @@ display:
             default_group: All
             default_group_multiple: {  }
             group_items: {  }
-          reduce_duplicates: true
-          type: select
-          limit: true
-          vid: sites
-          hierarchy: true
-          error_message: true
-          plugin_id: taxonomy_index_tid
+          reduce_duplicates: 0
+          entity_type: node
+          plugin_id: sub_sites_filter
         type:
           id: type
           table: node_field_data
@@ -736,6 +734,8 @@ display:
               anonymous: '0'
               administrator: '0'
             reduce: false
+            operator_limit_selection: false
+            operator_list: {  }
           is_grouped: false
           group_info:
             label: ''
@@ -774,6 +774,8 @@ display:
             multiple: false
             remember_roles:
               authenticated: authenticated
+            operator_limit_selection: false
+            operator_list: {  }
           is_grouped: true
           group_info:
             label: 'Published status'
@@ -806,6 +808,9 @@ display:
           plugin_id: node_status
           group: 1
           entity_type: node
+          expose:
+            operator_limit_selection: false
+            operator_list: {  }
       sorts:
         changed:
           id: changed
