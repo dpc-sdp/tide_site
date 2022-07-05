@@ -15,6 +15,11 @@ function tide_site_token_info_alter(&$data) {
     'name' => t('Path without Site Prefix'),
     'description' => t('The base path component without site prefix.'),
   ];
+
+  $data['tokens']['node']['publication-parent-prefix'] = [
+    'name' => t('Publication parent with prefix'),
+    'description' => t('The publication parent to use with linkit'),
+  ];
 }
 
 /**
@@ -50,6 +55,23 @@ function tide_site_tokens($type, $tokens, array $data, array $options, Bubbleabl
           $value = preg_replace("/^\/site\-(\d+)\//", '/', $value, 1);
           $replacements[$original] = $value;
           break;
+      }
+    }
+  }
+
+  if ($type == 'node' && !empty($data['node'])) {
+    foreach ($tokens as $name => $original) {
+      switch ($name) {
+        case 'publication-parent-prefix':
+          $node = $data['node'];
+          if($node->getType() == 'publication_page'){
+            if ($node->hasField('field_publication') && !$node->get('field_publication')->isEmpty()) {
+              $text = $node->field_publication->entity->getTitle();
+              $value = "| Parent: " . $text;
+            }
+            $replacements[$original] = $value;
+            break;
+          }
       }
     }
   }
