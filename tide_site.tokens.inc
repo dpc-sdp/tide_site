@@ -64,7 +64,7 @@ function tide_site_tokens($type, $tokens, array $data, array $options, Bubbleabl
       switch ($name) {
         case 'publication-parent-prefix':
           $node = $data['node'];
-          if($node->getType() == 'publication_page'){
+          if ($node->getType() == 'publication_page') {
             if ($node->hasField('field_publication') && !$node->get('field_publication')->isEmpty()) {
               $text = $node->field_publication->entity->getTitle();
               $value = "| Parent: " . $text;
