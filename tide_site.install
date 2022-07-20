@@ -24,22 +24,10 @@ function tide_site_install() {
     }
   }
   // This view is replaced by summary_contents_filters view.
-  $view_ids = [
-    'content',
-    'tide_core_moderated_content_filters',
-  ];
-  foreach ($view_ids as $view_id) {
-    $view = \Drupal::entityTypeManager()->getStorage('view')->load($view_id);
-    // Disable views.
-    if ($view) {
-      $view->setStatus(FALSE)->save();
-      $view->delete();
-    }
-    // Delete related configs of views.
-    $config = \Drupal::configFactory()->getEditable('views.view.' . $view_id);
-    if ($config) {
-      $config->delete();
-    }
+  $view_id = 'content';
+  $view = \Drupal::entityTypeManager()->getStorage('view')->load($view_id);
+  if ($view) {
+    $view->setStatus(FALSE)->save();
   }
 }
 
