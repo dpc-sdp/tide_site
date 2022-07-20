@@ -32,7 +32,7 @@ function tide_site_install() {
     $view = \Drupal::entityTypeManager()->getStorage('view')->load($view_id);
     if ($view) {
       $view->setStatus(FALSE)->save();
-      \Drupal::entityTypeManager()->getStorage('view')->load($view)->delete();
+      $view->delete();
       \Drupal::configFactory()->getEditable('views.view.' . $view)->delete();
     }
   }
