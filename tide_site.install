@@ -23,6 +23,12 @@ function tide_site_install() {
       tide_site_entity_bundle_create($type, $bundle);
     }
   }
+  // This view is replaced by summary_contents_filters view.
+  $view_id = 'content';
+  $view = \Drupal::entityTypeManager()->getStorage('view')->load($view_id);
+  if ($view) {
+    $view->setStatus(FALSE)->save();
+  }
 }
 
 /**
