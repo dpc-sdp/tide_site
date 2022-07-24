@@ -26,6 +26,9 @@
         "patches": {
             "drupal/core": {
               "Add a token for publication status - https://www.drupal.org/project/drupal/issues/3073554": "https://www.drupal.org/files/issues/2019-08-09/3073554_10.patch"
+            },
+            "drupal/linkit": {
+                "Unpublished nodes not included even when option is selected - https://www.drupal.org/project/linkit/issues/3049946": "https://www.drupal.org/files/issues/2021-05-27/linkit-unpublished-nodes-not-included-3049946-28.patch"
             }
         }
     }
