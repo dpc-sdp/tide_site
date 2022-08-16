@@ -21,17 +21,9 @@ class TideDefaultSitemapGenerator extends DefaultSitemapGenerator {
    */
   public function generate(array $links) {
     parent::generate($links);
-    $highest_id = $this->db->query('SELECT MAX(id) FROM {simple_sitemap}')
+    $highest_id = $this->db->query('SELECT MAX(id) FROM {simple_sitemap}')->fetchField();
+    $highest_delta = $this->db->query('SELECT MAX(delta) FROM {simple_sitemap} WHERE type = :type AND status = :status', [':type' => $this->sitemapVariant, ':status' => 0])
       ->fetchField();
-    $highest_delta = $this->db->query('SELECT MAX(delta) FROM {simple_sitemap} WHERE type = :type AND status = :status', [
-      ':type' => $this->sitemapVariant,
-      ':status' => 1,
-    ])
-      ->fetchField();
-
-    $this->db->delete('simple_sitemap_site')
-      ->condition('status', '1')
-      ->execute();
 
     $sites = \Drupal::service('tide_site.helper')->getAllSites();
     if (!empty($sites)) {
@@ -127,7 +119,7 @@ class TideDefaultSitemapGenerator extends DefaultSitemapGenerator {
     // sitemap variant, as publishing involves deleting the currently published
     // variant.
     if (FALSE !== $unpublished_chunk) {
-      $this->remove('published');
+      $this->TideSiteMapRemove('published');
       $this->db->query('UPDATE {simple_sitemap_site} SET status = :status WHERE type = :type', [':type' => $this->sitemapVariant, ':status' => 1]);
     }
     parent::publish();
@@ -135,10 +127,19 @@ class TideDefaultSitemapGenerator extends DefaultSitemapGenerator {
   }
 
   /**
+   * @param string $mode
+   * @return $this
+   */
+  public function TideSiteMapRemove($mode = 'all') {
+    self::purgeSitemapVariants($this->sitemapVariant, $mode);
+
+    return $this;
+  }
+
+  /**
    * {@inheridoc}
    */
   public static function purgeSitemapVariants($variants = NULL, $mode = 'all') {
-    parent::purgeSitemapVariants($variants,$mode);
     if (NULL === $variants || !empty((array) $variants)) {
       $delete_query = \Drupal::database()->delete('simple_sitemap_site');
 
