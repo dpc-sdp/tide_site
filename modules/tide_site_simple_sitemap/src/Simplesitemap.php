@@ -2,11 +2,9 @@
 
 namespace Drupal\tide_site_simple_sitemap;
 
-use Drupal\simple_sitemap\Plugin\simple_sitemap\SitemapGenerator\SitemapGeneratorBase;
 use Drupal\simple_sitemap\Simplesitemap as DefaultSimplesitemap;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use function Symfony\Component\VarDumper\Dumper\esc;
 
 /**
  * Class simple sitemap.
@@ -47,12 +45,26 @@ class Simplesitemap extends DefaultSimplesitemap {
         return parent::fetchSitemapChunk($id);
       }
       else {
+        if ($this->hasSiteMapChunks()) {
+          return $this->db->query('SELECT * FROM {simple_sitemap_site} WHERE delta = :delta and site_id = :site_id',
+            [':delta' => 0, ':site_id' => $site_id])->fetchObject();
+        }
         return $this->db->query('SELECT * FROM {simple_sitemap_site} WHERE site_id = :site_id',
           [':site_id' => $site_id])->fetchObject();
       }
     } catch (\Exception $exception) {
       throw new NotFoundHttpException();
     }
+  }
+
+  protected function hasSiteMapChunks() {
+    $result = \Drupal::database()->select('simple_sitemap_site', 's')
+      ->fields('s', ['delta'])
+      ->condition('s.status', 1)
+      ->condition('s.delta', '0', '=')
+      ->execute()
+      ->fetchAll();
+    return !empty($result);
   }
 
 }
