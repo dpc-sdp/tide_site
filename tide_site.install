@@ -479,3 +479,20 @@ function tide_site_update_8021() {
     \Drupal::service('module_installer')->install([$module]);
   }
 }
+
+/**
+ * Display only distinct results.
+ */
+function tide_site_update_8022() {
+  // Getting the updated query option from install dir.
+  module_load_include('inc', 'tide_core', 'includes/helpers');
+  $config_location = [drupal_get_path('module', 'tide_site') . '/config/install'];
+  $config = 'views.view.summary_contents_filters';
+  $config_read = _tide_read_config($config, $config_location, FALSE);
+  $query = $config_read['display']['default']['display_options']['query'];
+
+  // Setting the updated query option in config sync.
+  $summary_contents_view = \Drupal::configFactory()
+    ->getEditable('views.view.summary_contents_filters');
+  $summary_contents_view->set('display.default.display_options.query', $query)->save();
+}
