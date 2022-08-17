@@ -2,6 +2,7 @@
 
 namespace Drupal\tide_site\Commands;
 
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drush\Commands\DrushCommands;
 
 /**
@@ -16,6 +17,8 @@ use Drush\Commands\DrushCommands;
  *   - http://cgit.drupalcode.org/devel/tree/drush.services.yml
  */
 class TideSiteCommands extends DrushCommands {
+
+  use StringTranslationTrait;
 
   /**
    * Update the domains on the site taxonomy based on an environment variable.
@@ -32,7 +35,7 @@ class TideSiteCommands extends DrushCommands {
     try {
       $environment = getenv('LAGOON_GIT_BRANCH');
       if ($environment == 'production') {
-        $this->output()->writeln(t('This command cannot run in Lagoon production environments.'));
+        $this->output()->writeln($this->t('This command cannot run in Lagoon production environments.'));
       }
       else {
         $fe_domains = getenv('FE_DOMAINS');
@@ -43,10 +46,10 @@ class TideSiteCommands extends DrushCommands {
             $term->set('field_site_domains', str_replace('<br/>', "\r\n", $domain[1]));
             $term->save();
           }
-          $this->output()->writeln(t('Domains Updated.'));
+          $this->output()->writeln($this->t('Domains Updated.'));
         }
         else {
-          $this->output()->writeln(t('No site specific domains were found in this environment.'));
+          $this->output()->writeln($this->t('No site specific domains were found in this environment.'));
         }
       }
     }

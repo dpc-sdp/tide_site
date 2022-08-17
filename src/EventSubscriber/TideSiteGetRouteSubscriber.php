@@ -79,7 +79,7 @@ class TideSiteGetRouteSubscriber implements EventSubscriberInterface {
     }
 
     try {
-      $uuid = isset($response['data']['id']) ? $response['data']['id'] : NULL;
+      $uuid = $response['data']['id'] ?? NULL;
 
       /** @var \Drupal\Core\Entity\EntityInterface $entity */
       $entity = $event->getEntity();
@@ -88,7 +88,7 @@ class TideSiteGetRouteSubscriber implements EventSubscriberInterface {
         return;
       }
 
-      $entity_type = isset($response['data']['attributes']['entity_type']) ? $response['data']['attributes']['entity_type'] : NULL;
+      $entity_type = $response['data']['attributes']['entity_type'] ?? NULL;
       // Do nothing if this is not a restricted entity type.
       if (!$this->siteHelper->isRestrictedEntityType($entity_type) && $path !== '/') {
         return;
