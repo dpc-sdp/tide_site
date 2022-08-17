@@ -32,6 +32,8 @@ class Simplesitemap extends DefaultSimplesitemap {
   }
 
   /**
+   * Fetches a single sitemap chunk by site and page.
+   *
    * {@inheridoc}
    */
   protected function fetchSitemapChunk($id) {
