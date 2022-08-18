@@ -104,3 +104,15 @@ resourceFields:
     enhancer:
       id: ''
     disabled: false
+  field_show_table_of_contents:
+    fieldName: field_show_table_of_contents
+    publicName: field_show_table_of_contents
+    enhancer:
+      id: ''
+    disabled: false
+  field_title_of_table_of_contents:
+    fieldName: field_title_of_table_of_contents
+    publicName: field_title_of_table_of_contents
+    enhancer:
+      id: ''
+    disabled: false

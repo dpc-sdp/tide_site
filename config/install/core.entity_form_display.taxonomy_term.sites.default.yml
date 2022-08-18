@@ -5,6 +5,7 @@ dependencies:
     - entity_browser.browser.tide_image_browser
     - field.field.taxonomy_term.sites.field_acknowledgement_to_country
     - field.field.taxonomy_term.sites.field_prominence_ack_to_country
+    - field.field.taxonomy_term.sites.field_show_table_of_contents
     - field.field.taxonomy_term.sites.field_site_domains
     - field.field.taxonomy_term.sites.field_site_footer_logos
     - field.field.taxonomy_term.sites.field_site_footer_menu
@@ -17,6 +18,7 @@ dependencies:
     - field.field.taxonomy_term.sites.field_site_slogan
     - field.field.taxonomy_term.sites.field_site_social_links
     - field.field.taxonomy_term.sites.field_site_twitter_image
+    - field.field.taxonomy_term.sites.field_title_of_table_of_contents
     - image.style.thumbnail
     - taxonomy.vocabulary.sites
   module:
@@ -25,6 +27,23 @@ dependencies:
     - maxlength
     - paragraphs
     - text
+third_party_settings:
+  field_group:
+    group_table_of_contents:
+      children:
+        - field_show_table_of_contents
+        - field_title_of_table_of_contents
+      parent_name: ''
+      weight: 15
+      format_type: details
+      region: content
+      format_settings:
+        id: ''
+        classes: ''
+        description: ''
+        open: false
+        required_fields: true
+      label: 'Table of contents'
 id: taxonomy_term.sites.default
 targetEntityType: taxonomy_term
 bundle: sites
@@ -45,6 +64,13 @@ content:
       placeholder: ''
     third_party_settings: {  }
     type: string_textarea
+    region: content
+  field_show_table_of_contents:
+    weight: 17
+    settings:
+      display_label: true
+    third_party_settings: {  }
+    type: boolean_checkbox
     region: content
   field_site_domains:
     weight: 3
@@ -188,6 +214,14 @@ content:
     weight: 15
     region: content
     third_party_settings: {  }
+  field_title_of_table_of_contents:
+    weight: 18
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+    type: string_textfield
+    region: content
 hidden:
   description: true
   path: true

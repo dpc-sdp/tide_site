@@ -6,8 +6,8 @@ Feature: JSONAPI exposure
 
   Background:
     Given "sites" terms:
-      | name             | field_site_slogan:value | field_site_footer_text:value | field_site_domains |
-      | [TEST] Site name | Test site slogan        | test site footer             | www.example.com    |
+      | name             | field_site_slogan:value | field_site_footer_text:value | field_site_domains | field_title_of_table_of_contents | field_show_table_of_contents |
+      | [TEST] Site name | Test site slogan        | test site footer             | www.example.com    | Test Table of content            | 1                            |
 
   @api @suggest
   Scenario: Request to Sites endpoint to get all information about sites
@@ -25,5 +25,7 @@ Feature: JSONAPI exposure
     And the JSON node "data[0].attributes.field_site_domains" should be equal to "www.example.com"
     And the JSON node "data[0].attributes.field_site_slogan.value" should be equal to "Test site slogan"
     And the JSON node "data[0].attributes.field_site_footer_text.value" should be equal to "test site footer"
+    And the JSON node "data[0].attributes.field_show_table_of_contents" should be equal to "1"
+    And the JSON node "data[0].attributes.field_title_of_table_of_contents" should be equal to "Test Table of content"
     And the JSON node "data[0].relationships.field_site_main_menu" should exist
     And the JSON node "data[0].relationships.field_site_footer_menu" should exist
