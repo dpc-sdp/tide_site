@@ -37,8 +37,8 @@ class Simplesitemap extends DefaultSimplesitemap {
    * {@inheridoc}
    */
   protected function fetchSitemapChunk($id) {
-    $site_id = $this->request->get('site');
-    $page = $this->request->get('page');
+    $site_id = $this->request->query->getInt('site');
+    $page = $this->request->query->getInt('page');
     // If no site_id provided, returns its parent.
     if (empty($site_id)) {
       return parent::fetchSitemapChunk($id);
