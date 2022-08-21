@@ -2,6 +2,8 @@
 
 namespace Drupal\tide_site_simple_sitemap\Plugin\simple_sitemap\SitemapGenerator;
 
+use Drupal\Core\Language\LanguageInterface;
+use Drupal\Core\Url;
 use Drupal\simple_sitemap\Plugin\simple_sitemap\SitemapGenerator\DefaultSitemapGenerator;
 use Drupal\taxonomy\Entity\Term;
 
@@ -245,7 +247,14 @@ class TideDefaultSitemapGenerator extends DefaultSitemapGenerator {
     // Add sitemap chunk locations to document.
     foreach ($chunk_info as $chunk_data) {
       $this->writer->startElement('sitemap');
-      $this->writer->writeElement('loc', $site_url . '/sitemap.xml?page=' . $chunk_data->delta);
+      $this->writer->writeElement('loc', Url::fromRoute(
+        'simple_sitemap.sitemap_default',
+        ['page' => $chunk_data->delta],
+        [
+          'absolute' => TRUE,
+          'base_url' => $site_url,
+          'language' => $this->languageManager->getLanguage(LanguageInterface::LANGCODE_NOT_APPLICABLE),
+        ])->toString());
       $this->writer->writeElement('lastmod', date('c', $chunk_data->sitemap_created));
       $this->writer->endElement();
     }
