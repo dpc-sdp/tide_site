@@ -189,7 +189,8 @@ class TideDefaultSitemapGenerator extends DefaultSitemapGenerator {
     if (!empty($chunk_info = $this->getChunkInfo()) && count($chunk_info) > 1) {
       $highest_id = $this->db->query('SELECT MAX(id) FROM {simple_sitemap}')
         ->fetchField();
-      foreach ($this->getSiteBasedInfo() as $term_id => $item) {
+      $sites = \Drupal::service('tide_site.helper')->getAllSites();
+      foreach ($sites as $term_id => $item) {
         $this->db->merge('simple_sitemap_site')
           ->keys([
             'delta' => self::INDEX_DELTA,
@@ -202,12 +203,12 @@ class TideDefaultSitemapGenerator extends DefaultSitemapGenerator {
             'site_id' => $term_id,
             'delta' => self::INDEX_DELTA,
             'type' => $this->sitemapVariant,
-            'sitemap_string' => $this->getSiteBasedIndexXml($this->getChunkInfo(), $term_id),
+            'sitemap_string' => $this->getSiteBasedIndexXml($this->getChunkInfo(), $item),
             'sitemap_created' => $this->time->getRequestTime(),
             'status' => 0,
           ])
           ->updateFields([
-            'sitemap_string' => $this->getSiteBasedIndexXml($this->getChunkInfo(), $term_id),
+            'sitemap_string' => $this->getSiteBasedIndexXml($this->getChunkInfo(), $item),
             'sitemap_created' => $this->time->getRequestTime(),
           ])
           ->execute();
@@ -222,7 +223,7 @@ class TideDefaultSitemapGenerator extends DefaultSitemapGenerator {
    *
    * {@inheridoc}
    */
-  private function getSiteBasedIndexXml(array $chunk_info, int $site_id) {
+  private function getSiteBasedIndexXml(array $chunk_info, Term $site) {
     $this->writer->openMemory();
     $this->writer->setIndent(TRUE);
     $this->writer->startSitemapDocument();
@@ -243,7 +244,7 @@ class TideDefaultSitemapGenerator extends DefaultSitemapGenerator {
       $this->writer->writeAttribute($name, $value);
     }
     $site_url = \Drupal::service('tide_site.helper')
-      ->getSiteBaseUrl(Term::load($site_id));
+      ->getSiteBaseUrl($site);
     if (!$this->isDefaultVariant()) {
       $site_url .= '/' . $this->sitemapVariant;
     }
@@ -266,17 +267,6 @@ class TideDefaultSitemapGenerator extends DefaultSitemapGenerator {
     $this->writer->endDocument();
 
     return $this->writer->outputMemory();
-  }
-
-  /**
-   * Gets site ids from simple_sitemap_site table.
-   */
-  private function getSiteBasedInfo() {
-    return $this->db->select('simple_sitemap_site', 's')
-      ->fields('s', ['delta', 'site_id'])
-      ->condition('s.status', 0)
-      ->execute()
-      ->fetchAllAssoc('site_id');
   }
 
 }
