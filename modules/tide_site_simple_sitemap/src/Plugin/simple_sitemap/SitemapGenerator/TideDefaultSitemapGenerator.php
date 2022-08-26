@@ -244,6 +244,9 @@ class TideDefaultSitemapGenerator extends DefaultSitemapGenerator {
     }
     $site_url = \Drupal::service('tide_site.helper')
       ->getSiteBaseUrl(Term::load($site_id));
+    if (!$this->isDefaultVariant()) {
+      $site_url .= '/' . $this->sitemapVariant;
+    }
     // Add sitemap chunk locations to document.
     foreach ($chunk_info as $chunk_data) {
       $this->writer->startElement('sitemap');

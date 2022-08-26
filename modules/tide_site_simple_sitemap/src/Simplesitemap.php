@@ -36,53 +36,49 @@ class Simplesitemap extends DefaultSimplesitemap {
    *
    * {@inheridoc}
    */
-  protected function fetchSitemapChunk($id) {
-    $site_id = $this->request->query->getInt('site');
-    $page = $this->request->query->getInt('page');
-    // If no site_id provided, returns its parent.
+  protected function fetchSitemapChunk($id, $site_id = NULL) {
     if (empty($site_id)) {
       return parent::fetchSitemapChunk($id);
     }
-    // If the page number is provided, return the chunk.
-    if (!empty($page)) {
-      $result = $this->db->query('SELECT * FROM {simple_sitemap_site} WHERE delta = :delta and site_id = :site_id',
-        [':delta' => $page, ':site_id' => $site_id])->fetchObject();
-      return $this->validateResult($result);
-    }
-    // Returns the site-based pagination xml if it exists.
-    if ($this->hasSiteMapChunks()) {
-      $result = $this->db->query('SELECT * FROM {simple_sitemap_site} WHERE delta = :delta and site_id = :site_id',
-        [':delta' => SitemapGeneratorBase::INDEX_DELTA, ':site_id' => $site_id])
-        ->fetchObject();
-      return $this->validateResult($result);
-    }
-    // Returns the site-based xml if it exists.
-    $result = $this->db->query('SELECT * FROM {simple_sitemap_site} WHERE site_id = :site_id',
-      [':site_id' => $site_id])->fetchObject();
-    return $this->validateResult($result);
+    return $this->db->query('SELECT * FROM {simple_sitemap_site} WHERE id = :id and site_id = :site_id',
+      [':id' => $id, ':site_id' => $site_id])->fetchObject();
   }
 
   /**
-   * Checks if tide_simple_site_map has chunks.
+   * Returns a sitemap variant, its index, or its requested chunk.
+   *
+   * @param int|null $delta
+   *  Optional delta of the chunk.
+   *
+   * @return string|false
+   *  If no chunk delta is provided, either the sitemap variant is returned,
+   *  or its index in case of a chunked sitemap.
+   *  If a chunk delta is provided, the relevant chunk is returned.
+   *  Returns false if the sitemap variant is not retrievable from the database.
    */
-  protected function hasSiteMapChunks() {
-    $result = $this->db->select('simple_sitemap_site', 's')
-      ->fields('s', ['delta'])
-      ->condition('s.status', 1)
-      ->condition('s.delta', SitemapGeneratorBase::INDEX_DELTA)
-      ->execute()
-      ->fetchAll();
-    return !empty($result);
-  }
-
-  /**
-   * Checks if the result is valid.
-   */
-  protected function validateResult($result) {
-    if (empty($result)) {
-      throw new NotFoundHttpException();
+  public function getSitemap($delta = NULL) {
+    $site_id = $this->request->query->getInt('site');
+    if (empty($site_id)) {
+      parent::getSitemap($delta);
     }
-    return $result;
+    $chunk_info = $this->fetchSitemapVariantInfo();
+    if (empty($delta) || !isset($chunk_info[$delta])) {
+
+      if (isset($chunk_info[SitemapGeneratorBase::INDEX_DELTA])) {
+        // Return sitemap index if one exists.
+        return $this->fetchSitemapChunk($chunk_info[SitemapGeneratorBase::INDEX_DELTA]->id, $site_id)
+          ->sitemap_string;
+      }
+
+      // Return sitemap chunk if there is only one chunk.
+      return isset($chunk_info[SitemapGeneratorBase::FIRST_CHUNK_DELTA])
+        ? $this->fetchSitemapChunk($chunk_info[SitemapGeneratorBase::FIRST_CHUNK_DELTA]->id, $site_id)
+          ->sitemap_string
+        : FALSE;
+    }
+
+    // Return specific sitemap chunk.
+    return $this->fetchSitemapChunk($chunk_info[$delta]->id, $site_id)->sitemap_string;
   }
 
 }
