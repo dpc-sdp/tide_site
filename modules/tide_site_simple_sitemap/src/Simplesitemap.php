@@ -5,7 +5,6 @@ namespace Drupal\tide_site_simple_sitemap;
 use Drupal\simple_sitemap\Plugin\simple_sitemap\SitemapGenerator\SitemapGeneratorBase;
 use Drupal\simple_sitemap\Simplesitemap as DefaultSimplesitemap;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * Class simple sitemap.
@@ -47,14 +46,7 @@ class Simplesitemap extends DefaultSimplesitemap {
   /**
    * Returns a sitemap variant, its index, or its requested chunk.
    *
-   * @param int|null $delta
-   *  Optional delta of the chunk.
-   *
-   * @return string|false
-   *  If no chunk delta is provided, either the sitemap variant is returned,
-   *  or its index in case of a chunked sitemap.
-   *  If a chunk delta is provided, the relevant chunk is returned.
-   *  Returns false if the sitemap variant is not retrievable from the database.
+   * {@inheritdoc}
    */
   public function getSitemap($delta = NULL) {
     $site_id = $this->request->query->getInt('site');
