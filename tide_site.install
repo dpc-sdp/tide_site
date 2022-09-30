@@ -92,7 +92,7 @@ function tide_site_update_8002(&$sandbox) {
  */
 function tide_site_update_8003() {
   $view = 'views.view.summary_contents';
-  $config_path = drupal_get_path('module', 'tide_site') . '/config/install';
+  $config_path = \Drupal::service('extension.list.module')->getPath('tide_site') . '/config/install';
   $source = new FileStorage($config_path);
   $config_storage = \Drupal::service('config.storage');
   $config_storage->write($view, $source->read($view));
@@ -113,7 +113,7 @@ function tide_site_update_8004() {
  */
 function tide_site_update_8005() {
   module_load_include('inc', 'tide_core', 'includes/helpers');
-  $module_path = drupal_get_path('module', 'tide_site');
+  $module_path = \Drupal::service('extension.list.module')->getPath('tide_site');
   $config_location = [$module_path . '/config/install'];
   _tide_import_single_config('field.storage.taxonomy_term.field_site_og_image', $config_location);
   _tide_import_single_config('field.field.taxonomy_term.sites.field_site_og_image', $config_location);
@@ -163,7 +163,7 @@ function tide_site_update_8005() {
  */
 function tide_site_update_8006() {
   module_load_include('inc', 'tide_core', 'includes/helpers');
-  $module_path = drupal_get_path('module', 'tide_site');
+  $module_path = \Drupal::service('extension.list.module')->getPath('tide_site');
   $config_location = [$module_path . '/config/install'];
   _tide_import_single_config('field.storage.taxonomy_term.field_prominence_ack_to_country', $config_location);
   _tide_import_single_config('field.field.taxonomy_term.sites.field_prominence_ack_to_country', $config_location);
@@ -246,7 +246,7 @@ function tide_site_update_8009() {
  */
 function tide_site_update_8010() {
   $view = 'views.view.summary_contents_filters';
-  $config_path = drupal_get_path('module', 'tide_site') . '/config/install';
+  $config_path = \Drupal::service('extension.list.module')->getPath('tide_site') . '/config/install';
   $source = new FileStorage($config_path);
   $config_storage = \Drupal::service('config.storage');
   $config_storage->write($view, $source->read($view));
@@ -309,7 +309,7 @@ function tide_site_update_8014() {
  */
 function tide_site_update_8015() {
   $view = 'views.view.tide_site_moderated_content_filters';
-  $config_path = drupal_get_path('module', 'tide_site') . '/config/install';
+  $config_path = \Drupal::service('extension.list.module')->getPath('tide_site') . '/config/install';
   $source = new FileStorage($config_path);
   $config_storage = \Drupal::service('config.storage');
   $config_storage->write($view, $source->read($view));
@@ -320,7 +320,7 @@ function tide_site_update_8015() {
  */
 function tide_site_update_8016() {
   $view = 'views.view.summary_contents_filters';
-  $config_path = drupal_get_path('module', 'tide_site') . '/config/install';
+  $config_path = \Drupal::service('extension.list.module')->getPath('tide_site') . '/config/install';
   $source = new FileStorage($config_path);
   $config_storage = \Drupal::service('config.storage');
   $config_storage->write($view, $source->read($view));
@@ -368,7 +368,7 @@ function tide_site_update_8019() {
         'field.storage.taxonomy_term.field_site_twitter_image' => 'field_storage_config',
         'field.field.taxonomy_term.sites.field_site_twitter_image' => 'field_config',
       ];
-      $config_location = [drupal_get_path('module', 'tide_site') . '/config/install'];
+      $config_location = [\Drupal::service('extension.list.module')->getPath('tide_site') . '/config/install'];
       // Check if field already exported to config/sync.
       foreach ($configs as $config => $type) {
         $config_read = _tide_read_config($config, $config_location, TRUE);
@@ -432,7 +432,7 @@ function tide_site_update_8020(&$sandbox) {
     'field.storage.taxonomy_term.field_site_social_links' => 'field_storage_config',
     'field.field.taxonomy_term.sites.field_site_social_links' => 'field_config',
   ];
-  $config_location = [drupal_get_path('module', 'tide_site') . '/config/install'];
+  $config_location = [\Drupal::service('extension.list.module')->getPath('tide_site') . '/config/install'];
   // Check if field already exported to config/sync.
   foreach ($configs as $config => $type) {
     $config_read = _tide_read_config($config, $config_location, TRUE);
@@ -486,7 +486,7 @@ function tide_site_update_8021() {
 function tide_site_update_8022() {
   // Getting the updated query option from install dir.
   module_load_include('inc', 'tide_core', 'includes/helpers');
-  $config_location = [drupal_get_path('module', 'tide_site') . '/config/install'];
+  $config_location = [\Drupal::service('extension.list.module')->getPath('tide_site') . '/config/install'];
   $config = 'views.view.summary_contents_filters';
   $config_read = _tide_read_config($config, $config_location, FALSE);
   $query = $config_read['display']['default']['display_options']['query'];
@@ -528,7 +528,7 @@ function tide_site_update_8024() {
     'field.field.taxonomy_term.sites.field_title_of_table_of_contents' => 'field_config',
   ];
   module_load_include('inc', 'tide_core', 'includes/helpers');
-  $config_location = [drupal_get_path('module', 'tide_site') . '/config/install'];
+  $config_location = [\Drupal::service('extension.list.module')->getPath('tide_site') . '/config/install'];
   // Check if field already exported to config/sync.
   foreach ($configs as $config => $type) {
     $config_read = _tide_read_config($config, $config_location, TRUE);
