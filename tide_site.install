@@ -496,3 +496,153 @@ function tide_site_update_8022() {
     ->getEditable('views.view.summary_contents_filters');
   $summary_contents_view->set('display.default.display_options.query', $query)->save();
 }
+
+/**
+ * Create new Linkit profile to view content information.
+ */
+function tide_site_update_8023() {
+  $configs = [
+    'linkit.linkit_profile.site_content' => 'linkit_profile',
+  ];
+  module_load_include('inc', 'tide_core', 'includes/helpers');
+  $config_location = [__DIR__ . '/config/install'];
+  foreach ($configs as $config => $type) {
+    $config_read = _tide_read_config($config, $config_location, TRUE);
+    $storage = \Drupal::entityTypeManager()->getStorage($type);
+    $id = substr($config, strrpos($config, '.') + 1);
+    if ($storage->load($id) == NULL) {
+      $config_entity = $storage->createFromStorageRecord($config_read);
+      $config_entity->save();
+    }
+  }
+}
+
+/**
+ * Add a new Table of contents on the Site Taxonomy.
+ */
+function tide_site_update_8024() {
+  $configs = [
+    'field.storage.taxonomy_term.field_show_table_of_contents' => 'field_storage_config',
+    'field.storage.taxonomy_term.field_title_of_table_of_contents' => 'field_storage_config',
+    'field.field.taxonomy_term.sites.field_show_table_of_contents' => 'field_config',
+    'field.field.taxonomy_term.sites.field_title_of_table_of_contents' => 'field_config',
+  ];
+  module_load_include('inc', 'tide_core', 'includes/helpers');
+  $config_location = [drupal_get_path('module', 'tide_site') . '/config/install'];
+  // Check if field already exported to config/sync.
+  foreach ($configs as $config => $type) {
+    $config_read = _tide_read_config($config, $config_location, TRUE);
+    $storage = \Drupal::entityTypeManager()->getStorage($type);
+    $id = $storage->getIDFromConfigName($config, $storage->getEntityType()->getConfigPrefix());
+    if ($storage->load($id) == NULL) {
+      $config_entity = $storage->createFromStorageRecord($config_read);
+      $config_entity->save();
+    }
+  }
+
+  // Adding the field to display form.
+  $entity_form_display = Drupal::entityTypeManager()
+    ->getStorage('entity_form_display')
+    ->load('taxonomy_term.sites.default');
+  if ($entity_form_display) {
+    $entity_form_display->setComponent('field_show_table_of_contents', [
+      'weight' => 17,
+      'settings' => [
+        'display_label' => TRUE,
+      ],
+      'third_party_settings' => [],
+      'type' => 'boolean_checkbox',
+      'region' => 'content',
+    ]);
+    $entity_form_display->setComponent('field_title_of_table_of_contents', [
+      'weight' => 18,
+      'settings' => [
+        'size' => 60,
+        'placeholder' => '',
+      ],
+      'third_party_settings' => [],
+      'type' => 'string_textfield',
+      'region' => 'content',
+    ]);
+    $field_group = $entity_form_display->getThirdPartySettings('field_group');
+    $field_group['group_table_of_contents'] = [
+      'children' => [
+        'field_show_table_of_contents',
+        'field_title_of_table_of_contents',
+      ],
+      'parent_name' => '',
+      'label' => 'Table of contents',
+      'weight' => 15,
+      'format_type' => 'details',
+      'region' => 'content',
+      'format_settings' => [
+        'show_empty_fields' => FALSE,
+        'required_fields' => TRUE,
+        'id' => '',
+        'classes' => '',
+        'description' => '',
+        'open' => FALSE,
+      ],
+    ];
+    $entity_form_display->setThirdPartySetting('field_group', 'group_table_of_contents', $field_group['group_table_of_contents']);
+  }
+  $entity_form_display->save();
+
+  // Adding the field to display view.
+  $entity_view_display = Drupal::entityTypeManager()
+    ->getStorage('entity_view_display')
+    ->load('taxonomy_term.sites.default');
+  if ($entity_view_display) {
+    $entity_view_display->setComponent('field_show_table_of_contents', [
+      'weight' => 14,
+      'label' => 'above',
+      'settings' => [
+        'format' => 'default',
+        'format_custom_false' => '',
+        'format_custom_true' => '',
+      ],
+      'third_party_settings' => [],
+      'region' => 'content',
+      'type' => 'boolean',
+    ]);
+    $entity_view_display->setComponent('field_title_of_table_of_contents', [
+      'weight' => 15,
+      'label' => 'above',
+      'settings' => [
+        'link_to_entity' => FALSE,
+      ],
+      'third_party_settings' => [],
+      'region' => 'content',
+      'type' => 'string',
+    ]);
+  }
+  $entity_view_display->save();
+
+  $config_factory = \Drupal::configFactory();
+  $config = $config_factory->getEditable('jsonapi_extras.jsonapi_resource_config.taxonomy_term--sites');
+
+  $content = $config->get('resourceFields');
+  if (!isset($content['field_show_table_of_contents'])) {
+    $content['field_show_table_of_contents'] = [
+      'fieldName' => 'field_show_table_of_contents',
+      'publicName' => 'field_show_table_of_contents',
+      'enhancer' => [
+        'id' => '',
+      ],
+      'disabled' => FALSE,
+    ];
+    $config->set('resourceFields', $content);
+  }
+  if (!isset($content['field_title_of_table_of_contents'])) {
+    $content['field_title_of_table_of_contents'] = [
+      'fieldName' => 'field_title_of_table_of_contents',
+      'publicName' => 'field_title_of_table_of_contents',
+      'enhancer' => [
+        'id' => '',
+      ],
+      'disabled' => FALSE,
+    ];
+    $config->set('resourceFields', $content);
+  }
+  $config->save();
+}
