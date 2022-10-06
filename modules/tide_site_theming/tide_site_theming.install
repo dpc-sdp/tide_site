@@ -5,10 +5,12 @@
  * Install file.
  */
 
+use Drupal\user\Entity\Role;
 
 /**
  * Implements hook_install().
  */
+
 function tide_site_theming_install() {
   /** @var \Drupal\Core\Entity\Display\EntityFormDisplayInterface $entity_form_display */
   $entity_form_display = \Drupal::entityTypeManager()
@@ -28,7 +30,7 @@ function tide_site_theming_install() {
         'description_rows' => 5,
         'key_size' => 60,
         'key_placeholder' => '',
-        'description_enabled' => false,
+        'description_enabled' => FALSE,
         'description_placeholder' => '',
       ],
       'third_party_settings' => [],
@@ -45,10 +47,10 @@ function tide_site_theming_install() {
       'region' => 'content',
       'format_settings' => [
         'classes' => '',
-        'show_empty_fields' => false,
+        'show_empty_fields' => FALSE,
         'id' => 'tide-site-theming-fileds',
-        'open' => false,
-        'required_fields' => true,
+        'open' => FALSE,
+        'required_fields' => TRUE,
         'effect' => 'none',
       ],
     ];
@@ -58,8 +60,8 @@ function tide_site_theming_install() {
 
   // Adding the field to display view.
   $entity_view_display = Drupal::entityTypeManager()
-  ->getStorage('entity_view_display')
-  ->load('taxonomy_term.sites.default');
+    ->getStorage('entity_view_display')
+    ->load('taxonomy_term.sites.default');
   if ($entity_view_display) {
     $entity_view_display->setComponent('field_site_twitter_image', [
       'type' => 'key_value',
@@ -67,7 +69,7 @@ function tide_site_theming_install() {
       'label' => 'above',
       'region' => 'content',
       'settings' => [
-        'value_only' => false
+        'value_only' => FALSE,
       ],
       'third_party_settings' => []
     ]);
