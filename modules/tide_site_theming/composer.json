@@ -1,0 +1,9 @@
+{
+    "name": "dpc-sdp/tide_site_theming",
+    "description": "Tide Spell Checker integration",
+    "type": "drupal-module",
+    "license": "GPL-2.0-or-later",
+    "require": {
+        "drupal/key_value_field": "^1.3"
+    }
+}
