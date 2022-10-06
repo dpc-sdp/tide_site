@@ -9,7 +9,7 @@
         "drupal/create_menus_permission": "^1.0"
     },
     "suggest": {
-        "dpc-sdp/tide_api:^3.0.0": "Allows to use Drupal in headless mode"
+        "dpc-sdp/tide_api:dev-feature/SRM-512_update_drupal_to_9.4": "Allows to use Drupal in headless mode"
     },
     "repositories": {
         "drupal": {
