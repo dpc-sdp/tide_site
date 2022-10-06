@@ -72,6 +72,7 @@ function tide_site_theming_install() {
       'third_party_settings' => []
     ]);
   }
+  $entity_view_display->save();
 
   // Grant view preview links block to default roles from tide_core.
   /** @var \Drupal\user\RoleInterface $role */
@@ -79,4 +80,21 @@ function tide_site_theming_install() {
   if ($role) {
     $role->grantPermission('tide site theming')->save();
   }
+  // Add to JSON.
+  $config_factory = \Drupal::configFactory();
+  $config = $config_factory->getEditable('jsonapi_extras.jsonapi_resource_config.taxonomy_term--sites');
+
+  $content = $config->get('resourceFields');
+  if (!isset($content['field_site_theme_values'])) {
+    $content['field_site_theme_values'] = [
+      'fieldName' => 'field_site_theme_values',
+      'publicName' => 'field_site_theme_values',
+      'enhancer' => [
+        'id' => '',
+      ],
+      'disabled' => FALSE,
+    ];
+    $config->set('resourceFields', $content);
+  }
+  $config->save();
 }
