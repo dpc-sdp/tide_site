@@ -1,0 +1,82 @@
+<?php
+
+/**
+ * @file
+ * Install file.
+ */
+
+
+/**
+ * Implements hook_install().
+ */
+function tide_site_theming_install() {
+  /** @var \Drupal\Core\Entity\Display\EntityFormDisplayInterface $entity_form_display */
+  $entity_form_display = \Drupal::entityTypeManager()
+    ->getStorage('entity_form_display')
+    ->load('taxonomy_term.sites.default');
+  if ($entity_form_display) {
+    $entity_form_display->setComponent('field_site_theme_values', [
+      'type' => 'key_value_textfield',
+      'weight' => 18,
+      'region' => 'content',
+      'settings' => [
+        'size' => 60,
+        'placeholder' => '',
+        'key_label' => 'Key',
+        'value_label' => 'Value',
+        'description_label' => 'Description',
+        'description_rows' => 5,
+        'key_size' => 60,
+        'key_placeholder' => '',
+        'description_enabled' => false,
+        'description_placeholder' => '',
+      ],
+      'third_party_settings' => [],
+    ]);
+    $field_group = $entity_form_display->getThirdPartySettings('field_group');
+    $field_group['group_site_theme_values'] = [
+      'children' => [
+        'field_site_theme_values',
+      ],
+      'parent_name' => '',
+      'label' => 'Site theme values',
+      'weight' => 17,
+      'format_type' => 'details',
+      'region' => 'content',
+      'format_settings' => [
+        'classes' => '',
+        'show_empty_fields' => false,
+        'id' => 'tide-site-theming-fileds',
+        'open' => false,
+        'required_fields' => true,
+        'effect' => 'none',
+      ],
+    ];
+    $entity_form_display->setThirdPartySetting('field_group', 'group_site_theme_values', $field_group['group_site_theme_values']);
+  }
+  $entity_form_display->save();
+
+  // Adding the field to display view.
+  $entity_view_display = Drupal::entityTypeManager()
+  ->getStorage('entity_view_display')
+  ->load('taxonomy_term.sites.default');
+  if ($entity_view_display) {
+    $entity_view_display->setComponent('field_site_twitter_image', [
+      'type' => 'key_value',
+      'weight' => 16,
+      'label' => 'above',
+      'region' => 'content',
+      'settings' => [
+        'value_only' => false
+      ],
+      'third_party_settings' => []
+    ]);
+  }
+
+  // Grant view preview links block to default roles from tide_core.
+  /** @var \Drupal\user\RoleInterface $role */
+  $role = Role::load('site_admin');
+  if ($role) {
+    $role->grantPermission('tide site theming')->save();
+  }
+}

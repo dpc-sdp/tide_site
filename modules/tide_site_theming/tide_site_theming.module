@@ -1,0 +1,21 @@
+<?php
+
+/**
+ * @file
+ * Tide Site Theming module .
+ */
+
+/**
+ * Implements hook_field_group_form_process_alter().
+ */
+function tide_site_theming_field_group_form_process_alter(array &$element, &$group, &$complete_form) {
+    // Grant a
+    if ($element['#id'] == 'tide-site-theming-fileds') {
+      $user = \Drupal::currentUser();
+      $access_tide_site_theming_fields = 'tide site theming';
+      if (!$user->hasPermission($access_tide_site_theming_fields)) {
+        $element['#access'] = FALSE;
+        return;
+      }
+    }
+  }
