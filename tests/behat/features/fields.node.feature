@@ -6,7 +6,7 @@ Feature: Site and Primary Site fields on nodes
   @api
   Scenario: Site and Primary Site fields are added to content types upon creation.
     Given no "sitetest" content type
-    When I am logged in as a user with the "administer content types, administer node fields, administer node display, administer node form display" permission
+    When I am logged in as an administrator
     And I go to "admin/structure/types/add"
     Then the response status code should be 200
 
@@ -57,7 +57,7 @@ Feature: Site and Primary Site fields on nodes
       | Test Site 2          | 0               |
       | Test Site 3          | 0               |
 
-    When I am logged in as a user with the "administer content types, administer node fields, administer node display, administer node form display" permission
+    When I am logged in as an administrator
     And I go to "admin/structure/types/add"
     Then the response status code should be 200
 
