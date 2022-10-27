@@ -308,3 +308,19 @@ function tide_site_simple_sitemap_update_8006() {
     }
   }
 }
+
+/**
+ * Clean up old sitemaps.
+ */
+function tide_site_simple_sitemap_update_8007() {
+  \Drupal::service('state')->deleteMultiple([
+    'simple_sitemap.last_cron_generate',
+    'simple_sitemap.queue_items_initial_amount',
+    'simple_sitemap.queue_stashed_results',
+  ]);
+  \Drupal::service('queue')
+    ->get('simple_sitemap_elements')
+    ->deleteQueue();
+  \Drupal::database()->truncate('simple_sitemap')->execute();
+  \Drupal::database()->truncate('simple_sitemap_site')->execute();
+}
