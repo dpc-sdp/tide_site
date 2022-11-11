@@ -20,6 +20,8 @@ class TideSiteSimpleSitemapServiceProvider extends ServiceProviderBase {
     $sitemap_definition = $container->getDefinition('simple_sitemap.generator');
     $sitemap_definition->setClass('Drupal\tide_site_simple_sitemap\Simplesitemap')
       ->addMethodCall('setRequest', [new Reference('request_stack')]);
+    $sitemap_manager = $container->getDefinition('simple_sitemap.manager');
+    $sitemap_manager->setClass('Drupal\tide_site_simple_sitemap\SimplesitemapManager');
   }
 
 }

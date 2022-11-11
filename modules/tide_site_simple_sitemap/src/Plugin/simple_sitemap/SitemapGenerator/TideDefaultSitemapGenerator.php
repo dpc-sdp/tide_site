@@ -2,7 +2,10 @@
 
 namespace Drupal\tide_site_simple_sitemap\Plugin\simple_sitemap\SitemapGenerator;
 
+use Drupal\Core\Language\LanguageInterface;
+use Drupal\Core\Url;
 use Drupal\simple_sitemap\Plugin\simple_sitemap\SitemapGenerator\DefaultSitemapGenerator;
+use Drupal\taxonomy\Entity\Term;
 
 /**
  * Class default sitemap generator.
@@ -21,14 +24,13 @@ class TideDefaultSitemapGenerator extends DefaultSitemapGenerator {
    */
   public function generate(array $links) {
     parent::generate($links);
-    $highest_id = $this->db->query('SELECT MAX(id) FROM {simple_sitemap_site}')
-      ->fetchField();
-    $highest_delta = $this->db->query('SELECT MAX(delta) FROM {simple_sitemap_site} WHERE type = :type AND status = :status', [
+    $highest_id = $this->db->query('SELECT MAX(id) FROM {simple_sitemap}')->fetchField();
+    $highest_delta = $this->db->query('SELECT MAX(delta) FROM {simple_sitemap} WHERE type = :type AND status = :status', [
       ':type' => $this->sitemapVariant,
       ':status' => 0,
     ])
       ->fetchField();
-    $this->db->truncate('simple_sitemap_site')->execute();
+
     $sites = \Drupal::service('tide_site.helper')->getAllSites();
     if (!empty($sites)) {
       // Prepare to copy/split sitemap links to all sites.
@@ -89,22 +91,21 @@ class TideDefaultSitemapGenerator extends DefaultSitemapGenerator {
             $links_per_site[$site_id][] = $site_link;
           }
         }
-        \Drupal::service('entity.memory_cache')->deleteAll();
       }
 
       // Now we have the sitemap of all sites.
       foreach ($links_per_site as $site_id => $site_links) {
-        if (count($site_links)) {
+        if (!empty($site_links)) {
           // Write to our own table.
           $values = [
-            'id' => NULL === $highest_id ? 0 : $highest_id + 1,
+            'id' => NULL === $highest_id ? 0 : $highest_id,
             'site_id' => $site_id,
-            'delta' => NULL === $highest_delta ? self::FIRST_CHUNK_DELTA : $highest_delta + 1,
+            'delta' => NULL === $highest_delta ? self::FIRST_CHUNK_DELTA : $highest_delta,
             'type' => $this->sitemapVariant,
             'sitemap_string' => $this->getXml($site_links),
             'sitemap_created' => $this->time->getRequestTime(),
             'status' => 0,
-            'link_count' => count($links),
+            'link_count' => count($site_links),
           ];
           $this->db->insert('simple_sitemap_site')->fields($values)->execute();
         }
@@ -113,66 +114,42 @@ class TideDefaultSitemapGenerator extends DefaultSitemapGenerator {
   }
 
   /**
-   * Generate Index.
+   * Publish new sitemaps.
    *
-   * @return $this
-   *
-   * @throws \Exception
+   * {@inheridoc}
    */
-  public function generateIndex() {
-    if (!empty($chunk_info = $this->getChunkInfo()) && count($chunk_info) > 1) {
-      $index_xml = $this->getIndexXml($chunk_info);
-      $highest_id = $this->db->query('SELECT MAX(id) FROM {simple_sitemap_site}')
-        ->fetchField();
-      $this->db->merge('simple_sitemap_site')
-        ->keys([
-          'delta' => self::INDEX_DELTA,
-          'type' => $this->sitemapVariant,
-          'status' => 0,
-        ])
-        ->insertFields([
-          'id' => NULL === $highest_id ? 0 : $highest_id + 1,
-          'delta' => self::INDEX_DELTA,
-          'type' => $this->sitemapVariant,
-          'sitemap_string' => $index_xml,
-          'sitemap_created' => $this->time->getRequestTime(),
-          'status' => 0,
-        ])
-        ->updateFields([
-          'sitemap_string' => $index_xml,
-          'sitemap_created' => $this->time->getRequestTime(),
-        ])
-        ->execute();
+  public function publish() {
+    $unpublished_chunk = $this->db->query('SELECT MAX(id) FROM {simple_sitemap_site} WHERE type = :type AND status = :status', [
+      ':type' => $this->sitemapVariant,
+      ':status' => 0,
+    ])->fetchField();
+
+    // Only allow publishing a sitemap variant if there is an unpublished
+    // sitemap variant, as publishing involves deleting the currently published
+    // variant.
+    if (FALSE !== $unpublished_chunk) {
+      $this->tideSiteMapRemove('published');
+      $this->db->query('UPDATE {simple_sitemap_site} SET status = :status WHERE type = :type', [
+        ':type' => $this->sitemapVariant,
+        ':status' => 1,
+      ]);
     }
-
+    parent::publish();
     return $this;
   }
 
   /**
-   * Get chunk info.
+   * This is mostly for fixing the function signature issue.
    */
-  protected function getChunkInfo() {
-    return $this->db->select('simple_sitemap_site', 's')
-      ->fields('s', ['delta', 'sitemap_created', 'type'])
-      ->condition('s.type', $this->sitemapVariant)
-      ->condition('s.delta', self::INDEX_DELTA, '<>')
-      ->condition('s.status', 0)
-      ->execute()
-      ->fetchAllAssoc('delta');
-  }
-
-  /**
-   * Remove function for sitemap generator.
-   */
-  public function remove($mode = 'all') {
-    parent::purgeSitemapVariants($this->sitemapVariant, $mode);
+  public function tideSiteMapRemove($mode = 'all') {
     self::purgeSitemapVariants($this->sitemapVariant, $mode);
-
     return $this;
   }
 
   /**
-   * Purge sitemap variants.
+   * Remove previous sitemaps once new ones get published.
+   *
+   * {@inheridoc}
    */
   public static function purgeSitemapVariants($variants = NULL, $mode = 'all') {
     if (NULL === $variants || !empty((array) $variants)) {
@@ -191,8 +168,7 @@ class TideDefaultSitemapGenerator extends DefaultSitemapGenerator {
           break;
 
         default:
-
-          // @todo throw error.
+          // @todo throw error
       }
 
       if (NULL !== $variants) {
@@ -201,6 +177,96 @@ class TideDefaultSitemapGenerator extends DefaultSitemapGenerator {
 
       $delete_query->execute();
     }
+  }
+
+  /**
+   * Generate an index sitemap for site-based sitemap.xml.
+   *
+   * {@inheridoc}
+   */
+  public function generateIndex() {
+    parent::generateIndex();
+    if (!empty($chunk_info = $this->getChunkInfo()) && count($chunk_info) > 1) {
+      $highest_id = $this->db->query('SELECT MAX(id) FROM {simple_sitemap}')
+        ->fetchField();
+      $sites = \Drupal::service('tide_site.helper')->getAllSites();
+      foreach ($sites as $term_id => $item) {
+        $this->db->merge('simple_sitemap_site')
+          ->keys([
+            'delta' => self::INDEX_DELTA,
+            'site_id' => $term_id,
+            'type' => $this->sitemapVariant,
+            'status' => 0,
+          ])
+          ->insertFields([
+            'id' => NULL === $highest_id ? 0 : $highest_id,
+            'site_id' => $term_id,
+            'delta' => self::INDEX_DELTA,
+            'type' => $this->sitemapVariant,
+            'sitemap_string' => $this->getSiteBasedIndexXml($this->getChunkInfo(), $item),
+            'sitemap_created' => $this->time->getRequestTime(),
+            'status' => 0,
+          ])
+          ->updateFields([
+            'sitemap_string' => $this->getSiteBasedIndexXml($this->getChunkInfo(), $item),
+            'sitemap_created' => $this->time->getRequestTime(),
+          ])
+          ->execute();
+      }
+    }
+
+    return $this;
+  }
+
+  /**
+   * Gets a site-based sitemap.xml.
+   *
+   * {@inheridoc}
+   */
+  private function getSiteBasedIndexXml(array $chunk_info, Term $site) {
+    $this->writer->openMemory();
+    $this->writer->setIndent(TRUE);
+    $this->writer->startSitemapDocument();
+
+    // Add the XML stylesheet to document if enabled.
+    if ($this->settings['xsl']) {
+      $this->writer->writeXsl();
+    }
+
+    $this->writer->writeGeneratedBy();
+    $this->writer->startElement('sitemapindex');
+
+    // Add attributes to document.
+    $attributes = self::$indexAttributes;
+    $sitemap_variant = $this->sitemapVariant;
+    $this->moduleHandler->alter('simple_sitemap_index_attributes', $attributes, $sitemap_variant);
+    foreach ($attributes as $name => $value) {
+      $this->writer->writeAttribute($name, $value);
+    }
+    $site_url = \Drupal::service('tide_site.helper')
+      ->getSiteBaseUrl($site);
+    if (!$this->isDefaultVariant()) {
+      $site_url .= '/' . $this->sitemapVariant;
+    }
+    // Add sitemap chunk locations to document.
+    foreach ($chunk_info as $chunk_data) {
+      $this->writer->startElement('sitemap');
+      $this->writer->writeElement('loc', Url::fromRoute(
+        'simple_sitemap.sitemap_default',
+        ['page' => $chunk_data->delta],
+        [
+          'absolute' => TRUE,
+          'base_url' => $site_url,
+          'language' => $this->languageManager->getLanguage(LanguageInterface::LANGCODE_NOT_APPLICABLE),
+        ])->toString());
+      $this->writer->writeElement('lastmod', date('c', $chunk_data->sitemap_created));
+      $this->writer->endElement();
+    }
+
+    $this->writer->endElement();
+    $this->writer->endDocument();
+
+    return $this->writer->outputMemory();
   }
 
 }
