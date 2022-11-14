@@ -18,4 +18,12 @@ function tide_site_theming_field_group_form_process_alter(array &$element, &$gro
       return;
     }
   }
+  if ($element['#id'] == 'tide-feature-flag-fields') {
+    $user = \Drupal::currentUser();
+    $access_tide_feature_flag_fields = 'tide site feature flags';
+    if (!$user->hasPermission($access_tide_feature_flag_fields)) {
+      $element['#access'] = FALSE;
+      return;
+    }
+  }
 }

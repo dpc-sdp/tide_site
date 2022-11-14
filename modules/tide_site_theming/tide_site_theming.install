@@ -57,6 +57,52 @@ function tide_site_theming_install() {
   }
   $entity_form_display->save();
 
+  /** @var \Drupal\Core\Entity\Display\EntityFormDisplayInterface $entity_form_display */
+  $entity_form_display = \Drupal::entityTypeManager()
+    ->getStorage('entity_form_display')
+    ->load('taxonomy_term.sites.default');
+  if ($entity_form_display) {
+    $entity_form_display->setComponent('field_site_feature_flags', [
+      'type' => 'key_value_textfield',
+      'weight' => 19,
+      'region' => 'content',
+      'settings' => [
+        'size' => 60,
+        'placeholder' => '',
+        'key_label' => 'Key',
+        'value_label' => 'Value',
+        'description_label' => 'Description',
+        'description_rows' => 5,
+        'key_size' => 60,
+        'key_placeholder' => '',
+        'description_enabled' => FALSE,
+        'description_placeholder' => '',
+      ],
+      'third_party_settings' => [],
+    ]);
+    $field_group = $entity_form_display->getThirdPartySettings('field_group');
+    $field_group['group_site_feature_flag_values'] = [
+      'children' => [
+        'field_site_feature_flags',
+      ],
+      'parent_name' => '',
+      'label' => 'Site feature flag values',
+      'weight' => 18,
+      'format_type' => 'details',
+      'region' => 'content',
+      'format_settings' => [
+        'classes' => '',
+        'show_empty_fields' => FALSE,
+        'id' => 'tide-feature-flag-fields',
+        'open' => FALSE,
+        'required_fields' => TRUE,
+        'effect' => 'none',
+      ],
+    ];
+    $entity_form_display->setThirdPartySetting('field_group', 'group_site_feature_flag_values', $field_group['group_site_feature_flag_values']);
+  }
+  $entity_form_display->save();
+
   // Adding the field to display view.
   $entity_view_display = Drupal::entityTypeManager()
     ->getStorage('entity_view_display')
@@ -75,11 +121,29 @@ function tide_site_theming_install() {
   }
   $entity_view_display->save();
 
+  $entity_view_display = Drupal::entityTypeManager()
+    ->getStorage('entity_view_display')
+    ->load('taxonomy_term.sites.default');
+  if ($entity_view_display) {
+    $entity_view_display->setComponent('field_site_feature_flags', [
+      'type' => 'key_value',
+      'weight' => 17,
+      'label' => 'above',
+      'region' => 'content',
+      'settings' => [
+        'value_only' => FALSE,
+      ],
+      'third_party_settings' => [],
+    ]);
+  }
+  $entity_view_display->save();
+
   // Grant view preview links block to default roles from tide_core.
   /** @var \Drupal\user\RoleInterface $role */
   $role = Role::load('site_admin');
   if ($role) {
     $role->grantPermission('tide site theming')->save();
+    $role->grantPermission('tide site feature flags')->save();
   }
   // Add to JSON.
   $config_factory = \Drupal::configFactory();
@@ -90,6 +154,17 @@ function tide_site_theming_install() {
     $content['field_site_theme_values'] = [
       'fieldName' => 'field_site_theme_values',
       'publicName' => 'field_site_theme_values',
+      'enhancer' => [
+        'id' => '',
+      ],
+      'disabled' => FALSE,
+    ];
+    $config->set('resourceFields', $content);
+  }
+  if (!isset($content['field_site_feature_flags'])) {
+    $content['field_site_feature_flags'] = [
+      'fieldName' => 'field_site_feature_flags',
+      'publicName' => 'field_site_feature_flags',
       'enhancer' => [
         'id' => '',
       ],
