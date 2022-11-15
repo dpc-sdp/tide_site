@@ -1,6 +1,3 @@
 tide site theming:
   title: 'Access tide site theming fields'
   description: 'Allow users to access the tide site theming fields in site taxonomy.'
-tide site feature flags:
-  title: 'Access tide site feature flags'
-  description: 'Allow users to access the tide site feature flags in site taxonomy.'

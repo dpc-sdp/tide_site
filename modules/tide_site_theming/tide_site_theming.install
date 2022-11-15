@@ -143,34 +143,27 @@ function tide_site_theming_install() {
   $role = Role::load('site_admin');
   if ($role) {
     $role->grantPermission('tide site theming')->save();
-    $role->grantPermission('tide site feature flags')->save();
   }
   // Add to JSON.
   $config_factory = \Drupal::configFactory();
   $config = $config_factory->getEditable('jsonapi_extras.jsonapi_resource_config.taxonomy_term--sites');
-
+  $resourcefields_fields = [
+    'field_site_theme_values',
+    'field_site_feature_flags',
+  ];
   $content = $config->get('resourceFields');
-  if (!isset($content['field_site_theme_values'])) {
-    $content['field_site_theme_values'] = [
-      'fieldName' => 'field_site_theme_values',
-      'publicName' => 'field_site_theme_values',
-      'enhancer' => [
-        'id' => '',
-      ],
-      'disabled' => FALSE,
-    ];
-    $config->set('resourceFields', $content);
-  }
-  if (!isset($content['field_site_feature_flags'])) {
-    $content['field_site_feature_flags'] = [
-      'fieldName' => 'field_site_feature_flags',
-      'publicName' => 'field_site_feature_flags',
-      'enhancer' => [
-        'id' => '',
-      ],
-      'disabled' => FALSE,
-    ];
-    $config->set('resourceFields', $content);
+  foreach ($resourcefields_fields as $field) {
+    if (!isset($content[$field])) {
+      $content[$field] = [
+        'fieldName' => $field,
+        'publicName' => $field,
+        'enhancer' => [
+          'id' => '',
+        ],
+        'disabled' => FALSE,
+      ];
+      $config->set('resourceFields', $content);
+    }
   }
   $config->save();
 }

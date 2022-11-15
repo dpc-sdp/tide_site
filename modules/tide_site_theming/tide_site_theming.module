@@ -10,18 +10,10 @@
  */
 function tide_site_theming_field_group_form_process_alter(array &$element, &$group, &$complete_form) {
   // Grant access to site theming fields.
-  if ($element['#id'] == 'tide-site-theming-fileds') {
+  if ($element['#id'] == 'tide-site-theming-fileds' || $element['#id'] == 'tide-feature-flag-fields') {
     $user = \Drupal::currentUser();
     $access_tide_site_theming_fields = 'tide site theming';
     if (!$user->hasPermission($access_tide_site_theming_fields)) {
-      $element['#access'] = FALSE;
-      return;
-    }
-  }
-  if ($element['#id'] == 'tide-feature-flag-fields') {
-    $user = \Drupal::currentUser();
-    $access_tide_feature_flag_fields = 'tide site feature flags';
-    if (!$user->hasPermission($access_tide_feature_flag_fields)) {
       $element['#access'] = FALSE;
       return;
     }
