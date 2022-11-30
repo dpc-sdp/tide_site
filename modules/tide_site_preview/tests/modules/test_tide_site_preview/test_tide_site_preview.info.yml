@@ -1,0 +1,4 @@
+name: 'Test tide site preview'
+type: module
+description: 'Support module for tide site preview testing.'
+package: Testing
