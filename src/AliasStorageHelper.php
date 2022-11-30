@@ -152,8 +152,6 @@ class AliasStorageHelper {
     if (!$node) {
       $node = $this->getNodeFromPathEntity($path);
     }
-    /** @var \Drupal\Core\Entity\EntityStorageInterface $path_storage */
-    $path_storage = $this->entityTypeManager->getStorage('path_alias');
     if ($node) {
       /** @var string[] $aliases */
       $aliases = $this->getAllSiteAliases($path, $node);
@@ -172,7 +170,7 @@ class AliasStorageHelper {
             if ($existing_path->getPath() != $path->getPath()) {
               $this->uniquify($alias, $path->language()->getId());
               if ($original_alias != $alias) {
-                $path_storage->create([
+                $this->entityTypeManager->getStorage('path_alias')->create([
                   'path' => $path->getPath(),
                   'alias' => $alias,
                   'langcode' => $path->language()->getId(),
@@ -181,7 +179,7 @@ class AliasStorageHelper {
             }
           }
           else {
-            $path_storage->create([
+            $this->entityTypeManager->getStorage('path_alias')->create([
               'path' => $path->getPath(),
               'alias' => $alias,
               'langcode' => $path->language()->getId(),
@@ -222,12 +220,10 @@ class AliasStorageHelper {
         if (!$old_path) {
           $is_new = TRUE;
         }
-        /** @var \Drupal\Core\Entity\EntityStorageInterface $path_storage */
-        $path_storage = $this->entityTypeManager->getStorage('path_alias');
         try {
           if ($is_new) {
             $this->uniquify($alias, $path->language()->getId());
-            $path_storage->create([
+            $this->entityTypeManager->getStorage('path_alias')->create([
               'path' => $path->getPath(),
               'alias' => $alias,
               'langcode' => $path->language()->getId(),
@@ -286,8 +282,7 @@ class AliasStorageHelper {
     if ($langcode) {
       $conditions['langcode'] = $langcode;
     }
-    $path_storage = $this->entityTypeManager->getStorage('path_alias');
-    $path = $path_storage->loadByProperties($conditions);
+    $path = $this->entityTypeManager->getStorage('path_alias')->loadByProperties($conditions);
     return reset($path) ?: FALSE;
   }
 
@@ -336,8 +331,7 @@ class AliasStorageHelper {
    *   - langcode (string): The language code of the alias.
    */
   public function loadAll(array $conditions) {
-    $path_storage = $this->entityTypeManager->getStorage('path_alias');
-    $paths = $path_storage->loadByProperties($conditions);
+    $paths = $this->entityTypeManager->getStorage('path_alias')->loadByProperties($conditions);
     if (!$paths) {
       return FALSE;
     }
@@ -351,9 +345,8 @@ class AliasStorageHelper {
    *   The Path array.
    */
   public function deleteSiteAliases(PathAliasInterface $path) {
-    $path_alias_storage = $this->entityTypeManager->getStorage('path_alias');
-    $path_entities = $path_alias_storage->loadByProperties(['path' => $path->getPath()]);
-    $path_alias_storage->delete($path_entities);
+    $path_entities = $this->entityTypeManager->getStorage('path_alias')->loadByProperties(['path' => $path->getPath()]);
+    $this->entityTypeManager->getStorage('path_alias')->delete($path_entities);
   }
 
 }
