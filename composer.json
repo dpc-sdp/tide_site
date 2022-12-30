@@ -1,35 +1,35 @@
 {
-    "name": "dpc-sdp/tide_site",
-    "description": "Post content to multiple sites and sections.",
-    "type": "drupal-module",
-    "license": "GPL-2.0-or-later",
-    "require": {
-        "dpc-sdp/tide_core": "^3.0.0",
-        "dpc-sdp/tide_media": "^3.0.0",
-        "drupal/create_menus_permission": "^1.0"
+  "description": "Post content to multiple sites and sections.",
+  "extra": {
+    "drush": {
+      "services": {
+        "drush.services.yml": "^10"
+      }
     },
-    "suggest": {
-        "dpc-sdp/tide_api:^3.0.0": "Allows to use Drupal in headless mode"
-    },
-    "repositories": {
-        "drupal": {
-            "type": "composer",
-            "url": "https://packages.drupal.org/8"
-        }
-    },
-    "extra": {
-        "drush": {
-            "services": {
-                "drush.services.yml": "^10"
-            }
-        },
-        "patches": {
-            "drupal/core": {
-              "Add a token for publication status - https://www.drupal.org/project/drupal/issues/3073554": "https://www.drupal.org/files/issues/2019-08-09/3073554_10.patch"
-            },
-            "drupal/linkit": {
-                "Unpublished nodes not included even when option is selected - https://www.drupal.org/project/linkit/issues/3049946": "https://www.drupal.org/files/issues/2021-05-27/linkit-unpublished-nodes-not-included-3049946-28.patch"
-            }
-        }
+    "patches": {
+      "drupal/core": {
+        "Add a token for publication status - https://www.drupal.org/project/drupal/issues/3073554": "https://www.drupal.org/files/issues/2019-08-09/3073554_10.patch"
+      },
+      "drupal/linkit": {
+        "Unpublished nodes not included even when option is selected - https://www.drupal.org/project/linkit/issues/3049946": "https://www.drupal.org/files/issues/2021-05-27/linkit-unpublished-nodes-not-included-3049946-28.patch"
+      }
     }
+  },
+  "license": "GPL-2.0-or-later",
+  "name": "dpc-sdp/tide_site",
+  "repositories": {
+    "drupal": {
+      "type": "composer",
+      "url": "https://packages.drupal.org/8"
+    }
+  },
+  "require": {
+    "dpc-sdp/tide_core": "dev-reference",
+    "dpc-sdp/tide_media": "dev-reference",
+    "drupal/create_menus_permission": "^1.0"
+  },
+  "suggest": {
+    "dpc-sdp/tide_api:^3.0.0": "Allows to use Drupal in headless mode"
+  },
+  "type": "drupal-module"
 }
