@@ -98,9 +98,9 @@ class TideDefaultSitemapGenerator extends DefaultSitemapGenerator {
         if (!empty($site_links)) {
           // Write to our own table.
           $values = [
-            'id' => NULL === $highest_id ? 0 : $highest_id,
+            'id' => $highest_id ?? 0,
             'site_id' => $site_id,
-            'delta' => NULL === $highest_delta ? self::FIRST_CHUNK_DELTA : $highest_delta,
+            'delta' => $highest_delta ?? self::FIRST_CHUNK_DELTA,
             'type' => $this->sitemapVariant,
             'sitemap_string' => $this->getXml($site_links),
             'sitemap_created' => $this->time->getRequestTime(),
@@ -199,7 +199,7 @@ class TideDefaultSitemapGenerator extends DefaultSitemapGenerator {
             'status' => 0,
           ])
           ->insertFields([
-            'id' => NULL === $highest_id ? 0 : $highest_id,
+            'id' => $highest_id ?? 0,
             'site_id' => $term_id,
             'delta' => self::INDEX_DELTA,
             'type' => $this->sitemapVariant,
