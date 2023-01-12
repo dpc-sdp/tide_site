@@ -108,7 +108,7 @@ function tide_site_theming_install() {
     ->getStorage('entity_view_display')
     ->load('taxonomy_term.sites.default');
   if ($entity_view_display) {
-    $entity_view_display->setComponent('field_site_twitter_image', [
+    $entity_view_display->setComponent('field_site_theme_values', [
       'type' => 'key_value',
       'weight' => 16,
       'label' => 'above',
@@ -117,14 +117,7 @@ function tide_site_theming_install() {
         'value_only' => FALSE,
       ],
       'third_party_settings' => [],
-    ]);
-  }
-  $entity_view_display->save();
-
-  $entity_view_display = Drupal::entityTypeManager()
-    ->getStorage('entity_view_display')
-    ->load('taxonomy_term.sites.default');
-  if ($entity_view_display) {
+    ])->save();
     $entity_view_display->setComponent('field_site_feature_flags', [
       'type' => 'key_value',
       'weight' => 17,
@@ -134,9 +127,8 @@ function tide_site_theming_install() {
         'value_only' => FALSE,
       ],
       'third_party_settings' => [],
-    ]);
+    ])->save();
   }
-  $entity_view_display->save();
 
   // Grant view preview links block to default roles from tide_core.
   /** @var \Drupal\user\RoleInterface $role */
