@@ -26,7 +26,8 @@
   "require": {
     "dpc-sdp/tide_core": "dev-reference",
     "dpc-sdp/tide_media": "dev-reference",
-    "drupal/create_menus_permission": "^1.0"
+    "drupal/create_menus_permission": "^1.0",
+    "drupal/key_value_field": "^1.3"
   },
   "suggest": {
     "dpc-sdp/tide_api:^3.0.0": "Allows to use Drupal in headless mode"
