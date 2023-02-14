@@ -1,0 +1,13 @@
+name: 'Tide Site Theming'
+description: 'Functionality to apply theming to ripple front end.'
+type: module
+package: Tide
+core_version_requirement: ^9 || ^10
+dependencies:
+  - dpc-sdp:tide_site
+  - key_value_field:key_value_field
+config_devel:
+  install:
+    - field.field.taxonomy_term.sites.field_site_theme_values
+    - field.storage.taxonomy_term.field_site_theme_values
+  optional: { }
