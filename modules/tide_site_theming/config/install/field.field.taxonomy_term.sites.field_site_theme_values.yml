@@ -1,0 +1,20 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.taxonomy_term.field_site_theme_values
+    - taxonomy.vocabulary.sites
+  module:
+    - key_value_field
+id: taxonomy_term.sites.field_site_theme_values
+field_name: field_site_theme_values
+entity_type: taxonomy_term
+bundle: sites
+label: 'Theme values'
+description: 'Site theming fields allows adding “key” “value” pairs to apply theming e.g <code>key => rpl-clr-primary,  value => #1c4f9c</code>'
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: key_value
