@@ -4,7 +4,7 @@
     "type": "drupal-module",
     "license": "GPL-2.0-or-later",
     "require": {
-        "dpc-sdp/tide_core": "^3.1.13",
+        "dpc-sdp/tide_core": "dev-bug/build-fail-issue-on-depenant-modules as 3.1.13",
         "dpc-sdp/tide_media": "^3.0.8",
         "drupal/create_menus_permission": "^1.0",
         "drupal/key_value_field": "^1.3"
