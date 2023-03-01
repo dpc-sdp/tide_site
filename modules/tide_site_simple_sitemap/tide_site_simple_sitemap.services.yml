@@ -1,5 +1,0 @@
-services:
-  tide_site_simple_sitemap.reponses_event_subscriber:
-    class: Drupal\tide_site_simple_sitemap\EventSubscriber\Response
-    tags:
-      - {name: event_subscriber}

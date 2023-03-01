@@ -2,325 +2,82 @@
 
 /**
  * @file
- * Install file.
+ * Tide Site install file.
  */
 
-/**
- * Implements hook_schema().
- */
-function tide_site_simple_sitemap_schema() {
-  $schema = [];
-  $schema['simple_sitemap_site'] = [
-    'description' => 'Holds XML sitemaps as strings for quick retrieval.',
-    'fields' => [
-      'id' => [
-        'description' => 'Sitemap chunk unique identifier.',
-        'type' => 'int',
-        'not null' => TRUE,
-        'unsigned' => TRUE,
-      ],
-      'site_id' => [
-        'description' => 'Site ID.',
-        'type' => 'int',
-        'not null' => TRUE,
-        'unsigned' => TRUE,
-      ],
-      'type' => [
-        'description' => 'Type of sitemap this chunk belongs to.',
-        'type' => 'varchar',
-        'length' => 50,
-        'not null' => TRUE,
-        'default' => '',
-      ],
-      'delta' => [
-        'description' => 'Delta of the chunk within the type scope.',
-        'type' => 'int',
-        'not null' => TRUE,
-        'unsigned' => TRUE,
-      ],
-      'sitemap_string' => [
-        'description' => 'XML sitemap chunk string.',
-        'type' => 'text',
-        'size' => 'big',
-        'not null' => TRUE,
-      ],
-      'sitemap_created' => [
-        'description' => 'Timestamp of sitemap chunk generation.',
-        'type' => 'int',
-        'not null' => TRUE,
-        'unsigned' => TRUE,
-        'default' => 0,
-      ],
-      'status' => [
-        'description' => 'Flag indicating the publishing status of the chunk.',
-        'type' => 'int',
-        'size' => 'tiny',
-        'not null' => TRUE,
-        'unsigned' => TRUE,
-        'default' => 0,
-      ],
-      'link_count' => [
-        'description' => 'The number of links in the sitemap.',
-        'type' => 'int',
-        'not null' => TRUE,
-        'unsigned' => TRUE,
-        'default' => 0,
-      ],
-    ],
-    'primary key' => ['id', 'site_id'],
-    'indexes' => [
-      'type_status_delta' => ['type', 'status', 'delta'],
-    ],
-  ];
-
-  return $schema;
-}
-
-/**
- * Implements hook_requirements().
- */
-function tide_site_simple_sitemap_requirements($phase) {
-  $requirements = [];
-  if ($phase == 'runtime') {
-    if (\Drupal::moduleHandler()->moduleExists('domain_simple_sitemap')) {
-      $requirements['tide_site_simple_sitemap'] = [
-        'title' => t('Tide Site - Simple Sitemap'),
-        'description' => t('Tide Site Simple Sitemap may not work properly when Domain Access Simple Sitemap is enabled.'),
-        'severity' => REQUIREMENT_ERROR,
-        'value' => t('Domain Access Simple Sitemap is enabled'),
-      ];
-    }
-  }
-  return $requirements;
-}
+use Drupal\simple_sitemap\Entity\SimpleSitemapType;
+use Drupal\simple_sitemap\Entity\SimpleSitemap;
 
 /**
  * Implements hook_install().
  */
 function tide_site_simple_sitemap_install($is_syncing) {
-  /** @var \Drupal\simple_sitemap\EntityHelper $sitemapHelper */
-  $sitemapHelper = Drupal::service('simple_sitemap.entity_helper');
-  /** @var \Drupal\simple_sitemap\Simplesitemap $generator */
-  $generator = \Drupal::service('simple_sitemap.generator');
-  /** @var \Drupal\simple_sitemap\SimplesitemapManager $manager */
-  $manager = \Drupal::service('simple_sitemap.manager');
-  $manager->addSitemapVariant('default', [
-    'type' => 'tide_default_hreflang',
-    'label' => 'Default',
-    'weight' => 0,
+  _update_settings();
+}
+
+/**
+ * Updates bundle settings.
+ */
+function tide_site_simple_sitemap_update_8008(&$sandbox) {
+  _update_settings();
+}
+
+/**
+ * Update for sitemap 4.x.
+ */
+function _update_settings() {
+  // Step1, Creates a sitemap type.
+  $type = SimpleSitemapType::create([
+    'id'                => 'tide_default_sitemap_type',
+    'label'             => 'Tide default sitemap type',
+    'sitemap_generator' => 'tide_default',
+    'url_generators'    => ['tide_entity'],
   ]);
-  $generator->saveSetting('default_variant', 'default');
-  $generator->saveSetting('xsl', FALSE);
-  $generator->setVariants('default')->addCustomLink('/', [
-    'priority' => '1.0',
-    'changefreq' => 'daily',
-  ]);
+  $type->save();
+
+  // Step2, Creates sitemap entities.
+  $sites = \Drupal::service('tide_site.helper')->getAllSites();
+  $sites += ['default' => 'Default'];
+  foreach ($sites as $site_id => $item) {
+    $simple_site_map = SimpleSitemap::create([
+      'id'    => $site_id === 'default' ? 'default' : 'site-' . $site_id,
+      'label' => $site_id === 'default' ? 'Default' : $item->label(),
+      'type'  => 'tide_default_sitemap_type',
+    ]);
+    $simple_site_map->save();
+  }
+
+  // Step3, Enables sitemap bundle settings.
+  /** @var \Drupal\simple_sitemap\Manager\EntityManager $entity_manager */
+  $entity_manager = Drupal::service('simple_sitemap.entity_manager');
+  $bundle_info = \Drupal::service('entity_type.bundle.info')->getBundleInfo(
+    'node'
+  );
   $settings = [
-    "index" => TRUE,
-    "priority" => "0.5",
-    "changefreq" => "",
-    "include_images" => FALSE,
+    'index'          => '1',
+    'priority'       => '0.5',
+    'changefreq'     => '',
+    'include_images' => '0',
   ];
-  $generator->setVariants('default');
-  $bundles = $sitemapHelper->getBundleInfo('node');
-  if ($bundles) {
-    foreach ($bundles as $bundle => $details) {
-      $generator->setBundleSettings('node', $bundle, $settings);
+  foreach ($sites as $site_id => $item) {
+    if ($site_id === 'default') {
+      $entity_manager->setVariants($site_id);
+    }
+    else {
+      $entity_manager->setVariants('site-' . $site_id);
+    }
+    foreach ($bundle_info as $bundle_id => $details) {
+      $entity_manager->setBundleSettings('node', $bundle_id, $settings);
     }
   }
 }
 
 /**
- * Adding 'type' and 'delta' fields to simple_sitemap_site table.
+ * Removes simple_sitemap_site table.
  */
-function tide_site_simple_sitemap_update_8001() {
-
-  $database = \Drupal::database();
-  $database->truncate('simple_sitemap_site')->execute();
-
-  if (!$database->schema()->fieldExists('simple_sitemap_site', 'type')) {
-    $database->schema()->addField(
-      'simple_sitemap_site',
-      'type', [
-        'description' => 'Type of sitemap this chunk belongs to.',
-        'type' => 'varchar',
-        'length' => 50,
-        'not null' => TRUE,
-        'default' => '',
-      ]
-    );
+function tide_site_simple_sitemap_update_8009() {
+  $hasTable = \Drupal::database()->schema()->tableExists('simple_sitemap_site');
+  if ($hasTable === TRUE) {
+    \Drupal::database()->schema()->dropTable('simple_sitemap_site');
   }
-  if (!$database->schema()->fieldExists('simple_sitemap_site', 'delta')) {
-    $database->schema()->addField(
-      'simple_sitemap_site',
-      'delta', [
-        'description' => 'Delta of the chunk within the type scope.',
-        'type' => 'int',
-        'size' => 'small',
-        'not null' => TRUE,
-        'unsigned' => TRUE,
-      ]
-    );
-  }
-}
-
-/**
- * Adding 'status' field to simple_sitemap_site table and weight to variants.
- */
-function tide_site_simple_sitemap_update_8002() {
-  $database = \Drupal::database();
-  $database->truncate('simple_sitemap_site')->execute();
-
-  if (!$database->schema()->fieldExists('simple_sitemap_site', 'status')) {
-    $database->schema()->addField(
-      'simple_sitemap_site',
-      'status', [
-        'description' => "Flag indicating the publishing status of the chunk.",
-        'type' => 'int',
-        'size' => 'tiny',
-        'not null' => TRUE,
-        'unsigned' => TRUE,
-        'default' => 0,
-      ]
-    );
-  }
-}
-
-/**
- * Changing id and delta fields of simple_sitemap_site table.
- */
-function tide_site_simple_sitemap_update_8003() {
-  $schema = \Drupal::database()->schema();
-
-  $schema->changeField(
-    'simple_sitemap_site',
-    'id',
-    'id', [
-      'description' => 'Sitemap chunk unique identifier.',
-      'type' => 'int',
-      'not null' => TRUE,
-      'unsigned' => TRUE,
-    ]
-  );
-
-  $schema->changeField(
-    'simple_sitemap_site',
-    'delta',
-    'delta', [
-      'description' => 'Delta of the chunk within the variant scope.',
-      'type' => 'int',
-      'not null' => TRUE,
-      'unsigned' => TRUE,
-    ]
-  );
-}
-
-/**
- * Add the link_count field to simple_sitemap_site table.
- */
-function tide_site_simple_sitemap_update_8004() {
-  \Drupal::database()->schema()->addField(
-    'simple_sitemap_site',
-    'link_count', [
-      'description' => 'The number of links in the sitemap.',
-      'type' => 'int',
-      'not null' => TRUE,
-      'unsigned' => TRUE,
-      'default' => 0,
-    ]
-  );
-}
-
-/**
- * Add indexes to the simple_sitemap_site table.
- */
-function tide_site_simple_sitemap_update_8005() {
-  $schema = \Drupal::database()->schema();
-  $spec = [
-    'fields' => [
-      'type' => [
-        'description' => 'Type of sitemap this chunk belongs to.',
-        'type' => 'varchar',
-        'length' => 50,
-        'not null' => TRUE,
-        'default' => '',
-      ],
-      'delta' => [
-        'description' => 'Delta of the chunk within the type scope.',
-        'type' => 'int',
-        'not null' => TRUE,
-        'unsigned' => TRUE,
-      ],
-      'status' => [
-        'description' => 'Flag indicating the publishing status of the chunk.',
-        'type' => 'int',
-        'size' => 'tiny',
-        'not null' => TRUE,
-        'unsigned' => TRUE,
-        'default' => 0,
-      ],
-    ],
-  ];
-  $schema->addIndex(
-    'simple_sitemap_site',
-    'type_status_delta',
-    [
-      'type',
-      'status',
-      'delta',
-    ],
-    $spec
-  );
-}
-
-/**
- * Install bundle settings and homepage.
- */
-function tide_site_simple_sitemap_update_8006() {
-  /** @var \Drupal\simple_sitemap\EntityHelper $sitemapHelper */
-  $sitemapHelper = Drupal::service('simple_sitemap.entity_helper');
-  /** @var \Drupal\simple_sitemap\Simplesitemap $generator */
-  $generator = \Drupal::service('simple_sitemap.generator');
-  /** @var \Drupal\simple_sitemap\SimplesitemapManager $manager */
-  $manager = \Drupal::service('simple_sitemap.manager');
-  $manager->addSitemapVariant('default', [
-    'type' => 'tide_default_hreflang',
-    'label' => 'Default',
-    'weight' => 0,
-  ]);
-  $generator->saveSetting('default_variant', 'default');
-  $generator->saveSetting('xsl', FALSE);
-  $generator->setVariants('default')->addCustomLink('/', [
-    'priority' => '1.0',
-    'changefreq' => 'daily',
-  ]);
-  $settings = [
-    "index" => TRUE,
-    "priority" => "0.5",
-    "changefreq" => "",
-    "include_images" => FALSE,
-  ];
-  $generator->setVariants('default');
-  $bundles = $sitemapHelper->getBundleInfo('node');
-  if ($bundles) {
-    foreach ($bundles as $bundle => $details) {
-      $generator->setBundleSettings('node', $bundle, $settings);
-    }
-  }
-}
-
-/**
- * Clean up old sitemaps.
- */
-function tide_site_simple_sitemap_update_8007() {
-  \Drupal::service('state')->deleteMultiple([
-    'simple_sitemap.last_cron_generate',
-    'simple_sitemap.queue_items_initial_amount',
-    'simple_sitemap.queue_stashed_results',
-  ]);
-  \Drupal::service('queue')
-    ->get('simple_sitemap_elements')
-    ->deleteQueue();
-  \Drupal::database()->truncate('simple_sitemap')->execute();
-  \Drupal::database()->truncate('simple_sitemap_site')->execute();
 }
