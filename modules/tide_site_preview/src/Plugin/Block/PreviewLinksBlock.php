@@ -233,8 +233,7 @@ class PreviewLinksBlock extends BlockBase implements ContainerFactoryPluginInter
     $node = $this->routeMatch->getParameter('node');
     if ($route_name === 'entity.node.revision') {
       try {
-        $vid = $this->routeMatch->getParameter('node_revision');
-        $node = is_int($vid) ? $this->entityTypeManager->getStorage('node')->loadRevision($vid) : NULL;
+        $node = $this->routeMatch->getParameter('node_revision');
       }
       catch (Exception $exception) {
         watchdog_exception('tide_site_preview', $exception);
