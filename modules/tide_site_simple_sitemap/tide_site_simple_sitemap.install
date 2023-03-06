@@ -31,7 +31,7 @@ function _update_settings() {
     'id'                => 'tide_default_sitemap_type',
     'label'             => 'Tide default sitemap type',
     'sitemap_generator' => 'tide_default',
-    'url_generators'    => ['tide_entity'],
+    'url_generators'    => ['tide_custom', 'tide_entity'],
   ]);
   $type->save();
 
@@ -49,10 +49,12 @@ function _update_settings() {
 
   // Step3, Enables sitemap bundle settings.
   /** @var \Drupal\simple_sitemap\Manager\EntityManager $entity_manager */
-  $entity_manager = Drupal::service('simple_sitemap.entity_manager');
+  $entity_manager = \Drupal::service('simple_sitemap.entity_manager');
   $bundle_info = \Drupal::service('entity_type.bundle.info')->getBundleInfo(
     'node'
   );
+  /** @var Drupal\simple_sitemap\Manager\Generator $custom_generator */
+  $custom_generator = \Drupal::service('simple_sitemap.generator');
   $settings = [
     'index'          => '1',
     'priority'       => '0.5',
@@ -61,9 +63,19 @@ function _update_settings() {
   ];
   foreach ($sites as $site_id => $item) {
     if ($site_id === 'default') {
+      $custom_generator->setVariants('default');
+      $custom_generator->customLinkManager()->add(
+        '/',
+        ["path" => "/", "priority" => "1.0", "changefreq" => "daily"]
+      );
       $entity_manager->setVariants($site_id);
     }
     else {
+      $custom_generator->setVariants('site-' . $site_id);
+      $custom_generator->customLinkManager()->add(
+        '/',
+        ["path" => "/", "priority" => "1.0", "changefreq" => "daily"]
+      );
       $entity_manager->setVariants('site-' . $site_id);
     }
     foreach ($bundle_info as $bundle_id => $details) {

@@ -6,23 +6,22 @@ use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Url;
 use Drupal\simple_sitemap\Plugin\simple_sitemap\SimpleSitemapPluginBase;
-use Drupal\simple_sitemap\Plugin\simple_sitemap\UrlGenerator\EntityUrlGenerator;
+use Drupal\simple_sitemap\Plugin\simple_sitemap\UrlGenerator\CustomUrlGenerator;
 use Drupal\tide_site\AliasStorageHelper;
 use Drupal\tide_site\TideSiteHelper;
 use Drupal\tide_site_simple_sitemap\Plugin\Handler\TideSitemapHandlerTrait;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Class entity url generator.
+ * Provides the custom URL generator.
  *
  * @UrlGenerator(
- *   id = "tide_entity",
- *   label = @Translation("Tide Entity URL generator"),
- *   description = @Translation("Generates URLs for entity bundles and bundle
- *   overrides."),
+ *   id = "tide_custom",
+ *   label = @Translation("Tide Custom URL generator"),
+ *   description = @Translation("Tide Generates URLs."),
  * )
  */
-class TideEntityUrlGenerator extends EntityUrlGenerator {
+class TideCustomUrlGenerator extends CustomUrlGenerator {
 
   use TideSitemapHandlerTrait;
 
@@ -52,9 +51,8 @@ class TideEntityUrlGenerator extends EntityUrlGenerator {
     $language_manager,
     $entity_type_manager,
     $entity_helper,
-    $entities_manager,
-    $url_generator_manager,
-    $memory_cache,
+    $custom_links,
+    $path_validator,
     TideSiteHelper $siteHelper,
     AliasStorageHelper $aliasStorageHelper
   ) {
@@ -67,11 +65,9 @@ class TideEntityUrlGenerator extends EntityUrlGenerator {
       $language_manager,
       $entity_type_manager,
       $entity_helper,
-      $entities_manager,
-      $url_generator_manager,
-      $memory_cache
+      $custom_links,
+      $path_validator
     );
-    $this->entitiesPerDataset = $this->settings->get('entities_per_queue_item', 50);
     $this->siteHelper = $siteHelper;
     $this->aliasStorageHelper = $aliasStorageHelper;
   }
@@ -93,73 +89,11 @@ class TideEntityUrlGenerator extends EntityUrlGenerator {
       $container->get('language_manager'),
       $container->get('entity_type.manager'),
       $container->get('simple_sitemap.entity_helper'),
-      $container->get('simple_sitemap.entity_manager'),
-      $container->get('plugin.manager.simple_sitemap.url_generator'),
-      $container->get('entity.memory_cache'),
+      $container->get('simple_sitemap.custom_link_manager'),
+      $container->get('path.validator'),
       $container->get('tide_site.helper'),
       $container->get('tide_site.alias_storage_helper')
     );
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getDataSets(): array {
-    $data_sets = [];
-    $sitemap_entity_types = $this->entityHelper->getSupportedEntityTypes();
-    $all_bundle_settings = $this->entitiesManager->setVariants($this->sitemap->id())->getAllBundleSettings();
-    if (isset($all_bundle_settings[$this->sitemap->id()])) {
-      foreach ($all_bundle_settings[$this->sitemap->id()] as $entity_type_name => $bundles) {
-        if (!isset($sitemap_entity_types[$entity_type_name])) {
-          continue;
-        }
-        if ($this->isOverwrittenForEntityType($entity_type_name)) {
-          continue;
-        }
-        $entityTypeStorage = $this->entityTypeManager->getStorage($entity_type_name);
-        $keys = $sitemap_entity_types[$entity_type_name]->getKeys();
-
-        foreach ($bundles as $bundle_name => $bundle_settings) {
-          if ($bundle_settings['index']) {
-            $query = $entityTypeStorage->getQuery();
-            if ($site_id = $this->getSiteIdFromSitemapId()) {
-              $query->condition('field_node_site.entity.tid', $site_id);
-            }
-            if (!empty($keys['id'])) {
-              $query->sort($keys['id']);
-            }
-            if (!empty($keys['bundle'])) {
-              $query->condition($keys['bundle'], $bundle_name);
-            }
-            if (!empty($keys['published'])) {
-              $query->condition($keys['published'], 1);
-            }
-            elseif (!empty($keys['status'])) {
-              $query->condition($keys['status'], 1);
-            }
-
-            $query->accessCheck(FALSE);
-
-            $data_set = [
-              'entity_type' => $entity_type_name,
-              'id' => [],
-            ];
-            foreach ($query->execute() as $entity_id) {
-              $data_set['id'][] = $entity_id;
-              if (count($data_set['id']) >= $this->entitiesPerDataset) {
-                $data_sets[] = $data_set;
-                $data_set['id'] = [];
-              }
-            }
-            // Add the last data set if there are some IDs gathered.
-            if (!empty($data_set['id'])) {
-              $data_sets[] = $data_set;
-            }
-          }
-        }
-      }
-    }
-    return $data_sets;
   }
 
   /**
@@ -194,11 +128,11 @@ class TideEntityUrlGenerator extends EntityUrlGenerator {
       // Not a content entity or including all untranslated variants.
       $alternate_urls = $this->getAlternateUrlsForAllLanguages($url_object);
     }
-
+    $site_base_url = $this->getSiteBaseUrl();
     foreach ($alternate_urls as $langcode => $url) {
       $url_variants[] = $path_data + [
         'langcode' => $langcode,
-        'url' => $this->getSiteIdFromSitemapId() === NULL ? $url : $this->getFrontendUrl($url),
+        'url' => empty($site_base_url) ? $url : $site_base_url,
         'alternate_urls' => $alternate_urls,
       ];
     }
