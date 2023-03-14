@@ -2,10 +2,7 @@ name: 'Tide Site - Simple Sitemap'
 description: 'Functionality to extend Simple Sitemap with support of multiple sites.'
 type: module
 package: Tide
-core_version_requirement: ^8.9 || ^9
+core_version_requirement: ^9.4 || ^10
 dependencies:
   - dpc-sdp:tide_site
   - simple_sitemap:simple_sitemap
-config_devel:
-  optional:
-    - simple_sitemap.variants.tide_default_hreflang
