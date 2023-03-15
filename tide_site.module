@@ -24,6 +24,8 @@ use Drupal\views\ViewExecutable;
 use Drupal\path_alias\Entity\PathAlias;
 use Drupal\path_alias\PathAliasInterface;
 use Drupal\tide_site\TideSitePathAliasListBuilder;
+use Drupal\search_api\Entity\Index;
+use Drupal\node\NodeInterface;
 
 /**
  * Implements hook_entity_bundle_create().
@@ -637,6 +639,16 @@ function tide_site_path_alias_update(PathAliasInterface $path) {
         $path->delete();
       }
     }
+  }
+  // Put the logic to the very late of the process,
+  // ensure forcing the index will be the last thing to do.
+  if ($node instanceof NodeInterface) {
+    $index = Index::load('node');
+    $language = \Drupal::languageManager()->getCurrentLanguage()->getId();
+    $item_id = 'entity:node/' . $node->id() . ':' . $language;
+    $items = [];
+    $items[$item_id] = $index->loadItem($item_id);
+    $index->indexSpecificItems($items);
   }
 }
 
