@@ -24,7 +24,6 @@ use Drupal\views\ViewExecutable;
 use Drupal\path_alias\Entity\PathAlias;
 use Drupal\path_alias\PathAliasInterface;
 use Drupal\tide_site\TideSitePathAliasListBuilder;
-use Drupal\search_api\Entity\Index;
 use Drupal\node\NodeInterface;
 
 /**
@@ -640,15 +639,10 @@ function tide_site_path_alias_update(PathAliasInterface $path) {
       }
     }
   }
-  // Put the logic to the very late of the process,
-  // ensure forcing the index will be the last thing to do.
+  // Put the logic to the very late of the process.
   if ($node instanceof NodeInterface) {
-    $index = Index::load('node');
-    $language = \Drupal::languageManager()->getCurrentLanguage()->getId();
-    $item_id = 'entity:node/' . $node->id() . ':' . $language;
-    $items = [];
-    $items[$item_id] = $index->loadItem($item_id);
-    $index->indexSpecificItems($items);
+    \Drupal::getContainer()->get('search_api.entity_datasource.tracking_manager')
+      ->entityUpdate($node);
   }
 }
 
