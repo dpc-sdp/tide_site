@@ -5,6 +5,9 @@
  * Tide Site Simple Sitemap functions.
  */
 
+use Drupal\simple_sitemap\Entity\SimpleSitemapInterface;
+use Drupal\simple_sitemap\Entity\SimpleSitemap;
+
 /**
  * Implements hook_ENTITY_TYPE_delete().
  */
@@ -13,10 +16,13 @@ function tide_site_simple_sitemap_taxonomy_term_delete($term) {
   try {
     /** @var \Drupal\taxonomy\TermInterface $term */
     if ($term->bundle() == 'sites') {
-      \Drupal::database()
-        ->delete('simple_sitemap_site')
-        ->condition('site_id', $term->id())
-        ->execute();
+      $sitemap_id = 'site-' . $term->id();
+      $sitemap = SimpleSitemap::load($sitemap_id);
+      $sitemap_storage = \Drupal::entityTypeManager()->getStorage('simple_sitemap');
+      if ($sitemap instanceof SimpleSitemapInterface) {
+        $sitemap_storage->deleteContent($sitemap);
+        $sitemap_storage->load($sitemap_id)->delete();
+      }
     }
   }
   catch (Exception $exception) {
