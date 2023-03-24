@@ -1,0 +1,20 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - tide_site_preview
+  theme:
+    - claro
+id: claro_tide_site_preview_links
+theme: claro
+region: highlighted
+weight: 0
+provider: null
+plugin: tide_site_preview_links_block
+settings:
+  id: tide_site_preview_links_block
+  label: 'Click the links below to preview this revision on frontend sites'
+  label_display: visible
+  provider: tide_site_preview
+  open_new_window: 1
+visibility: {  }
