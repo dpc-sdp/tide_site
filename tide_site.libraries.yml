@@ -2,3 +2,11 @@ tide_site_layout:
   css:
     theme:
       css/tide_site_layout.css: {}
+tide_site_redirect:
+  js:
+    js/redirect.js: {}
+  dependencies:
+    - core/jquery
+    - core/jquery.once
+    - core/drupal
+    - core/drupalSettings
