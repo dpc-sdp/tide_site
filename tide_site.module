@@ -588,6 +588,40 @@ function tide_site_form_alter(array &$form, FormStateInterface $form_state, $for
       }
     }
   }
+  // Add site prefix to redirect URL.
+  if ('redirect_redirect_form' === $form_id) {
+    $sites_term = 'sites';
+    // Get all primary sites ony, do not load sub-sites.
+    $term_tree = \Drupal::entityTypeManager()->getStorage('taxonomy_term')->loadTree(
+      $sites_term,
+      0,
+      1,
+      TRUE
+    );
+    // Build options list.
+    $options = [];
+
+    foreach ($term_tree as $term) {
+      if ($term instanceof Term) {
+        $options['site-' . $term->id()] = $term->getName();
+      }
+    }
+    asort($options, SORT_STRING);
+    $options = [...['none' => 'Select site'], ...$options];
+
+    $form['redirect_site'] = [
+      '#type' => 'select',
+      '#title' => 'Site name',
+      '#options' => $options,
+      '#weight' => -10,
+    ];
+
+    foreach (array_keys($form['actions']) as $action) {
+      if ($action !== 'preview' && isset($form['actions'][$action]['#type']) && $form['actions'][$action]['#type'] === 'submit') {
+        array_unshift($form['actions'][$action]['#submit'], '_tide_site_set_site_redirect');
+      }
+    }
+  }
 }
 
 /**
@@ -934,5 +968,16 @@ function tide_site_tide_help(string $route_name, RouteMatchInterface $route_matc
     case 'entity.menu.collection':
     case 'entity.menu.add_form':
       return '<p>' . t('Learn how to create and edit <a href="@sdp-handbook" target="_blank">navigation menus</a>.', ['@sdp-handbook' => 'https://www.singledigitalpresence.vic.gov.au/create-and-edit-menus']) . '</p>';
+  }
+}
+
+/**
+ * Submition handler for redirect form.
+ */
+function _tide_site_set_site_redirect(&$form, FormStateInterface $form_state) {
+  $from = $form_state->getValue('redirect_source');
+  $site = $form_state->getValue('redirect_site');
+  if (($site !== 'none') && isset($from[0]['path'])) {
+    $form_state->setValue('redirect_source', [['path' => $site . '/' . $from[0]['path']]]);
   }
 }
