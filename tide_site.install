@@ -646,3 +646,25 @@ function tide_site_update_8024() {
   }
   $config->save();
 }
+
+/**
+ * Update linkit.linkit_profile.site_content config.
+ */
+function tide_site_update_8025() {
+  $configs = [
+    'linkit.linkit_profile.site_content' => 'linkit_profile',
+  ];
+  \Drupal::moduleHandler()->loadInclude('tide_core', 'inc', 'includes/helpers');
+  $config_location = [__DIR__ . '/config/install'];
+  foreach ($configs as $config => $type) {
+    $storage = \Drupal::entityTypeManager()->getStorage($type);
+    $id = substr($config, strrpos($config, '.') + 1);
+    $config_entity = $storage->load($id);
+    if ($config_entity !== NULL){
+      $storage->delete([$config_entity]);
+    }
+    $config_read = _tide_read_config($config, $config_location, TRUE);
+    $new_config_entity = $storage->createFromStorageRecord($config_read);
+    $new_config_entity->save();
+  }
+}
