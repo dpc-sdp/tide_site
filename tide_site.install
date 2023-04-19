@@ -660,7 +660,7 @@ function tide_site_update_8025() {
     $storage = \Drupal::entityTypeManager()->getStorage($type);
     $id = substr($config, strrpos($config, '.') + 1);
     $config_entity = $storage->load($id);
-    if ($config_entity !== NULL){
+    if ($config_entity !== NULL) {
       $storage->delete([$config_entity]);
     }
     $config_read = _tide_read_config($config, $config_location, FALSE);
