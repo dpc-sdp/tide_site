@@ -650,7 +650,7 @@ function tide_site_update_8024() {
 /**
  * Updates user permissions [SDPAP-7778].
  */
-function tide_media_update_8025() {
+function tide_site_update_8025() {
   if (\Drupal::moduleHandler()->moduleExists('tide_site')) {
     /** @var \Drupal\tide_site\TideSiteHelper $site_helper */
     $site_helper = \Drupal::service('tide_site.helper');
