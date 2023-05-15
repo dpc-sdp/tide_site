@@ -662,10 +662,10 @@ function tide_site_update_8025() {
     ];
     foreach ($usernames as $username) {
       $user = user_load_by_name($username);
-      if ($user->hasField('field_name')) {
+      if ($user && $user->hasField('field_name')) {
         $user->set('field_name', $username);
       }
-      if ($user->hasField('field_last_name')) {
+      if ($user && $user->hasField('field_last_name')) {
         $user->set('field_last_name', $username);
       }
       $user->set('field_user_site', $sites);
