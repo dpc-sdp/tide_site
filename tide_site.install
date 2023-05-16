@@ -663,15 +663,17 @@ function tide_site_update_8025() {
     ];
     foreach ($usernames as $username) {
       $user = user_load_by_name($username);
-      $account = User::load($user->id());
-      if ($account->hasField('field_name')) {
-        $account->set('field_name', $username);
+      if (isset($user)) {
+        $account = User::load($user->id());
+        if ($account->hasField('field_name')) {
+          $account->set('field_name', $username);
+        }
+        if ($account->hasField('field_last_name')) {
+          $account->set('field_last_name', $username);
+        }
+        $account->set('field_user_site', $sites);
+        $account->save();
       }
-      if ($account->hasField('field_last_name')) {
-        $account->set('field_last_name', $username);
-      }
-      $account->set('field_user_site', $sites);
-      $account->save();
     }
   }
 }
