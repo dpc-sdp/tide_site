@@ -652,7 +652,7 @@ function tide_site_update_8024() {
  * Updates user permissions [SDPAP-7778].
  */
 function tide_site_update_8025() {
-  if (\Drupal::moduleHandler()->moduleExists('tide_site')) {
+  if (\Drupal::moduleHandler()->moduleExists('tide_site_restriction')) {
     $usernames = [
       'editor1.test@example.com',
       'approver1.test@example.com',
