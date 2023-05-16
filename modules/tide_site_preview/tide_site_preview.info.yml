@@ -9,4 +9,4 @@ dependencies:
 config_devel:
   install: {  }
   optional:
-    - block.block.seven_tide_site_preview_links
+    - block.block.claro_tide_site_preview_links
