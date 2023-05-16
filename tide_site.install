@@ -11,6 +11,7 @@ use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\taxonomy\TaxonomyPermissions;
 use Drupal\Core\Site\Settings;
+use Drupal\user\Entity\User;
 
 /**
  * Implements hook_install().
@@ -662,14 +663,15 @@ function tide_site_update_8025() {
     ];
     foreach ($usernames as $username) {
       $user = user_load_by_name($username);
-      if ($user && $user->hasField('field_name')) {
-        $user->set('field_name', $username);
+      $account = User::load($user->id());
+      if ($account->hasField('field_name')) {
+        $account->set('field_name', $username);
       }
-      if ($user && $user->hasField('field_last_name')) {
-        $user->set('field_last_name', $username);
+      if ($account->hasField('field_last_name')) {
+        $account->set('field_last_name', $username);
       }
-      $user->set('field_user_site', $sites);
-      $user->save();
+      $account->set('field_user_site', $sites);
+      $account->save();
     }
   }
 }
