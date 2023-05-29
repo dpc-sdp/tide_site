@@ -589,6 +589,14 @@ function tide_site_form_alter(array &$form, FormStateInterface $form_state, $for
       }
     }
   }
+  // Add site prefix to redirect URL.
+  if ('redirect_redirect_form' === $form_id) {
+      _site_redirect_selection($form);
+  }
+  // Edit site prefix to redirect URL.
+  if ('redirect_redirect_edit_form' === $form_id) {
+      _site_redirect_selection($form, TRUE);
+  }
 }
 
 /**
@@ -941,4 +949,75 @@ function tide_site_tide_help(string $route_name, RouteMatchInterface $route_matc
     case 'entity.menu.add_form':
       return '<p>' . t('Learn how to create and edit <a href="@sdp-handbook" target="_blank">navigation menus</a>.', ['@sdp-handbook' => 'https://www.singledigitalpresence.vic.gov.au/create-and-edit-menus']) . '</p>';
   }
+}
+
+/**
+ * Submition handler for redirect form.
+ */
+function _tide_site_set_site_redirect(&$form, FormStateInterface $form_state) {
+    $from = $form_state->getValue('redirect_source');
+    $site = $form_state->getValue('redirect_site');
+    if (($site !== 0) && isset($from[0]['path'])) {
+        $form_state->setValue('redirect_source', [['path' => 'site-' . $site . '/' . $from[0]['path']]]);
+    }
+}
+
+/**
+ * Add site selection field to redirect form.
+ */
+function _site_redirect_selection(&$form, $is_edit_form = FALSE) {
+    $taxonomy_term = 'sites';
+    // Get all primary sites ony, do not load sub-sites.
+    $term_tree = \Drupal::entityTypeManager()->getStorage('taxonomy_term')->loadTree(
+        $taxonomy_term,
+        0,
+        1,
+        TRUE
+    );
+    // Build an options list.
+    $options = [0 => 'None'];
+    foreach ($term_tree as $term) {
+        if ($term instanceof TermInterface) {
+            $options[$term->id()] = $term->getName();
+        }
+    }
+    // Get the site ID from the redirect source while edit a redirect entity.
+    if ($is_edit_form) {
+        $source = $form['redirect_source']['widget'][0]['path']['#default_value'];
+        $site_position = strpos($source, 'site-');
+        $id_position = strpos($source, '/');
+        if (($site_position !== FALSE) && ($id_position !== FALSE)) {
+            $site_id = substr($source, 5, $id_position - 5);
+            $form['redirect_source']['widget'][0]['path']['#default_value'] = substr($source, $id_position + 1);
+        }
+    }
+    $form['redirect_site'] = [
+        '#type' => 'select',
+        '#title' => 'Select site',
+        '#options' => $options,
+        '#default_value' => $site_id ?? 0,
+        '#weight' => -10,
+        '#attached' => [
+            'library' => [
+                'tide_site/tide_site_redirect',
+            ],
+            'drupalSettings' => [
+                'base_url' => $form['redirect_source']['widget'][0]['path']['#field_prefix'],
+                'site_id' => $site_id ?? NULL,
+            ]
+        ]
+    ];
+
+    if (array_key_exists('actions', $form)) {
+        foreach (array_keys($form['actions']) as $action) {
+            if (
+                $action !== 'delete'
+                && isset($form['actions'][$action]['#type'])
+                && $form['actions'][$action]['#type'] === 'submit'
+                && isset($form['actions'][$action]['#submit'])
+            ) {
+                array_unshift($form['actions'][$action]['#submit'], '_tide_site_set_site_redirect');
+            }
+        }
+    }
 }
