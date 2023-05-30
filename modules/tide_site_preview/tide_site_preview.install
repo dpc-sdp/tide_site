@@ -28,7 +28,7 @@ function tide_site_preview_install() {
  */
 function tide_site_preview_update_8001() {
   $block = Block::load('seven_tide_site_preview_links');
-  if ($block !== NULL){
+  if ($block !== NULL) {
     $block->delete();
   }
 }
