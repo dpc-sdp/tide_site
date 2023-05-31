@@ -6,6 +6,7 @@
  */
 
 use Drupal\user\Entity\Role;
+use Drupal\block\Entity\Block;
 
 /**
  * Implements hook_install().
@@ -20,4 +21,31 @@ function tide_site_preview_install() {
       $role->grantPermission('view tide_site preview links')->save();
     }
   }
+}
+
+/**
+ * Remove block.block.seven_tide_site_preview_links.
+ */
+function tide_site_preview_update_8001() {
+  $block = Block::load('seven_tide_site_preview_links');
+  if ($block !== NULL) {
+    $block->delete();
+  }
+}
+
+/**
+ * Install block.block.claro_tide_site_preview_links.
+ */
+function tide_site_preview_update_8002() {
+  \Drupal::moduleHandler()->loadInclude('tide_core', 'inc', 'includes/helpers');
+  $config_location = [\Drupal::service('extension.list.module')->getPath('tide_site_preview') . '/config/optional'];
+  $storage = \Drupal::entityTypeManager()->getStorage('block');
+  $id = 'claro_tide_site_preview_links';
+  $config_entity = $storage->load($id);
+  if ($config_entity !== NULL) {
+    $storage->delete([$config_entity]);
+  }
+  $config_read = _tide_read_config('block.block.claro_tide_site_preview_links', $config_location, FALSE);
+  $new_config_entity = $storage->createFromStorageRecord($config_read);
+  $new_config_entity->save();
 }
