@@ -4,9 +4,9 @@ dependencies:
   module:
     - tide_site_preview
   theme:
-    - seven
-id: seven_tide_site_preview_links
-theme: seven
+    - claro
+id: claro_tide_site_preview_links
+theme: claro
 region: highlighted
 weight: -3
 provider: null

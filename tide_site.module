@@ -24,6 +24,7 @@ use Drupal\views\ViewExecutable;
 use Drupal\path_alias\Entity\PathAlias;
 use Drupal\path_alias\PathAliasInterface;
 use Drupal\tide_site\TideSitePathAliasListBuilder;
+use Drupal\node\NodeInterface;
 
 /**
  * Implements hook_entity_bundle_create().
@@ -637,6 +638,11 @@ function tide_site_path_alias_update(PathAliasInterface $path) {
         $path->delete();
       }
     }
+  }
+  // Put the logic to the very late of the process.
+  if ($node instanceof NodeInterface) {
+    \Drupal::getContainer()->get('search_api.entity_datasource.tracking_manager')
+      ->entityUpdate($node);
   }
 }
 
