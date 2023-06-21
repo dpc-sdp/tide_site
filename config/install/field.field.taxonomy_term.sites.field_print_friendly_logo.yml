@@ -1,0 +1,27 @@
+uuid: d8daa656-73de-433b-a8b0-fc656c8b13b3
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.taxonomy_term.field_print_friendly_logo
+    - taxonomy.vocabulary.sites
+  module:
+    - file
+id: taxonomy_term.sites.field_print_friendly_logo
+field_name: field_print_friendly_logo
+entity_type: taxonomy_term
+bundle: sites
+label: 'Print-friendly logo'
+description: 'Upload your print-friendly logo. Transparent (or white) background images preferred. Allowed types: png, gif, jpg, jpeg, SVG. 5MB limit.'
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:file'
+  handler_settings: {  }
+  file_directory: '[date:custom:Y]-[date:custom:m]'
+  file_extensions: 'png gif jpg jpeg svg'
+  max_filesize: '5 MB'
+  description_field: false
+field_type: file
