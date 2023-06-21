@@ -11,6 +11,7 @@ use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\taxonomy\TaxonomyPermissions;
 use Drupal\Core\Site\Settings;
+use Drupal\Component\Utility\NestedArray;
 
 /**
  * Implements hook_install().
