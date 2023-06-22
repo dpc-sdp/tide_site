@@ -5,8 +5,8 @@
  * Tide Site Simple Sitemap functions.
  */
 
-use Drupal\simple_sitemap\Entity\SimpleSitemapInterface;
 use Drupal\simple_sitemap\Entity\SimpleSitemap;
+use Drupal\simple_sitemap\Entity\SimpleSitemapInterface;
 
 /**
  * Implements hook_ENTITY_TYPE_delete().
