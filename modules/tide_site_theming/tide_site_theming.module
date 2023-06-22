@@ -13,7 +13,7 @@ function tide_site_theming_field_group_form_process_alter(array &$element, &$gro
   if (!isset($element['#id'])) {
     return;
   }
-  if ($element['#id'] == 'tide-site-theming-fileds' || $element['#id'] == 'tide-feature-flag-fields') {
+  if ($element['#id'] == 'tide-site-theming-fileds' || $element['#id'] == 'tide-feature-flag-fields' || $element['#id'] == 'tide-site-favicon-field') {
     $user = \Drupal::currentUser();
     $access_tide_site_theming_fields = 'tide site theming';
     if (!$user->hasPermission($access_tide_site_theming_fields)) {
