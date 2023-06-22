@@ -169,7 +169,7 @@ function tide_site_theming_update_8001() {
     'field.field.taxonomy_term.sites.field_site_favicon' => 'field_config',
   ];
   module_load_include('inc', 'tide_core', 'includes/helpers');
-  $config_location = [\Drupal::service('extension.list.module')->getPath('tide_site') . '/config/install'];
+  $config_location = [\Drupal::service('extension.list.module')->getPath('tide_site_theming') . '/config/install'];
   // Check if field already exported to config/sync.
   foreach ($configs as $config => $type) {
     $config_read = _tide_read_config($config, $config_location, TRUE);
