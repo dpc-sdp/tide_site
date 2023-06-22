@@ -166,9 +166,11 @@ function tide_site_theming_install() {
 function tide_site_theming_update_8001() {
   $configs = [
     'field.storage.taxonomy_term.field_site_favicon' => 'field_storage_config',
+    'field.storage.taxonomy_term.field_top_corner_graphic' => 'field_storage_config',
     'field.storage.taxonomy_term.field_bottom_corner_graphic' => 'field_storage_config',
     'field.field.taxonomy_term.sites.field_site_favicon' => 'field_config',
     'field.field.taxonomy_term.sites.field_top_corner_graphic' => 'field_config',
+    'field.field.taxonomy_term.sites.field_bottom_corner_graphic' => 'field_config',
   ];
   module_load_include('inc', 'tide_core', 'includes/helpers');
   $config_location = [\Drupal::service('extension.list.module')->getPath('tide_site_theming') . '/config/install'];
