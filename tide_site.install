@@ -5,13 +5,13 @@
  * Install file for tide_site.
  */
 
+use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Config\FileStorage;
 use Drupal\Core\Entity\Display\EntityFormDisplayInterface;
-use Drupal\field\Entity\FieldStorageConfig;
-use Drupal\field\Entity\FieldConfig;
-use Drupal\taxonomy\TaxonomyPermissions;
 use Drupal\Core\Site\Settings;
-use Drupal\Component\Utility\NestedArray;
+use Drupal\field\Entity\FieldConfig;
+use Drupal\field\Entity\FieldStorageConfig;
+use Drupal\taxonomy\TaxonomyPermissions;
 
 /**
  * Implements hook_install().
