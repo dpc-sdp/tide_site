@@ -222,7 +222,7 @@ function tide_site_theming_update_8001() {
         'svg_render_as_image' => TRUE,
         'image_loading' => [
           'attribute' => 'lazy',
-        ]
+        ],
       ],
       'third_party_settings' => [],
     ])->save();
