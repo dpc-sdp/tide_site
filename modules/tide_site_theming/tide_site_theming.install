@@ -163,7 +163,7 @@ function tide_site_theming_install() {
 /**
  * Add favicon.
  */
-function tide_site_update_8001() {
+function tide_site_theming_update_8001() {
   /** @var \Drupal\Core\Entity\Display\EntityFormDisplayInterface $entity_form_display */
   $entity_form_display = \Drupal::entityTypeManager()
     ->getStorage('entity_form_display')
