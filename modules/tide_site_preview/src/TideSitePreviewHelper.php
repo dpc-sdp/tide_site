@@ -2,10 +2,10 @@
 
 namespace Drupal\tide_site_preview;
 
+use Drupal\Core\Url;
 use Drupal\node\NodeInterface;
 use Drupal\taxonomy\TermInterface;
 use Drupal\tide_site\TideSiteHelper;
-use Drupal\Core\Url;
 
 /**
  * Helper class for Tide Site Preview.
