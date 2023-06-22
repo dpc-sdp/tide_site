@@ -164,6 +164,23 @@ function tide_site_theming_install() {
  * Add favicon.
  */
 function tide_site_theming_update_8001() {
+  $configs = [
+    'field.storage.taxonomy_term.field_show_table_of_contents' => 'field_storage_config',
+    'field.field.taxonomy_term.sites.field_site_favicon' => 'field_config',
+  ];
+  module_load_include('inc', 'tide_core', 'includes/helpers');
+  $config_location = [\Drupal::service('extension.list.module')->getPath('tide_site') . '/config/install'];
+  // Check if field already exported to config/sync.
+  foreach ($configs as $config => $type) {
+    $config_read = _tide_read_config($config, $config_location, TRUE);
+    $storage = \Drupal::entityTypeManager()->getStorage($type);
+    $id = $storage->getIDFromConfigName($config, $storage->getEntityType()->getConfigPrefix());
+    if ($storage->load($id) == NULL) {
+      $config_entity = $storage->createFromStorageRecord($config_read);
+      $config_entity->save();
+    }
+  }
+
   /** @var \Drupal\Core\Entity\Display\EntityFormDisplayInterface $entity_form_display */
   $entity_form_display = \Drupal::entityTypeManager()
     ->getStorage('entity_form_display')
