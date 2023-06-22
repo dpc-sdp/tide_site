@@ -5,8 +5,8 @@
  * Tide Site install file.
  */
 
-use Drupal\simple_sitemap\Entity\SimpleSitemapType;
 use Drupal\simple_sitemap\Entity\SimpleSitemap;
+use Drupal\simple_sitemap\Entity\SimpleSitemapType;
 
 /**
  * Implements hook_install().
