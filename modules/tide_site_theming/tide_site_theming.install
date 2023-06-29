@@ -159,3 +159,199 @@ function tide_site_theming_install() {
   }
   $config->save();
 }
+
+/**
+ * Add favicon and header graphics.
+ */
+function tide_site_theming_update_8001() {
+  $configs = [
+    'field.storage.taxonomy_term.field_site_favicon' => 'field_storage_config',
+    'field.storage.taxonomy_term.field_top_corner_graphic' => 'field_storage_config',
+    'field.storage.taxonomy_term.field_bottom_corner_graphic' => 'field_storage_config',
+    'field.field.taxonomy_term.sites.field_site_favicon' => 'field_config',
+    'field.field.taxonomy_term.sites.field_top_corner_graphic' => 'field_config',
+    'field.field.taxonomy_term.sites.field_bottom_corner_graphic' => 'field_config',
+  ];
+  module_load_include('inc', 'tide_core', 'includes/helpers');
+  $config_location = [\Drupal::service('extension.list.module')->getPath('tide_site_theming') . '/config/install'];
+  // Check if field already exported to config/sync.
+  foreach ($configs as $config => $type) {
+    $config_read = _tide_read_config($config, $config_location, TRUE);
+    $storage = \Drupal::entityTypeManager()->getStorage($type);
+    $id = $storage->getIDFromConfigName($config, $storage->getEntityType()->getConfigPrefix());
+    if ($storage->load($id) == NULL) {
+      $config_entity = $storage->createFromStorageRecord($config_read);
+      $config_entity->save();
+    }
+  }
+
+  /** @var \Drupal\Core\Entity\Display\EntityFormDisplayInterface $entity_form_display */
+  $entity_form_display = \Drupal::entityTypeManager()
+    ->getStorage('entity_form_display')
+    ->load('taxonomy_term.sites.default');
+  if ($entity_form_display) {
+    // Adds favicon.
+    $entity_form_display->setComponent('field_site_favicon', [
+      'type' => 'image_image',
+      'weight' => 20,
+      'region' => 'content',
+      'settings' => [
+        'progress_indicator' => 'throbber',
+        'preview_image_style' => 'thumbnail',
+      ],
+      'third_party_settings' => [],
+    ]);
+    $field_group = $entity_form_display->getThirdPartySettings('field_group');
+    $field_group['group_site_favicon_value'] = [
+      'children' => [
+        'field_site_favicon',
+      ],
+      'parent_name' => '',
+      'label' => 'Site favicon value',
+      'weight' => 19,
+      'format_type' => 'details',
+      'region' => 'content',
+      'format_settings' => [
+        'classes' => '',
+        'show_empty_fields' => FALSE,
+        'id' => 'tide-site-favicon-field',
+        'open' => FALSE,
+        'required_fields' => TRUE,
+        'effect' => 'none',
+      ],
+    ];
+    $entity_form_display->setThirdPartySetting('field_group', 'group_site_favicon_value', $field_group['group_site_favicon_value']);
+
+    // Adds header corner graphics.
+    $entity_form_display->setComponent('field_top_corner_graphic', [
+      'type' => 'image_image',
+      'weight' => 22,
+      'region' => 'content',
+      'settings' => [
+        'progress_indicator' => 'throbber',
+        'preview_image_style' => 'thumbnail',
+      ],
+      'third_party_settings' => [],
+    ]);
+    $entity_form_display->setComponent('field_bottom_corner_graphic', [
+      'type' => 'image_image',
+      'weight' => 23,
+      'region' => 'content',
+      'settings' => [
+        'progress_indicator' => 'throbber',
+        'preview_image_style' => 'thumbnail',
+      ],
+      'third_party_settings' => [],
+    ]);
+    $field_group = $entity_form_display->getThirdPartySettings('field_group');
+    $field_group['group_site_header_corner_graphic'] = [
+      'children' => [
+        'field_top_corner_graphic',
+        'field_bottom_corner_graphic',
+      ],
+      'parent_name' => '',
+      'label' => 'Site header corner graphics',
+      'weight' => 21,
+      'format_type' => 'details',
+      'region' => 'content',
+      'format_settings' => [
+        'classes' => '',
+        'show_empty_fields' => FALSE,
+        'id' => 'tide-site-header-corner-graphics',
+        'open' => FALSE,
+        'required_fields' => TRUE,
+        'effect' => 'none',
+      ],
+    ];
+    $entity_form_display->setThirdPartySetting('field_group', 'group_site_header_corner_graphic', $field_group['group_site_header_corner_graphic']);
+  }
+  $entity_form_display->save();
+
+  // Adding the field to display view.
+  $entity_view_display = Drupal::entityTypeManager()
+    ->getStorage('entity_view_display')
+    ->load('taxonomy_term.sites.default');
+  if ($entity_view_display) {
+    $entity_view_display->setComponent('field_site_favicon', [
+      'type' => 'image',
+      'weight' => 18,
+      'label' => 'above',
+      'region' => 'content',
+      'settings' => [
+        'image_link' => '',
+        'image_style' => '',
+        'svg_attributes' => [
+          'width' => NULL,
+          'height' => NULL,
+        ],
+        'svg_render_as_image' => TRUE,
+        'image_loading' => [
+          'attribute' => 'lazy',
+        ],
+      ],
+      'third_party_settings' => [],
+    ])->save();
+    $entity_view_display->setComponent('field_top_corner_graphic', [
+      'type' => 'image',
+      'weight' => 19,
+      'label' => 'above',
+      'region' => 'content',
+      'settings' => [
+        'image_link' => '',
+        'image_style' => '',
+        'svg_attributes' => [
+          'width' => NULL,
+          'height' => NULL,
+        ],
+        'svg_render_as_image' => TRUE,
+        'image_loading' => [
+          'attribute' => 'lazy',
+        ],
+      ],
+      'third_party_settings' => [],
+    ])->save();
+    $entity_view_display->setComponent('field_bottom_corner_graphic', [
+      'type' => 'image',
+      'weight' => 20,
+      'label' => 'above',
+      'region' => 'content',
+      'settings' => [
+        'image_link' => '',
+        'image_style' => '',
+        'svg_attributes' => [
+          'width' => NULL,
+          'height' => NULL,
+        ],
+        'svg_render_as_image' => TRUE,
+        'image_loading' => [
+          'attribute' => 'lazy',
+        ],
+      ],
+      'third_party_settings' => [],
+    ])->save();
+  }
+
+  // Add to JSON.
+  $config_factory = \Drupal::configFactory();
+  $config = $config_factory->getEditable('jsonapi_extras.jsonapi_resource_config.taxonomy_term--sites');
+  $resourcefields_fields = [
+    'field_site_favicon',
+    'field_top_corner_graphic',
+    'field_bottom_corner_graphic',
+  ];
+  $content = $config->get('resourceFields');
+  foreach ($resourcefields_fields as $field) {
+    if (!isset($content[$field])) {
+      $content[$field] = [
+        'fieldName' => $field,
+        'publicName' => $field,
+        'enhancer' => [
+          'id' => '',
+        ],
+        'disabled' => FALSE,
+      ];
+      $config->set('resourceFields', $content);
+    }
+  }
+  $config->save();
+}
