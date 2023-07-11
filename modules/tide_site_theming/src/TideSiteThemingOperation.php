@@ -8,7 +8,9 @@ use Drupal\user\Entity\Role;
  * Required changes to form and view display.
  */
 class TideSiteThemingOperation {
-  // Add necissary changes to the form and view display.
+  /**
+   * Add necissary changes to the form and view display.
+   */
   public function requiredChangesForTheming() {
     // Update entity form display.
     $entity_form_display = \Drupal::entityTypeManager()
