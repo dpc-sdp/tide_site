@@ -11,6 +11,7 @@ class TideSiteThemingOperation {
   /**
    * Add necissary changes to the form and view display.
    */
+
   public function requiredChangesForTheming() {
     // Update entity form display.
     $entity_form_display = \Drupal::entityTypeManager()
