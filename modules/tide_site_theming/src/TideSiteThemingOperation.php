@@ -4,30 +4,33 @@ namespace Drupal\tide_site_theming;
 
 use Drupal\user\Entity\Role;
 
+/**
+ * Required changes to form and view display.
+ */
 class TideSiteThemingOperation {
   // Add necissary changes to the form and view display.
-  public function tide_site_theming_required_changes() {
-    /** @var \Drupal\Core\Entity\Display\EntityFormDisplayInterface $entity_form_display */
+  public function requiredChangesForTheming() {
+    // Update entity form display.
     $entity_form_display = \Drupal::entityTypeManager()
       ->getStorage('entity_form_display')
       ->load('taxonomy_term.sites.default');
     if ($entity_form_display) {
-      // set field_site_theme_values.
+      // Set field_site_theme_values.
       $entity_form_display->setComponent('field_site_theme_values', [
         'type' => 'key_value_textfield',
         'weight' => 18,
         'region' => 'content',
         'settings' => [
-        'size' => 60,
-        'placeholder' => '',
-        'key_label' => 'Key',
-        'value_label' => 'Value',
-        'description_label' => 'Description',
-        'description_rows' => 5,
-        'key_size' => 60,
-        'key_placeholder' => '',
-        'description_enabled' => FALSE,
-        'description_placeholder' => '',
+          'size' => 60,
+          'placeholder' => '',
+          'key_label' => 'Key',
+          'value_label' => 'Value',
+          'description_label' => 'Description',
+          'description_rows' => 5,
+          'key_size' => 60,
+          'key_placeholder' => '',
+          'description_enabled' => FALSE,
+          'description_placeholder' => '',
         ],
         'third_party_settings' => [],
       ]);
@@ -130,8 +133,8 @@ class TideSiteThemingOperation {
         'weight' => 22,
         'region' => 'content',
         'settings' => [
-            'progress_indicator' => 'throbber',
-            'preview_image_style' => 'thumbnail',
+          'progress_indicator' => 'throbber',
+          'preview_image_style' => 'thumbnail',
         ],
         'third_party_settings' => [],
       ]);

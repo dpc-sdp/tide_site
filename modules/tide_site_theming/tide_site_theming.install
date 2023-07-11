@@ -17,7 +17,7 @@ function tide_site_theming_install() {
   }
 
   $themingoperation = new TideSiteThemingOperation();
-  $themingoperation->tide_site_theming_required_changes();
+  $themingoperation->requiredChangesForTheming();
 }
 
 /**
