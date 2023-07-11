@@ -5,7 +5,6 @@
  * Install file for tide_site.
  */
 
-use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Config\FileStorage;
 use Drupal\Core\Entity\Display\EntityFormDisplayInterface;
 use Drupal\Core\Site\Settings;
@@ -690,43 +689,39 @@ function tide_site_update_8026() {
       $config_entity->save();
     }
   }
-  $update_configs = [
-    'core.entity_view_display.taxonomy_term.sites.default' => 'entity_view_display',
-    'core.entity_form_display.taxonomy_term.sites.default' => 'entity_form_display',
-  ];
-  $skipped_settings = [
-    'uuid',
-    'langcode',
-    'status',
-    '_core',
-    'id',
-    'field_name',
-    'entity_type',
-    'bundle',
-    'label',
-    'description',
-    'required',
-    'translatable',
-    'field_type',
-  ];
-  foreach ($update_configs as $update_config => $type) {
-    $config_read = _tide_read_config($update_config, $config_location, FALSE);
-    $config = \Drupal::configFactory()->getEditable($update_config);
-    if (!$config) {
-      continue;
-    }
-    $data = $config->getRawData();
-    foreach ($config_read as $key => $item) {
-      if (in_array($key, $skipped_settings)) {
-        continue;
-      }
-      NestedArray::setValue($data, [
-        $key,
-      ], NestedArray::getValue($config_read, [
-        $key,
-      ]));
-    }
-    $config->setData($data)->save();
+
+  /** @var \Drupal\Core\Entity\Display\EntityFormDisplayInterface $entity_form_display */
+  $entity_form_display = \Drupal::entityTypeManager()
+    ->getStorage('entity_form_display')
+    ->load('taxonomy_term.sites.default');
+  if ($entity_form_display) {
+    $entity_form_display->setComponent('field_print_friendly_logo', [
+      'type' => 'file_generic',
+      'weight' => 3,
+      'region' => 'content',
+      'settings' => [
+        'progress_indicator' => 'throbber',
+      ],
+      'third_party_settings' => [],
+    ]);
+  }
+  $entity_form_display->save();
+
+  // Adding the field to display view.
+  $entity_view_display = Drupal::entityTypeManager()
+    ->getStorage('entity_view_display')
+    ->load('taxonomy_term.sites.default');
+  if ($entity_view_display) {
+    $entity_view_display->setComponent('field_print_friendly_logo', [
+      'type' => 'file_default',
+      'weight' => 2,
+      'label' => 'above',
+      'region' => 'content',
+      'settings' => [
+        'use_description_as_link_text' => TRUE,
+      ],
+      'third_party_settings' => [],
+    ])->save();
   }
 
   $config_factory = \Drupal::configFactory();
