@@ -4,18 +4,18 @@
     "type": "drupal-module",
     "license": "GPL-2.0-or-later",
     "require": {
-        "dpc-sdp/tide_core": "dev-feature/SRM-870-d10-update as 3.2.11",
-        "dpc-sdp/tide_media": "dev-feature/SRM-870-939-d10-update-d10 as 3.0.12",
+        "dpc-sdp/tide_core": "dev-feature/SRM-870-d10-update",
+        "dpc-sdp/tide_media": "dev-feature/SRM-870-939-d10-update-d10",
         "drupal/create_menus_permission": "dev-drupal_10_compatibility",
         "drupal/key_value_field": "^1.3"
     },
     "suggest": {
-        "dpc-sdp/tide_api:^3.0.0": "Allows to use Drupal in headless mode"
+        "dpc-sdp/tide_api:dev-feature/SRM-948-d10-update": "Allows to use Drupal in headless mode"
     },
     "repositories": {
         "drupal": {
             "type": "composer",
-            "url": "https://packages.drupal.org/8",
+            "url": "https://packages.drupal.org/10",
             "exclude": ["drupal/create_menus_permission"]
         },
         "drupal/create_menus_permission": {
