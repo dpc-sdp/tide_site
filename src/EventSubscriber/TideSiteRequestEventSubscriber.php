@@ -223,7 +223,7 @@ class TideSiteRequestEventSubscriber implements EventSubscriberInterface {
       return;
     }
 
-    $site_id = $event->getRequest()->query->get('site');
+    $site_id = $event->getRequest()->query->all()['site'] ?? [];
     if ($site_id) {
       $context = $response->getCacheableMetadata()->getCacheContexts();
       $context = Cache::mergeContexts($context, ['url.query_args:site']);
@@ -246,7 +246,7 @@ class TideSiteRequestEventSubscriber implements EventSubscriberInterface {
    *   The Resource type.
    */
   protected function setSiteFilterToJsonApi(Request $request, array $site_filter, ConfigurableResourceType $resource_type) {
-    $filter = $request->query->get('filter', []);
+    $filter = $request->query->all()['filter'] ?? [];
     $filter['site'] = $site_filter;
     $request->query->set('filter', $filter);
   }
@@ -254,14 +254,14 @@ class TideSiteRequestEventSubscriber implements EventSubscriberInterface {
   /**
    * Create a JSON Response for error message.
    *
-   * @param \Symfony\Component\HttpKernel\Event\GetResponseEvent $event
+   * @param \Symfony\Component\HttpKernel\Event\RequestEvent $event
    *   The event.
    * @param string $error_message
    *   The error message.
    * @param int $code
    *   The error code, default to 400.
    */
-  protected function setEventErrorResponse(GetResponseEvent $event, $error_message, $code = Response::HTTP_BAD_REQUEST) {
+  protected function setEventErrorResponse(RequestEvent $event, $error_message, $code = Response::HTTP_BAD_REQUEST) {
     $json_response = [
       'links' => [
         'self' => [
