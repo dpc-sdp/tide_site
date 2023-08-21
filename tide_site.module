@@ -16,15 +16,15 @@ use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Url;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\node\Entity\Node;
+use Drupal\node\NodeInterface;
+use Drupal\path_alias\Entity\PathAlias;
+use Drupal\path_alias\PathAliasInterface;
 use Drupal\search_api\IndexInterface;
 use Drupal\taxonomy\Entity\Term;
 use Drupal\tide_site\TideSiteFields;
 use Drupal\tide_site\TideSiteMenuAutocreate;
-use Drupal\views\ViewExecutable;
-use Drupal\path_alias\Entity\PathAlias;
-use Drupal\path_alias\PathAliasInterface;
 use Drupal\tide_site\TideSitePathAliasListBuilder;
-use Drupal\node\NodeInterface;
+use Drupal\views\ViewExecutable;
 
 /**
  * Implements hook_entity_bundle_create().
