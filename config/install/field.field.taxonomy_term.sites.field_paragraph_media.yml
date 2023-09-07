@@ -1,4 +1,3 @@
-uuid: d98852bc-879c-45d4-83fa-a78337e44ede
 langcode: en
 status: true
 dependencies:
@@ -6,8 +5,6 @@ dependencies:
     - field.storage.taxonomy_term.field_paragraph_media
     - media.type.image
     - taxonomy.vocabulary.sites
-_core:
-  default_config_hash: P0wRQ4hb0HL3_HCRYSfcGP3Mymb2DOpiCcE9rjy1K2A
 id: taxonomy_term.sites.field_paragraph_media
 field_name: field_paragraph_media
 entity_type: taxonomy_term

@@ -1,4 +1,3 @@
-uuid: 414eb22f-f25a-464d-96a4-d002bc8334c8
 langcode: en
 status: true
 dependencies:
@@ -36,8 +35,6 @@ dependencies:
     - media
     - svg_image
     - text
-_core:
-  default_config_hash: p52sXxs-aZmHcxFJtvA-uk7hywGsyLXDNaXONGC3M0k
 id: taxonomy_term.sites.default
 targetEntityType: taxonomy_term
 bundle: sites

@@ -1,12 +1,9 @@
-uuid: 859bc562-53d4-4111-826f-5aba8b6916d3
 langcode: en
 status: true
 dependencies:
   module:
     - media
     - taxonomy
-_core:
-  default_config_hash: NqobiLWcQPrsh4taiEnsZPr__uSeYxn6ewdBxHRF8fM
 id: taxonomy_term.field_paragraph_media
 field_name: field_paragraph_media
 entity_type: taxonomy_term

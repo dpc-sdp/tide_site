@@ -1,4 +1,3 @@
-uuid: 13d52e77-f141-4442-b66c-6f97beb73975
 langcode: en
 status: true
 dependencies:
@@ -8,8 +7,6 @@ dependencies:
     - taxonomy.vocabulary.sites
   module:
     - entity_reference_revisions
-_core:
-  default_config_hash: 6P4v_97kPGQU8EcNYA2_zXV-3_JfgTNMpE9EJc2fu-U
 id: taxonomy_term.sites.field_site_footer_logos
 field_name: field_site_footer_logos
 entity_type: taxonomy_term
