@@ -4,15 +4,12 @@ dependencies:
   config:
     - entity_browser.browser.tide_image_browser
     - field.field.taxonomy_term.sites.field_acknowledgement_to_country
-    - field.field.taxonomy_term.sites.field_bottom_corner_graphic
     - field.field.taxonomy_term.sites.field_paragraph_cta
     - field.field.taxonomy_term.sites.field_paragraph_media
     - field.field.taxonomy_term.sites.field_print_friendly_logo
     - field.field.taxonomy_term.sites.field_prominence_ack_to_country
     - field.field.taxonomy_term.sites.field_show_table_of_contents
     - field.field.taxonomy_term.sites.field_site_domains
-    - field.field.taxonomy_term.sites.field_site_favicon
-    - field.field.taxonomy_term.sites.field_site_feature_flags
     - field.field.taxonomy_term.sites.field_site_footer_logos
     - field.field.taxonomy_term.sites.field_site_footer_menu
     - field.field.taxonomy_term.sites.field_site_footer_text
@@ -23,17 +20,14 @@ dependencies:
     - field.field.taxonomy_term.sites.field_site_show_exit_site
     - field.field.taxonomy_term.sites.field_site_slogan
     - field.field.taxonomy_term.sites.field_site_social_links
-    - field.field.taxonomy_term.sites.field_site_theme_values
     - field.field.taxonomy_term.sites.field_site_twitter_image
     - field.field.taxonomy_term.sites.field_title_of_table_of_contents
-    - field.field.taxonomy_term.sites.field_top_corner_graphic
     - image.style.thumbnail
     - taxonomy.vocabulary.sites
   module:
     - entity_browser
     - field_group
     - file
-    - key_value_field
     - link
     - maxlength
     - paragraphs
