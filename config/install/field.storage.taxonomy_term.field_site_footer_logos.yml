@@ -1,10 +1,17 @@
+uuid: 76aa9813-aabc-4451-8b95-0b7ef94a56d3
 langcode: en
 status: true
 dependencies:
   module:
     - entity_reference_revisions
+    - field_permissions
     - paragraphs
     - taxonomy
+third_party_settings:
+  field_permissions:
+    permission_type: public
+_core:
+  default_config_hash: tvpQ1s2i5ldqru60-46pSTM-8eShm9BAmM05I8j419M
 id: taxonomy_term.field_site_footer_logos
 field_name: field_site_footer_logos
 entity_type: taxonomy_term

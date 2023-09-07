@@ -1,0 +1,21 @@
+uuid: 7980659f-042d-4a76-bcf0-75daa8b39862
+langcode: en
+status: true
+dependencies:
+  module:
+    - link
+    - taxonomy
+_core:
+  default_config_hash: 0J1lCRNj_cImjts2J5OwWEomZqYKBB3N_xy4ZB2CPpc
+id: taxonomy_term.field_paragraph_cta
+field_name: field_paragraph_cta
+entity_type: taxonomy_term
+type: link
+settings: {  }
+module: link
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

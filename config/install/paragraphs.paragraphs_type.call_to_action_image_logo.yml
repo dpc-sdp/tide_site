@@ -1,0 +1,10 @@
+uuid: 5a0fcaf6-2b04-4d8d-b12c-2498ab26d27c
+langcode: en
+status: true
+dependencies: {  }
+id: call_to_action_image_logo
+label: 'Call to action image logo'
+icon_uuid: null
+icon_default: null
+description: ''
+behavior_plugins: {  }
