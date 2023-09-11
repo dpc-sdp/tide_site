@@ -4,8 +4,6 @@ dependencies:
   config:
     - entity_browser.browser.tide_image_browser
     - field.field.taxonomy_term.sites.field_acknowledgement_to_country
-    - field.field.taxonomy_term.sites.field_paragraph_cta
-    - field.field.taxonomy_term.sites.field_paragraph_media
     - field.field.taxonomy_term.sites.field_print_friendly_logo
     - field.field.taxonomy_term.sites.field_prominence_ack_to_country
     - field.field.taxonomy_term.sites.field_show_table_of_contents
