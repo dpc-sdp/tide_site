@@ -5,6 +5,7 @@
  * Install file for tide_site.
  */
 
+use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Config\FileStorage;
 use Drupal\Core\Entity\Display\EntityFormDisplayInterface;
 use Drupal\Core\Site\Settings;
@@ -739,4 +740,55 @@ function tide_site_update_8026() {
     ];
     $config->set('resourceFields', $content);
   }
+}
+
+/**
+ * New field taxonomy image logo.
+ */
+function tide_site_update_8027() {
+  $configs = [
+    'paragraphs.paragraphs_type.call_to_action_image_logo' => 'paragraphs_type',
+    'field.storage.paragraph.field_feature_image' => 'field_storage_config',
+    'field.field.paragraph.call_to_action_image_logo.field_feature_image' => 'field_config',
+    'field.field.paragraph.call_to_action_image_logo.field_paragraph_cta' => 'field_config',
+    'core.entity_form_display.paragraph.call_to_action_image_logo.default' => 'entity_form_display',
+    'core.entity_view_display.paragraph.call_to_action_image_logo.default' => 'entity_view_display',
+
+  ];
+  module_load_include('inc', 'tide_core', 'includes/helpers');
+  $config_location = [\Drupal::service('extension.list.module')->getPath('tide_site') . '/config/install'];
+  // Check if field already exported to config/sync.
+  foreach ($configs as $config => $type) {
+    $config_read = _tide_read_config($config, $config_location, TRUE);
+    $storage = \Drupal::entityTypeManager()->getStorage($type);
+    $id = substr($config, strrpos($config, '.') + 1);
+    if ($storage->load($id) == NULL) {
+      $config_entity = $storage->createFromStorageRecord($config_read);
+      $config_entity->save();
+    }
+  }
+
+  $update_configs = [
+    'core.entity_view_display.taxonomy_term.sites.default' => 'entity_view_display',
+    'core.entity_form_display.taxonomy_term.sites.default' => 'entity_form_display',
+    'field.field.taxonomy_term.sites.field_site_footer_logos' => 'field_config',
+    'field.storage.taxonomy_term.field_site_footer_logos' => 'field_storage_config',
+  ];
+  foreach ($update_configs as $update_config => $type) {
+    $config_read = _tide_read_config($update_config, $config_location, FALSE);
+    $config = \Drupal::configFactory()->getEditable($update_config);
+    if (!$config) {
+      continue;
+    }
+    $data = $config->getRawData();
+    foreach ($config_read as $key => $item) {
+      NestedArray::setValue($data, [
+        $key,
+      ], NestedArray::getValue($config_read, [
+        $key,
+      ]));
+    }
+    $config->setData($data)->save();
+  }
+
 }
