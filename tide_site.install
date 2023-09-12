@@ -769,6 +769,8 @@ function tide_site_update_8027() {
   }
 
   $update_configs = [
+    'field.storage.paragraph.field_paragraph_cta' => 'field_storage_config',
+    'field.storage.paragraph.field_paragraph_media' => 'field_storage_config',
     'core.entity_view_display.taxonomy_term.sites.default' => 'entity_view_display',
     'core.entity_form_display.taxonomy_term.sites.default' => 'entity_form_display',
     'field.field.taxonomy_term.sites.field_site_footer_logos' => 'field_config',
