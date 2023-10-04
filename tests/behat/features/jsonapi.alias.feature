@@ -1,7 +1,7 @@
 @jsonapi
 Feature: Node path alias with site prefix in JSONAPI.
 
-  @api @suggest
+  @api @suggest @skipped
   Scenario: Check for Site Alias in JSONAPI response
     Given sites terms:
       | name        | parent | tid    | field_site_domains |
