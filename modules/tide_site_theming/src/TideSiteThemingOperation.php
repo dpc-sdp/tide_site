@@ -176,7 +176,7 @@ class TideSiteThemingOperation {
     $entity_form_display->save();
 
     // Adding the field to display view.
-    $entity_view_display = Drupal::entityTypeManager()
+    $entity_view_display = \Drupal::entityTypeManager()
       ->getStorage('entity_view_display')
       ->load('taxonomy_term.sites.default');
     if ($entity_view_display) {
