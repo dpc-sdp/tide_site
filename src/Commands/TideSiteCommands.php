@@ -3,6 +3,7 @@
 namespace Drupal\tide_site\Commands;
 
 use Drupal\Core\StringTranslation\StringTranslationTrait;
+use Drupal\taxonomy\Entity\Term;
 use Drush\Commands\DrushCommands;
 
 /**
