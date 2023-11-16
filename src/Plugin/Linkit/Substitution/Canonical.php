@@ -69,7 +69,7 @@ class Canonical extends LinkitCanonical implements ContainerFactoryPluginInterfa
    */
   public function getUrl(EntityInterface $entity) {
     /** @var \Drupal\Core\GeneratedUrl $url */
-    $url = parent::getUrl($entity);
+    $url = parent::getUrl($entity)->toString(TRUE);
 
     // Remove the site prefix from path alias when responding from
     // JSONAPI entity resource with site parameter.

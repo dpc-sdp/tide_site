@@ -127,11 +127,11 @@ function tide_site_entity_presave(EntityInterface $entity) {
 }
 
 /**
- * Implements hook_field_widget_form_alter().
+ * Implements hook_field_widget_single_element_form_alter().
  *
  * @todo Extract into a service.
  */
-function tide_site_field_widget_form_alter(&$element, FormStateInterface $form_state, $context) {
+function tide_site_field_widget_single_element_form_alter(&$element, FormStateInterface $form_state, $context) {
   $field_definition = $context['items']->getFieldDefinition();
 
   // Restrict options to 2 levels of depth for Site field.
@@ -658,6 +658,7 @@ function tide_site_taxonomy_term_delete($term) {
     $path_storage = \Drupal::entityTypeManager()->getStorage('path_alias');
     $site_prefix = $helper->getSitePathPrefix($term);
     $path_ids = \Drupal::entityQuery('path_alias')
+      ->accessCheck(TRUE)
       ->condition('alias', $site_prefix . '/', 'CONTAINS')
       ->condition('path', '/taxonomy/term/' . $term->id(), '=')
       ->execute();
@@ -690,6 +691,7 @@ function tide_site_node_update($node) {
     foreach ($unassigned_sites as $unassigned_site_id) {
       $site_prefix = $helper->getSitePathPrefix($unassigned_site_id);
       $path_ids = \Drupal::entityQuery('path_alias')
+        ->accessCheck(TRUE)
         ->condition('alias', $site_prefix . '/', 'CONTAINS')
         ->condition('path', '/node/' . $node->id(), '=')
         ->execute();

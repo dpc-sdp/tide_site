@@ -16,13 +16,6 @@ function tide_site_simple_sitemap_install($is_syncing) {
 }
 
 /**
- * Updates bundle settings.
- */
-function tide_site_simple_sitemap_update_8008(&$sandbox) {
-  _update_settings();
-}
-
-/**
  * Update for sitemap 4.x.
  */
 function _update_settings() {
@@ -81,15 +74,5 @@ function _update_settings() {
     foreach ($bundle_info as $bundle_id => $details) {
       $entity_manager->setBundleSettings('node', $bundle_id, $settings);
     }
-  }
-}
-
-/**
- * Removes simple_sitemap_site table.
- */
-function tide_site_simple_sitemap_update_8009() {
-  $hasTable = \Drupal::database()->schema()->tableExists('simple_sitemap_site');
-  if ($hasTable === TRUE) {
-    \Drupal::database()->schema()->dropTable('simple_sitemap_site');
   }
 }
