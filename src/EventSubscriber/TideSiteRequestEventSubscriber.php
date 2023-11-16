@@ -5,20 +5,20 @@ namespace Drupal\tide_site\EventSubscriber;
 use Drupal\Core\Cache\Cache;
 use Drupal\Core\Cache\CacheableResponseInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
+use Drupal\Core\Routing\RouteObjectInterface;
 use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\Core\Url;
 use Drupal\jsonapi\Routing\Routes;
 use Drupal\jsonapi_extras\ResourceType\ConfigurableResourceType;
 use Drupal\tide_site\TideSiteFields;
 use Drupal\tide_site\TideSiteHelper;
-use Symfony\Cmf\Component\Routing\RouteObjectInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
+use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
 /**
@@ -86,13 +86,13 @@ class TideSiteRequestEventSubscriber implements EventSubscriberInterface {
   /**
    * Add Site filter to the request of JSON API controller.
    *
-   * @param \Symfony\Component\HttpKernel\Event\GetResponseEvent $event
+   * @param \Symfony\Component\HttpKernel\Event\RequestEvent $event
    *   The event.
    *
    * @see \Symfony\Component\HttpKernel\HttpKernel::handleRaw()
    * @see \Drupal\jsonapi\Controller\RequestHandler::handle()
    */
-  public function onRequestAddSiteFilter(GetResponseEvent $event) {
+  public function onRequestAddSiteFilter(RequestEvent $event) {
     if (!$this->jsonApiEnabled) {
       return;
     }
@@ -214,16 +214,16 @@ class TideSiteRequestEventSubscriber implements EventSubscriberInterface {
   /**
    * Add Site to cache context and tags of JSON API response.
    *
-   * @param \Symfony\Component\HttpKernel\Event\FilterResponseEvent $event
+   * @param \Symfony\Component\HttpKernel\Event\ResponseEvent $event
    *   The event object.
    */
-  public function onResponseAddSiteFilterCacheContext(FilterResponseEvent $event) {
+  public function onResponseAddSiteFilterCacheContext(ResponseEvent $event) {
     $response = $event->getResponse();
     if (!$response instanceof CacheableResponseInterface) {
       return;
     }
 
-    $site_id = $event->getRequest()->query->get('site');
+    $site_id = $event->getRequest()->query->all()['site'] ?? [];
     if ($site_id) {
       $context = $response->getCacheableMetadata()->getCacheContexts();
       $context = Cache::mergeContexts($context, ['url.query_args:site']);
@@ -246,7 +246,7 @@ class TideSiteRequestEventSubscriber implements EventSubscriberInterface {
    *   The Resource type.
    */
   protected function setSiteFilterToJsonApi(Request $request, array $site_filter, ConfigurableResourceType $resource_type) {
-    $filter = $request->query->get('filter', []);
+    $filter = $request->query->all()['filter'] ?? [];
     $filter['site'] = $site_filter;
     $request->query->set('filter', $filter);
   }
@@ -254,14 +254,14 @@ class TideSiteRequestEventSubscriber implements EventSubscriberInterface {
   /**
    * Create a JSON Response for error message.
    *
-   * @param \Symfony\Component\HttpKernel\Event\GetResponseEvent $event
+   * @param \Symfony\Component\HttpKernel\Event\RequestEvent $event
    *   The event.
    * @param string $error_message
    *   The error message.
    * @param int $code
    *   The error code, default to 400.
    */
-  protected function setEventErrorResponse(GetResponseEvent $event, $error_message, $code = Response::HTTP_BAD_REQUEST) {
+  protected function setEventErrorResponse(RequestEvent $event, $error_message, $code = Response::HTTP_BAD_REQUEST) {
     $json_response = [
       'links' => [
         'self' => [
