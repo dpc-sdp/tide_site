@@ -44,8 +44,14 @@ class TideSiteCommands extends DrushCommands {
           foreach (explode(',', $fe_domains) as $fe_domain) {
             $domain = explode('|', $fe_domain);
             $term = Term::load($domain[0]);
-            $term->set('field_site_domains', str_replace('<br/>', "\r\n", $domain[1]));
-            $term->save();
+            // Check if the term exists before trying to manipulate it.
+            if ($term) {
+              $term->set('field_site_domains', str_replace('<br/>', "\r\n", $domain[1]));
+              $term->save();
+            }
+            else {
+              $this->output()->writeln($this->t('Term with ID @term_id not found.', ['@term_id' => $domain[0]]));
+            }
           }
           $this->output()->writeln($this->t('Domains Updated.'));
         }
