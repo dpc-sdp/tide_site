@@ -48,7 +48,8 @@ class TideSiteCommands extends DrushCommands {
             if ($term) {
               $term->set('field_site_domains', str_replace('<br/>', "\r\n", $domain[1]));
               $term->save();
-            } else {
+            } 
+            else {
               $this->output()->writeln($this->t('Term with ID @term_id not found.', ['@term_id' => $domain[0]]));
             }
           }
