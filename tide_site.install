@@ -5,6 +5,8 @@
  * Install file for tide_site.
  */
 
+ use Drupal\user\Entity\Role;
+
 /**
  * Implements hook_install().
  */
@@ -15,5 +17,16 @@ function tide_site_install() {
     foreach (array_keys($bundles) as $bundle) {
       tide_site_entity_bundle_create($type, $bundle);
     }
+  }
+}
+
+/**
+ * Approver should have permission to create/edit terms in sites.
+ */
+function tide_site_update_10000() {
+  $approver = Role::load('approver');
+  if ($approver) {
+    $approver->grantPermission('create terms in sites', 'edit terms in sites');
+    $approver->save();
   }
 }
