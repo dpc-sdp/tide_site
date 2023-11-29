@@ -28,7 +28,7 @@ function tide_site_update_10000() {
   $permissions = [
     'create terms in sites',
     'edit terms in sites',
-    ];
+  ];
   if ($approver) {
     foreach ($permissions as $permission) {
       $approver->grantPermission($permission);
