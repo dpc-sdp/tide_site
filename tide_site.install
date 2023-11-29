@@ -25,8 +25,14 @@ function tide_site_install() {
  */
 function tide_site_update_10000() {
   $approver = Role::load('approver');
+  $permissions = [
+    'create terms in sites',
+    'edit terms in sites',
+    ];
   if ($approver) {
-    $approver->grantPermission('create terms in sites', 'edit terms in sites');
+    foreach ($permissions as $permission) {
+      $approver->grantPermission($permission);
+    }
     $approver->save();
   }
 }
