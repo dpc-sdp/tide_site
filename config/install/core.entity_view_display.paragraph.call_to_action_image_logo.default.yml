@@ -1,0 +1,44 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.paragraph.call_to_action_image_logo.field_feature_image
+    - field.field.paragraph.call_to_action_image_logo.field_paragraph_cta
+    - paragraphs.paragraphs_type.call_to_action_image_logo
+  module:
+    - link
+    - svg_image
+id: paragraph.call_to_action_image_logo.default
+targetEntityType: paragraph
+bundle: call_to_action_image_logo
+mode: default
+content:
+  field_feature_image:
+    type: image
+    label: above
+    settings:
+      image_link: ''
+      image_style: ''
+      svg_attributes:
+        width: null
+        height: null
+      svg_render_as_image: true
+      image_loading:
+        attribute: lazy
+    third_party_settings: {  }
+    weight: 1
+    region: content
+  field_paragraph_cta:
+    type: link
+    label: above
+    settings:
+      trim_length: 80
+      url_only: false
+      url_plain: false
+      rel: ''
+      target: ''
+    third_party_settings: {  }
+    weight: 0
+    region: content
+hidden:
+  search_api_excerpt: true
