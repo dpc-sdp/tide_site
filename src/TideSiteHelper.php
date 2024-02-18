@@ -120,6 +120,31 @@ class TideSiteHelper {
     return $sites;
   }
 
+
+  /**
+   * Returns all sites.
+   *
+   * @return \Drupal\taxonomy\TermInterface[]
+   *   List of sites.
+   */
+  public function getAllSitesAndSiteSections() {
+    $sites = [];
+
+    try {
+      $terms = $this->entityTypeManager->getStorage('taxonomy_term')
+      ->loadByProperties(['vid' => 'sites']);
+      /** @var \Drupal\taxonomy\TermInterface $site */
+      foreach ($terms as $site) {
+        $sites[$site->id()] = $site;
+      }
+    }
+    catch (\Exception $exception) {
+      watchdog_exception('tide_site', $exception);
+    }
+
+    return $sites;
+  }
+
   /**
    * Loads a Site term by ID.
    *
