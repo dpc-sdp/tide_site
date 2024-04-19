@@ -35,14 +35,16 @@ function tide_site_simple_sitemap_taxonomy_term_delete($term) {
  * Implements hook_ENTITY_TYPE_insert().
  */
 function tide_site_simple_sitemap_simple_sitemap_insert(SimpleSitemap $entity) {
-  $sitemap_id =$entity->id();
-  if ($term_id = _tide_site_simple_sitemap_extract_site_number($sitemap_id)){
-    if(Term::load($term_id) && $entity->getType()->getOriginalId() === 'tide_default_sitemap_type'){
+  $sitemap_id = $entity->id();
+  if ($term_id = _tide_site_simple_sitemap_extract_site_number($sitemap_id)) {
+
+    if (Term::load($term_id) && $entity->getType()->getOriginalId() === 'tide_default_sitemap_type') {
       /** @var Drupal\simple_sitemap\Manager\Generator $custom_generator */
       $custom_generator = \Drupal::service('simple_sitemap.generator');
       $custom_generator->setSitemaps($entity->id());
       $site_based_custom_link = $custom_generator->customLinkManager()->get('/');
-      if (isset($site_based_custom_link[$sitemap_id]) && empty($site_based_custom_link[$sitemap_id])){
+
+      if (isset($site_based_custom_link[$sitemap_id]) && empty($site_based_custom_link[$sitemap_id])) {
         $custom_generator->customLinkManager()->add(
           '/',
           ["path" => "/", "priority" => "1.0", "changefreq" => "daily"]
@@ -59,5 +61,5 @@ function _tide_site_simple_sitemap_extract_site_number($string) {
   if (preg_match('/^site-(\d+)$/', $string, $matches)) {
     return $matches[1];
   }
-  return null;
+  return NULL;
 }
