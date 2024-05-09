@@ -58,10 +58,10 @@ class TideSiteResourceObjectNormalizationCacher extends ResourceObjectNormalizat
     return [
       '#cache' => [
         'keys' => [
-            $object->getResourceType()
-              ->getTypeName(),
-            $object->getId(),
-          ],
+          $object->getResourceType()
+            ->getTypeName(),
+          $object->getId(),
+        ],
         'bin' => 'jsonapi_normalizations',
       ],
     ];
