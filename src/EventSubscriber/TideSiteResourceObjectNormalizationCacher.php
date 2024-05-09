@@ -44,26 +44,26 @@ class TideSiteResourceObjectNormalizationCacher extends ResourceObjectNormalizat
   }
 
   /**
-  * Generates a lookup render array for a normalization.
-  *
-  * @param \Drupal\jsonapi\JsonApiResource\ResourceObject $object
-  *   The resource object for which to generate a cache item.
-  *
-  * @return array
-  *   A render array for use with the RenderCache service.
-  *
-  * @see \Drupal\dynamic_page_cache\EventSubscriber\DynamicPageCacheSubscriber::$dynamicPageCacheRedirectRenderArray
-  */
+   * Generates a lookup render array for a normalization.
+   *
+   * @param \Drupal\jsonapi\JsonApiResource\ResourceObject $object
+   *   The resource object for which to generate a cache item.
+   *
+   * @return array
+   *   A render array for use with the RenderCache service.
+   *
+   * @see \Drupal\dynamic_page_cache\EventSubscriber\DynamicPageCacheSubscriber::$dynamicPageCacheRedirectRenderArray
+   */
   protected static function generateLookupRenderArray(ResourceObject $object) {
     return [
       '#cache' => [
-          'keys' => [
-              $object->getResourceType()
-                ->getTypeName(),
-              $object->getId(),
-            ],
-          'bin' => 'jsonapi_normalizations',
-        ],
+        'keys' => [
+            $object->getResourceType()
+              ->getTypeName(),
+            $object->getId(),
+          ],
+        'bin' => 'jsonapi_normalizations',
+      ],
     ];
   }
 
