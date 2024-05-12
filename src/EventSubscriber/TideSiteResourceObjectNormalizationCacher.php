@@ -36,7 +36,7 @@ class TideSiteResourceObjectNormalizationCacher extends ResourceObjectNormalizat
       ->merge(static::mergeCacheableDependencies($normalization_parts[static::RESOURCE_CACHE_SUBSET_BASE]))
       ->merge(static::mergeCacheableDependencies($normalization_parts[static::RESOURCE_CACHE_SUBSET_FIELDS]));
     $this->variationCache
-    ->set($this->generateCacheKeys($object), $normalization_parts, $cacheability, new CacheableMetadata());
+      ->set($this->generateCacheKeys($object), $normalization_parts, $cacheability, new CacheableMetadata());
   }
 
   /**
