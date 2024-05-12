@@ -23,20 +23,20 @@ class TideSiteResourceObjectNormalizationCacher extends ResourceObjectNormalizat
     // @todo Investigate whether to cache POST and PATCH requests.
     // @todo Follow up on https://www.drupal.org/project/drupal/issues/3381898.
     if (!$this->requestStack
-        ->getCurrentRequest()
-        ->isMethodCacheable()) {
-        return;
+      ->getCurrentRequest()
+      ->isMethodCacheable()) {
+      return;
     }
 
-      // Merge the entity's cacheability metadata with that of the normalization
-      // parts, so that VariationCache can take care of cache redirects for us.
+    // Merge the entity's cacheability metadata with that of the normalization
+    // parts, so that VariationCache can take care of cache redirects for us.
     $cacheability = CacheableMetadata::createFromObject($object)
       // Adds url.query_args:site to the normalization.
       ->addCacheContexts(['url.query_args:site'])
       ->merge(static::mergeCacheableDependencies($normalization_parts[static::RESOURCE_CACHE_SUBSET_BASE]))
       ->merge(static::mergeCacheableDependencies($normalization_parts[static::RESOURCE_CACHE_SUBSET_FIELDS]));
       $this->variationCache
-        ->set($this->generateCacheKeys($object), $normalization_parts, $cacheability, new CacheableMetadata());
+      ->set($this->generateCacheKeys($object), $normalization_parts, $cacheability, new CacheableMetadata());
   }
 
   /**
@@ -53,10 +53,10 @@ class TideSiteResourceObjectNormalizationCacher extends ResourceObjectNormalizat
   protected static function generateCacheKeys(ResourceObject $object) {
     return [
       $object->getResourceType()
-          ->getTypeName(),
+        ->getTypeName(),
       $object->getId(),
       $object->getLanguage()
-          ->getId(),
+        ->getId(),
     ];
   }
 
