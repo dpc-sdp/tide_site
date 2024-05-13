@@ -14,33 +14,50 @@ class TideSiteResourceObjectNormalizationCacher extends ResourceObjectNormalizat
   /**
    * Writes a normalization to cache.
    *
-   * @see \Drupal\jsonapi\EventSubscriber\ResourceObjectNormalizationCacher
+   * @param \Drupal\jsonapi\JsonApiResource\ResourceObject $object
+   *   The resource object for which to generate a cache item.
+   * @param array $normalization_parts
+   *   The normalization parts to cache.
    */
   protected function set(ResourceObject $object, array $normalization_parts) {
-    $base = static::generateLookupRenderArray($object);
-    $data_as_render_array = $base + [
-        // The data we actually care about.
-      '#data' => $normalization_parts,
-        // Tell RenderCache to cache the #data property: the data we actually
-        // care about.
-      '#cache_properties' => ['#data'],
-        // These exist only to fulfill the requirements of the RenderCache,
-        // which is designed to work with render arrays only. We don't care
-        // about these.
-      '#markup' => '',
-      '#attached' => '',
-    ];
+    // @todo Investigate whether to cache POST and PATCH requests.
+    // @todo Follow up on https://www.drupal.org/project/drupal/issues/3381898.
+    if (!$this->requestStack
+      ->getCurrentRequest()
+      ->isMethodCacheable()) {
+      return;
+    }
 
     // Merge the entity's cacheability metadata with that of the normalization
-    // parts, so that RenderCache can take care of cache redirects for us.
-    CacheableMetadata::createFromObject($object)
+    // parts, so that VariationCache can take care of cache redirects for us.
+    $cacheability = CacheableMetadata::createFromObject($object)
       // Adds url.query_args:site to the normalization.
       ->addCacheContexts(['url.query_args:site'])
       ->merge(static::mergeCacheableDependencies($normalization_parts[static::RESOURCE_CACHE_SUBSET_BASE]))
-      ->merge(static::mergeCacheableDependencies($normalization_parts[static::RESOURCE_CACHE_SUBSET_FIELDS]))
-      ->applyTo($data_as_render_array);
+      ->merge(static::mergeCacheableDependencies($normalization_parts[static::RESOURCE_CACHE_SUBSET_FIELDS]));
+    $this->variationCache
+      ->set($this->generateCacheKeys($object), $normalization_parts, $cacheability, new CacheableMetadata());
+  }
 
-    $this->renderCache->set($data_as_render_array, $base);
+  /**
+   * Generates the cache keys for a normalization.
+   *
+   * @param \Drupal\jsonapi\JsonApiResource\ResourceObject $object
+   *   The resource object for which to generate the cache keys.
+   *
+   * @return string[]
+   *   The cache keys to pass to the variation cache.
+   *
+   * @see \Drupal\dynamic_page_cache\EventSubscriber\DynamicPageCacheSubscriber::$dynamicPageCacheRedirectRenderArray
+   */
+  protected static function generateCacheKeys(ResourceObject $object) {
+    return [
+      $object->getResourceType()
+        ->getTypeName(),
+      $object->getId(),
+      $object->getLanguage()
+        ->getId(),
+    ];
   }
 
 }
