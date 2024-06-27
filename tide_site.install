@@ -5,7 +5,7 @@
  * Install file for tide_site.
  */
 
- use Drupal\Component\Utility\NestedArray;
+use Drupal\Component\Utility\NestedArray;
 
 /**
  * Implements hook_install().
@@ -40,13 +40,13 @@ function tide_site_update_10001() {
       $config_entity->save();
     }
   }
-    $data = $config->getRawData();
-    foreach ($config_read as $key => $item) {
-      NestedArray::setValue($data, [
-        $key,
-      ], NestedArray::getValue($config_read, [
-        $key,
-      ]));
-    }
-    $config->setData($data)->save();
+  $data = $config->getRawData();
+  foreach ($config_read as $key => $item) {
+    NestedArray::setValue($data, [
+      $key,
+    ], NestedArray::getValue($config_read, [
+      $key,
+    ]));
+  }
+  $config->setData($data)->save();
 }
