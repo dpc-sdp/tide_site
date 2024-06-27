@@ -5,8 +5,6 @@
  * Install file for tide_site.
  */
 
-use Drupal\Component\Utility\NestedArray;
-
 /**
  * Implements hook_install().
  */
