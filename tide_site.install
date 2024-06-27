@@ -24,29 +24,18 @@ function tide_site_install() {
  * New field taxonomy image logo.
  */
 function tide_site_update_10001() {
-  $configs = [
-    'field.field.taxonomy_term.sites.field_additional_comment' => 'field_config',
-    'field.storage.taxonomy_term.field_additional_comment' => 'field_storage_config',
-  ];
   module_load_include('inc', 'tide_core', 'includes/helpers');
   $config_location = [\Drupal::service('extension.list.module')->getPath('tide_site') . '/config/install'];
+
+  $configs = [
+    'field.storage.taxonomy_term.field_additional_comment' => 'field_storage_config',
+    'field.field.taxonomy_term.sites.field_additional_comment' => 'field_config',
+  ];
   // Check if field already exported to config/sync.
   foreach ($configs as $config => $type) {
     $config_read = _tide_read_config($config, $config_location, TRUE);
     $storage = \Drupal::entityTypeManager()->getStorage($type);
-    $id = substr($config, strrpos($config, '.') + 1);
-    if ($storage->load($id) == NULL) {
-      $config_entity = $storage->createFromStorageRecord($config_read);
-      $config_entity->save();
-    }
+    $config_entity = $storage->createFromStorageRecord($config_read);
+    $config_entity->save();
   }
-  $data = $config->getRawData();
-  foreach ($config_read as $key => $item) {
-    NestedArray::setValue($data, [
-      $key,
-    ], NestedArray::getValue($config_read, [
-      $key,
-    ]));
-  }
-  $config->setData($data)->save();
 }
