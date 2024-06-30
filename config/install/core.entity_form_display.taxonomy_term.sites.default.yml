@@ -4,6 +4,7 @@ dependencies:
   config:
     - entity_browser.browser.tide_image_browser
     - field.field.taxonomy_term.sites.field_acknowledgement_to_country
+    - field.field.taxonomy_term.sites.field_additional_comment
     - field.field.taxonomy_term.sites.field_print_friendly_logo
     - field.field.taxonomy_term.sites.field_prominence_ack_to_country
     - field.field.taxonomy_term.sites.field_show_table_of_contents
@@ -24,10 +25,12 @@ dependencies:
     - taxonomy.vocabulary.sites
   module:
     - entity_browser
+    - field_group
     - file
     - link
     - maxlength
     - paragraphs
+    - svg_image
     - text
 third_party_settings:
   field_group:
@@ -38,7 +41,7 @@ third_party_settings:
       label: 'Table of contents'
       region: content
       parent_name: ''
-      weight: 17
+      weight: 19
       format_type: details
       format_settings:
         classes: ''
@@ -47,6 +50,8 @@ third_party_settings:
         open: false
         description: ''
         required_fields: true
+_core:
+  default_config_hash: htbZGw3MnsiFIDY_-BymSviwRBf0dz1-9SLWdBDDBjU
 id: taxonomy_term.sites.default
 targetEntityType: taxonomy_term
 bundle: sites
@@ -54,7 +59,15 @@ mode: default
 content:
   field_acknowledgement_to_country:
     type: string_textarea
-    weight: 11
+    weight: 13
+    region: content
+    settings:
+      rows: 5
+      placeholder: ''
+    third_party_settings: {  }
+  field_additional_comment:
+    type: text_textarea
+    weight: 5
     region: content
     settings:
       rows: 5
@@ -69,7 +82,7 @@ content:
     third_party_settings: {  }
   field_prominence_ack_to_country:
     type: string_textarea
-    weight: 12
+    weight: 14
     region: content
     settings:
       rows: 5
@@ -97,7 +110,7 @@ content:
         maxlength_js_truncate_html: false
   field_site_footer_logos:
     type: entity_reference_paragraphs
-    weight: 8
+    weight: 9
     region: content
     settings:
       title: Paragraph
@@ -110,7 +123,7 @@ content:
     third_party_settings: {  }
   field_site_footer_menu:
     type: entity_reference_autocomplete
-    weight: 6
+    weight: 7
     region: content
     settings:
       match_operator: CONTAINS
@@ -120,7 +133,7 @@ content:
     third_party_settings: {  }
   field_site_footer_text:
     type: text_textarea
-    weight: 7
+    weight: 8
     region: content
     settings:
       rows: 5
@@ -128,7 +141,7 @@ content:
     third_party_settings: {  }
   field_site_homepage:
     type: entity_reference_autocomplete
-    weight: 9
+    weight: 10
     region: content
     settings:
       match_operator: CONTAINS
@@ -146,7 +159,7 @@ content:
     third_party_settings: {  }
   field_site_main_menu:
     type: entity_reference_autocomplete
-    weight: 5
+    weight: 6
     region: content
     settings:
       match_operator: CONTAINS
@@ -156,7 +169,7 @@ content:
     third_party_settings: {  }
   field_site_og_image:
     type: entity_browser_entity_reference
-    weight: 13
+    weight: 15
     region: content
     settings:
       entity_browser: tide_image_browser
@@ -171,7 +184,7 @@ content:
     third_party_settings: {  }
   field_site_show_exit_site:
     type: boolean_checkbox
-    weight: 10
+    weight: 11
     region: content
     settings:
       display_label: true
@@ -186,7 +199,7 @@ content:
     third_party_settings: {  }
   field_site_social_links:
     type: link_default
-    weight: 15
+    weight: 17
     region: content
     settings:
       placeholder_url: 'https://example.com/Social'
@@ -197,7 +210,7 @@ content:
         maxlength_js_label: 'Link text limited to @limit characters, remaining: <strong>@remaining</strong>'
   field_site_twitter_image:
     type: entity_browser_entity_reference
-    weight: 14
+    weight: 16
     region: content
     settings:
       entity_browser: tide_image_browser
@@ -226,9 +239,14 @@ content:
       size: 60
       placeholder: ''
     third_party_settings: {  }
+  simple_sitemap:
+    weight: 12
+    region: content
+    settings: {  }
+    third_party_settings: {  }
   status:
     type: boolean_checkbox
-    weight: 16
+    weight: 18
     region: content
     settings:
       display_label: true

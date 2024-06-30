@@ -3,6 +3,7 @@ status: true
 dependencies:
   config:
     - field.field.taxonomy_term.sites.field_acknowledgement_to_country
+    - field.field.taxonomy_term.sites.field_additional_comment
     - field.field.taxonomy_term.sites.field_print_friendly_logo
     - field.field.taxonomy_term.sites.field_prominence_ack_to_country
     - field.field.taxonomy_term.sites.field_show_table_of_contents
@@ -24,7 +25,10 @@ dependencies:
     - entity_reference_revisions
     - file
     - link
+    - svg_image
     - text
+_core:
+  default_config_hash: Q1hLOv3ENdkAsxy8Plw0AY0JotT2Oi94tySGzfn_aaA
 id: taxonomy_term.sites.default
 targetEntityType: taxonomy_term
 bundle: sites
@@ -178,4 +182,5 @@ content:
     region: content
 hidden:
   description: true
+  field_additional_comment: true
   search_api_excerpt: true
