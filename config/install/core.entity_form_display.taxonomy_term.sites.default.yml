@@ -25,12 +25,10 @@ dependencies:
     - taxonomy.vocabulary.sites
   module:
     - entity_browser
-    - field_group
     - file
     - link
     - maxlength
     - paragraphs
-    - svg_image
     - text
 third_party_settings:
   field_group:
@@ -50,8 +48,6 @@ third_party_settings:
         open: false
         description: ''
         required_fields: true
-_core:
-  default_config_hash: htbZGw3MnsiFIDY_-BymSviwRBf0dz1-9SLWdBDDBjU
 id: taxonomy_term.sites.default
 targetEntityType: taxonomy_term
 bundle: sites
@@ -238,11 +234,6 @@ content:
     settings:
       size: 60
       placeholder: ''
-    third_party_settings: {  }
-  simple_sitemap:
-    weight: 12
-    region: content
-    settings: {  }
     third_party_settings: {  }
   status:
     type: boolean_checkbox
