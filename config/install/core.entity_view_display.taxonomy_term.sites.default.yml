@@ -3,6 +3,7 @@ status: true
 dependencies:
   config:
     - field.field.taxonomy_term.sites.field_acknowledgement_to_country
+    - field.field.taxonomy_term.sites.field_additional_comment
     - field.field.taxonomy_term.sites.field_print_friendly_logo
     - field.field.taxonomy_term.sites.field_prominence_ack_to_country
     - field.field.taxonomy_term.sites.field_show_table_of_contents
@@ -178,4 +179,5 @@ content:
     region: content
 hidden:
   description: true
+  field_additional_comment: true
   search_api_excerpt: true

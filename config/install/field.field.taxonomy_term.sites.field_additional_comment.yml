@@ -1,0 +1,28 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.taxonomy_term.field_additional_comment
+    - taxonomy.vocabulary.sites
+  module:
+    - allowed_formats
+    - text
+third_party_settings:
+  allowed_formats:
+    allowed_formats: {  }
+id: taxonomy_term.sites.field_additional_comment
+field_name: field_additional_comment
+entity_type: taxonomy_term
+bundle: sites
+label: 'Content rating form help text'
+description: ''
+required: false
+translatable: false
+default_value:
+  -
+    value: '<p><span>If you need a response, please use our </span><a class="rpl-text-link rpl-u-focusable-inline" href="https://www.vic.gov.au/contact-us">contact us form</a><span>.</span></p>'
+    format: rich_text
+default_value_callback: ''
+settings:
+  allowed_formats: {  }
+field_type: text_long
