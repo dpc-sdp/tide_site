@@ -11,6 +11,7 @@ Feature: Sites taxonomy vocabulary
     And I see field "Slogan"
     And I see field "Logo"
     And I see field "Footer text"
+    And I see field "Additional comment"
     And I see field "Domains"
     And I see field "Main menu"
     And I see field "Footer menu"
