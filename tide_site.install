@@ -5,6 +5,8 @@
  * Install file for tide_site.
  */
 
+use Drupal\Component\Utility\NestedArray;
+
 /**
  * Implements hook_install().
  */
@@ -15,5 +17,47 @@ function tide_site_install() {
     foreach (array_keys($bundles) as $bundle) {
       tide_site_entity_bundle_create($type, $bundle);
     }
+  }
+}
+
+/**
+ * New field taxonomy image logo.
+ */
+function tide_site_update_10001() {
+  \Drupal::moduleHandler()->loadInclude('tide_core', 'inc', 'includes/helpers');
+  $config_location = [\Drupal::service('extension.list.module')->getPath('tide_site') . '/config/install'];
+
+  $configs = [
+    'field.storage.taxonomy_term.field_additional_comment' => 'field_storage_config',
+    'field.field.taxonomy_term.sites.field_additional_comment' => 'field_config',
+  ];
+  // Check if field already exported to config/sync.
+  foreach ($configs as $config => $type) {
+    $config_read = _tide_read_config($config, $config_location, TRUE);
+    $storage = \Drupal::entityTypeManager()->getStorage($type);
+    $config_entity = $storage->createFromStorageRecord($config_read);
+    $config_entity->save();
+  }
+
+  $form_configs = [
+    'core.entity_form_display.taxonomy_term.sites.default',
+    'core.entity_view_display.taxonomy_term.sites.default',
+  ];
+  foreach ($form_configs as $form_config) {
+    $rewrite = _tide_read_config($form_config, $config_location, FALSE);
+    $display_config_entity = \Drupal::configFactory()->getEditable($form_config);
+    $original_config = $display_config_entity->getRawData();
+    $rewritten_config = NestedArray::mergeDeep($original_config, $rewrite);
+    if ($rewritten_config['dependencies']) {
+      $dependencies = $rewritten_config['dependencies'];
+      foreach ($dependencies as $type => $items) {
+        $uniqueItems = array_unique($items);
+        sort($uniqueItems);
+        $dependencies[$type] = $uniqueItems;
+      }
+      $rewritten_config['dependencies'] = $dependencies;
+    }
+    $display_config_entity->setData($rewritten_config);
+    $display_config_entity->save();
   }
 }
