@@ -29,8 +29,8 @@
     }
   },
   "require": {
-    "dpc-sdp/tide_core": "dev-reference",
-    "dpc-sdp/tide_media": "dev-reference",
+    "dpc-sdp/tide_core": "dev-d10.3-test as dev-reference",
+    "dpc-sdp/tide_media": "dev-d10.3-test as dev-reference",
     "drupal/create_menus_permission": "dev-drupal_10_compatibility",
     "drupal/key_value_field": "^1.3"
   },
