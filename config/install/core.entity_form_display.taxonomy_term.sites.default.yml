@@ -6,6 +6,8 @@ dependencies:
     - field.field.taxonomy_term.sites.field_acknowledgement_to_country
     - field.field.taxonomy_term.sites.field_additional_comment
     - field.field.taxonomy_term.sites.field_bottom_corner_graphic
+    - field.field.taxonomy_term.sites.field_short_name
+    - field.field.taxonomy_term.sites.field_site_app_icon
     - field.field.taxonomy_term.sites.field_print_friendly_logo
     - field.field.taxonomy_term.sites.field_prominence_ack_to_country
     - field.field.taxonomy_term.sites.field_show_table_of_contents
@@ -117,6 +119,22 @@ third_party_settings:
         open: false
         required_fields: true
         effect: none
+    group_site_app_icon:
+      children:
+        - field_site_app_icon
+      label: 'Site app icon'
+      region: content
+      parent_name: ''
+      weight: 23
+      format_type: details
+      format_settings:
+        classes: ''
+        show_empty_fields: false
+        id: ''
+        label_as_html: false
+        open: false
+        description: ''
+        required_fields: true
 id: taxonomy_term.sites.default
 targetEntityType: taxonomy_term
 bundle: sites
@@ -167,6 +185,22 @@ content:
     region: content
     settings:
       display_label: true
+    third_party_settings: {  }
+  field_short_name:
+    type: string_textfield
+    weight: 24
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  field_site_app_icon:
+    type: image_image
+    weight: 25
+    region: content
+    settings:
+      progress_indicator: throbber
+      preview_image_style: thumbnail
     third_party_settings: {  }
   field_site_domains:
     type: string_textarea
