@@ -217,11 +217,13 @@ function tide_site_theming_update_8001() {
 }
 
 /**
- * Add site app icon field.
+ * Add site app icon  and short name fields.
  */
 function tide_site_theming_update_10001() {
   $configs = [
+    'field.storage.taxonomy_term.field_short_name' => 'field_storage_config',
     'field.storage.taxonomy_term.field_site_app_icon' => 'field_storage_config',
+    'field.field.taxonomy_term.sites.field_short_name' => 'field_config',
     'field.field.taxonomy_term.sites.field_site_app_icon' => 'field_config',
   ];
   module_load_include('inc', 'tide_core', 'includes/helpers');
@@ -242,6 +244,7 @@ function tide_site_theming_update_10001() {
   $config = $config_factory->getEditable('jsonapi_extras.jsonapi_resource_config.taxonomy_term--sites');
   $resourcefields_fields = [
     'field_site_app_icon',
+    'field_short_name',
   ];
   $content = $config->get('resourceFields');
   foreach ($resourcefields_fields as $field) {
