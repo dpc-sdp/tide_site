@@ -239,26 +239,4 @@ function tide_site_theming_update_10001() {
     }
   }
 
-  // Add to JSON.
-  $config_factory = \Drupal::configFactory();
-  $config = $config_factory->getEditable('jsonapi_extras.jsonapi_resource_config.taxonomy_term--sites');
-  $resourcefields_fields = [
-    'field_site_app_icon',
-    'field_short_name',
-  ];
-  $content = $config->get('resourceFields');
-  foreach ($resourcefields_fields as $field) {
-    if (!isset($content[$field])) {
-      $content[$field] = [
-        'fieldName' => $field,
-        'publicName' => $field,
-        'enhancer' => [
-          'id' => '',
-        ],
-        'disabled' => FALSE,
-      ];
-      $config->set('resourceFields', $content);
-    }
-  }
-  $config->save();
 }

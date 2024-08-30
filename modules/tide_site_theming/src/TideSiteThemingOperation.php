@@ -130,6 +130,38 @@ class TideSiteThemingOperation {
       ];
       $entity_form_display->setThirdPartySetting('field_group', 'group_site_favicon_value', $field_group['group_site_favicon_value']);
 
+      // Adds app icon.
+      $entity_form_display->setComponent('field_site_app_icon', [
+        'type' => 'image_image',
+        'weight' => 20,
+        'region' => 'content',
+        'settings' => [
+          'progress_indicator' => 'throbber',
+          'preview_image_style' => 'thumbnail',
+        ],
+        'third_party_settings' => [],
+      ]);
+      $field_group = $entity_form_display->getThirdPartySettings('field_group');
+      $field_group['group_site_app_icon'] = [
+        'children' => [
+          'field_site_app_icon',
+        ],
+        'parent_name' => '',
+        'label' => 'Site app icon',
+        'weight' => 19,
+        'format_type' => 'details',
+        'region' => 'content',
+        'format_settings' => [
+          'classes' => '',
+          'show_empty_fields' => FALSE,
+          'id' => 'tide-site-app-icon',
+          'open' => FALSE,
+          'required_fields' => TRUE,
+          'effect' => 'none',
+        ],
+      ];
+      $entity_form_display->setThirdPartySetting('field_group', 'group_site_app_icon', $field_group['group_site_app_icon']);
+
       // Adds header corner graphics.
       $entity_form_display->setComponent('field_top_corner_graphic', [
         'type' => 'image_image',
@@ -219,7 +251,7 @@ class TideSiteThemingOperation {
         ],
         'third_party_settings' => [],
       ])->save();
-      $entity_view_display->setComponent('field_top_corner_graphic', [
+      $entity_view_display->setComponent('field_site_app_icon', [
         'type' => 'image',
         'weight' => 19,
         'label' => 'above',
@@ -238,9 +270,28 @@ class TideSiteThemingOperation {
         ],
         'third_party_settings' => [],
       ])->save();
-      $entity_view_display->setComponent('field_bottom_corner_graphic', [
+      $entity_view_display->setComponent('field_top_corner_graphic', [
         'type' => 'image',
         'weight' => 20,
+        'label' => 'above',
+        'region' => 'content',
+        'settings' => [
+          'image_link' => '',
+          'image_style' => '',
+          'svg_attributes' => [
+            'width' => NULL,
+            'height' => NULL,
+          ],
+          'svg_render_as_image' => TRUE,
+          'image_loading' => [
+            'attribute' => 'lazy',
+          ],
+        ],
+        'third_party_settings' => [],
+      ])->save();
+      $entity_view_display->setComponent('field_bottom_corner_graphic', [
+        'type' => 'image',
+        'weight' => 21,
         'label' => 'above',
         'region' => 'content',
         'settings' => [
@@ -272,6 +323,7 @@ class TideSiteThemingOperation {
       'field_site_theme_values',
       'field_site_feature_flags',
       'field_site_favicon',
+      'field_site_app_icon',
       'field_top_corner_graphic',
       'field_bottom_corner_graphic',
     ];
