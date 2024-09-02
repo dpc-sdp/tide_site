@@ -116,3 +116,15 @@ resourceFields:
     enhancer:
       id: ''
     disabled: false
+  field_site_app_icon:
+    disabled: false
+    fieldName: field_site_app_icon
+    publicName: field_site_app_icon
+    enhancer:
+      id: ''
+  field_short_name:
+    disabled: false
+    fieldName: field_short_name
+    publicName: field_short_name
+    enhancer:
+      id: ''
