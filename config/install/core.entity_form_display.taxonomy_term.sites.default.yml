@@ -135,8 +135,6 @@ third_party_settings:
         open: false
         description: ''
         required_fields: true
-_core:
-  default_config_hash: cErY_leYXdsFtWSkvqSk8oNmFrFTVbjkzNV4mlpY5Qk
 id: taxonomy_term.sites.default
 targetEntityType: taxonomy_term
 bundle: sites

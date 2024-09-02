@@ -243,6 +243,7 @@ function tide_site_theming_update_10001() {
   $form_configs = [
     'core.entity_form_display.taxonomy_term.sites.default',
     'core.entity_view_display.taxonomy_term.sites.default',
+    'field.field.taxonomy_term.sites.field_site_favicon',
   ];
   foreach ($form_configs as $form_config) {
     $rewrite = _tide_read_config($form_config, $config_location, FALSE);
