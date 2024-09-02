@@ -5,8 +5,8 @@
  * Install file.
  */
 
- use Drupal\Component\Utility\NestedArray;
- use Drupal\tide_site_theming\TideSiteThemingOperation;
+use Drupal\Component\Utility\NestedArray;
+use Drupal\tide_site_theming\TideSiteThemingOperation;
 
 /**
  * Implements hook_install().
