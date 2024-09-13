@@ -8,7 +8,9 @@ dependencies:
     - field.field.taxonomy_term.sites.field_bottom_corner_graphic
     - field.field.taxonomy_term.sites.field_print_friendly_logo
     - field.field.taxonomy_term.sites.field_prominence_ack_to_country
+    - field.field.taxonomy_term.sites.field_short_name
     - field.field.taxonomy_term.sites.field_show_table_of_contents
+    - field.field.taxonomy_term.sites.field_site_app_icon
     - field.field.taxonomy_term.sites.field_site_domains
     - field.field.taxonomy_term.sites.field_site_favicon
     - field.field.taxonomy_term.sites.field_site_feature_flags
@@ -47,7 +49,7 @@ third_party_settings:
       label: 'Table of contents'
       region: content
       parent_name: ''
-      weight: 18
+      weight: 19
       format_type: details
       format_settings:
         classes: ''
@@ -62,7 +64,7 @@ third_party_settings:
       label: 'Site theme values'
       region: content
       parent_name: ''
-      weight: 19
+      weight: 20
       format_type: details
       format_settings:
         classes: ''
@@ -77,7 +79,7 @@ third_party_settings:
       label: 'Site feature flag values'
       region: content
       parent_name: ''
-      weight: 20
+      weight: 21
       format_type: details
       format_settings:
         classes: ''
@@ -92,7 +94,7 @@ third_party_settings:
       label: 'Site favicon value'
       region: content
       parent_name: ''
-      weight: 21
+      weight: 22
       format_type: details
       format_settings:
         classes: ''
@@ -108,7 +110,7 @@ third_party_settings:
       label: 'Site header corner graphics'
       region: content
       parent_name: ''
-      weight: 22
+      weight: 24
       format_type: details
       format_settings:
         classes: ''
@@ -117,6 +119,22 @@ third_party_settings:
         open: false
         required_fields: true
         effect: none
+    group_site_app_icon:
+      children:
+        - field_site_app_icon
+      label: 'Site app icon'
+      region: content
+      parent_name: ''
+      weight: 23
+      format_type: details
+      format_settings:
+        classes: ''
+        show_empty_fields: false
+        id: tide-site-app-icon
+        label_as_html: false
+        open: false
+        description: ''
+        required_fields: true
 id: taxonomy_term.sites.default
 targetEntityType: taxonomy_term
 bundle: sites
@@ -124,7 +142,7 @@ mode: default
 content:
   field_acknowledgement_to_country:
     type: string_textarea
-    weight: 12
+    weight: 13
     region: content
     settings:
       rows: 5
@@ -155,10 +173,18 @@ content:
     third_party_settings: {  }
   field_prominence_ack_to_country:
     type: string_textarea
-    weight: 13
+    weight: 14
     region: content
     settings:
       rows: 5
+      placeholder: ''
+    third_party_settings: {  }
+  field_short_name:
+    type: string_textfield
+    weight: 26
+    region: content
+    settings:
+      size: 60
       placeholder: ''
     third_party_settings: {  }
   field_show_table_of_contents:
@@ -167,6 +193,14 @@ content:
     region: content
     settings:
       display_label: true
+    third_party_settings: {  }
+  field_site_app_icon:
+    type: image_image
+    weight: 25
+    region: content
+    settings:
+      progress_indicator: throbber
+      preview_image_style: thumbnail
     third_party_settings: {  }
   field_site_domains:
     type: string_textarea
@@ -266,7 +300,7 @@ content:
     third_party_settings: {  }
   field_site_og_image:
     type: entity_browser_entity_reference
-    weight: 14
+    weight: 15
     region: content
     settings:
       entity_browser: tide_image_browser
@@ -281,7 +315,7 @@ content:
     third_party_settings: {  }
   field_site_show_exit_site:
     type: boolean_checkbox
-    weight: 11
+    weight: 12
     region: content
     settings:
       display_label: true
@@ -296,7 +330,7 @@ content:
     third_party_settings: {  }
   field_site_social_links:
     type: link_default
-    weight: 16
+    weight: 17
     region: content
     settings:
       placeholder_url: 'https://example.com/Social'
@@ -323,7 +357,7 @@ content:
     third_party_settings: {  }
   field_site_twitter_image:
     type: entity_browser_entity_reference
-    weight: 15
+    weight: 16
     region: content
     settings:
       entity_browser: tide_image_browser
@@ -362,7 +396,7 @@ content:
     third_party_settings: {  }
   status:
     type: boolean_checkbox
-    weight: 17
+    weight: 18
     region: content
     settings:
       display_label: true

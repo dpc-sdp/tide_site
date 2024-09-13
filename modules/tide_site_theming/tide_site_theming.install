@@ -5,6 +5,7 @@
  * Install file.
  */
 
+use Drupal\Component\Utility\NestedArray;
 use Drupal\tide_site_theming\TideSiteThemingOperation;
 
 /**
@@ -214,4 +215,80 @@ function tide_site_theming_update_8001() {
     }
   }
   $config->save();
+}
+
+/**
+ * Add site app icon  and short name fields.
+ */
+function tide_site_theming_update_10001() {
+  $configs = [
+    'field.storage.taxonomy_term.field_short_name' => 'field_storage_config',
+    'field.storage.taxonomy_term.field_site_app_icon' => 'field_storage_config',
+    'field.field.taxonomy_term.sites.field_short_name' => 'field_config',
+    'field.field.taxonomy_term.sites.field_site_app_icon' => 'field_config',
+  ];
+  \Drupal::moduleHandler()->loadInclude('tide_core', 'inc', 'includes/helpers');
+  $config_location = [\Drupal::service('extension.list.module')->getPath('tide_site') . '/config/install'];
+  // Check if field already exported to config/sync.
+  foreach ($configs as $config => $type) {
+    $config_read = _tide_read_config($config, $config_location, TRUE);
+    $storage = \Drupal::entityTypeManager()->getStorage($type);
+    $id = $storage->getIDFromConfigName($config, $storage->getEntityType()->getConfigPrefix());
+    if ($storage->load($id) == NULL) {
+      $config_entity = $storage->createFromStorageRecord($config_read);
+      $config_entity->save();
+    }
+  }
+
+  $form_configs = [
+    'core.entity_form_display.taxonomy_term.sites.default',
+    'core.entity_view_display.taxonomy_term.sites.default',
+    'field.field.taxonomy_term.sites.field_site_favicon',
+  ];
+  foreach ($form_configs as $form_config) {
+    $rewrite = _tide_read_config($form_config, $config_location, FALSE);
+    $display_config_entity = \Drupal::configFactory()->getEditable($form_config);
+    $original_config = $display_config_entity->getRawData();
+    $rewritten_config = NestedArray::mergeDeep($original_config, $rewrite);
+    if ($rewritten_config['dependencies']) {
+      $dependencies = $rewritten_config['dependencies'];
+      foreach ($dependencies as $type => $items) {
+        $uniqueItems = array_unique($items);
+        sort($uniqueItems);
+        $dependencies[$type] = $uniqueItems;
+      }
+      $rewritten_config['dependencies'] = $dependencies;
+    }
+    $display_config_entity->setData($rewritten_config);
+    $display_config_entity->save();
+  }
+}
+
+/**
+ * Add new fields to json:api.
+ */
+function tide_site_theming_update_10002() {
+  \Drupal::moduleHandler()->loadInclude('tide_core', 'inc', 'includes/helpers');
+  $config_location = [\Drupal::service('extension.list.module')->getPath('tide_site') . '/config/optional'];
+
+  $form_configs = [
+    'jsonapi_extras.jsonapi_resource_config.taxonomy_term--sites',
+  ];
+  foreach ($form_configs as $form_config) {
+    $rewrite = _tide_read_config($form_config, $config_location, FALSE);
+    $display_config_entity = \Drupal::configFactory()->getEditable($form_config);
+    $original_config = $display_config_entity->getRawData();
+    $rewritten_config = NestedArray::mergeDeep($original_config, $rewrite);
+    if ($rewritten_config['dependencies']) {
+      $dependencies = $rewritten_config['dependencies'];
+      foreach ($dependencies as $type => $items) {
+        $uniqueItems = array_unique($items);
+        sort($uniqueItems);
+        $dependencies[$type] = $uniqueItems;
+      }
+      $rewritten_config['dependencies'] = $dependencies;
+    }
+    $display_config_entity->setData($rewritten_config);
+    $display_config_entity->save();
+  }
 }

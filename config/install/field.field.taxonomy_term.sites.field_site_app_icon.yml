@@ -1,16 +1,17 @@
+uuid: e662f8a0-1655-49a0-80b6-b568be653dd1
 langcode: en
 status: true
 dependencies:
   config:
-    - field.storage.taxonomy_term.field_site_favicon
+    - field.storage.taxonomy_term.field_site_app_icon
     - taxonomy.vocabulary.sites
   module:
     - image
-id: taxonomy_term.sites.field_site_favicon
-field_name: field_site_favicon
+id: taxonomy_term.sites.field_site_app_icon
+field_name: field_site_app_icon
 entity_type: taxonomy_term
 bundle: sites
-label: 'Site favicon'
+label: 'Site app icon'
 description: ''
 required: false
 translatable: false
@@ -20,10 +21,10 @@ settings:
   handler: 'default:file'
   handler_settings: {  }
   file_directory: '[date:custom:Y]-[date:custom:m]'
-  file_extensions: 'png gif jpg jpeg'
+  file_extensions: 'png gif jpg jpeg webp'
   max_filesize: ''
-  max_resolution: 128x128
-  min_resolution: 128x128
+  max_resolution: 512x512
+  min_resolution: 512x512
   alt_field: true
   alt_field_required: true
   title_field: false
